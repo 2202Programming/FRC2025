@@ -49,6 +49,9 @@ public class SwerveModuleMK3 {
   private final RelativeEncoder angleEncoder; // aka internalAngle
   private final RelativeEncoder driveEncoder;
   
+  private final SparkMaxConfig driveConfig;
+  private final SparkMaxConfig angleConfig;
+
   // CTRE devices
   private final CANcoder absEncoder; // aka externalAngle (external to Neo/Smartmax)
   private double angleCmdInvert;
@@ -114,8 +117,8 @@ public class SwerveModuleMK3 {
     // cc is the chassis config for all our pathing math
     cc = specs.getChassisConfig();
 
-    SparkMaxConfig driveConfig = new SparkMaxConfig();
-    SparkMaxConfig angleConfig = new SparkMaxConfig();
+    driveConfig = new SparkMaxConfig();
+    angleConfig = new SparkMaxConfig();
 
     driveConfig
         .inverted(invertDrive)
@@ -259,7 +262,7 @@ public class SwerveModuleMK3 {
     // read absEncoder position, set internal angleEncoder to that value adjust for
     // cmd inversion.
     // Average a couple of samples of the absolute encoder
-    double pos_deg = absEncoder.getAbsolutePosition().getValue() * 360.0;
+    double pos_deg = absEncoder.getAbsolutePosition().getValueAsDouble() * 360.0;
     //sleep(10);
     //double absPosition = absEncoder.getAbsolutePosition().getValue() * 360.0;
     //pos_deg = (pos_deg + absPosition) / 2.0;
@@ -290,32 +293,39 @@ public class SwerveModuleMK3 {
   void realityCheckSparkMax(double angle_cancoder, double internal_angle) {
     boolean result = true;
 
-    if (Math.abs(
-        driveEncoder.getPositionConversionFactor() - Math.PI * cc.wheelDiameter / cc.kDriveGR) > 0.1) {
+    double driveReportedConversionFactor = driveMotor.configAccessor.encoder.getPositionConversionFactor();
+    if (Math.abs(driveReportedConversionFactor - Math.PI * cc.wheelDiameter / cc.kDriveGR) > 0.1) {
       System.out.println("*** ERROR *** " + myprefix + " position conversion factor incorrect for drive");
       System.out.println("Expected Position CF: " + Math.PI * cc.wheelDiameter / cc.kDriveGR);
-      System.out.println("Returned Position CF: " + driveEncoder.getPositionConversionFactor());
+      System.out.println("Returned Position CF: " + driveReportedConversionFactor);
       result = false;
     }
-    if (Math.abs(driveEncoder.getVelocityConversionFactor()
+
+    double driveReportedVelocityFactor = driveMotor.configAccessor.encoder.getVelocityConversionFactor();
+    if (Math.abs(driveReportedVelocityFactor
         - Math.PI * cc.wheelDiameter / cc.kDriveGR / 60.0) > 0.1) {
       System.out.println("*** ERROR *** " + myprefix + " velocity conversion factor incorrect for drive");
       System.out.println("Expected Vel CF: " + Math.PI * cc.wheelDiameter / cc.kDriveGR / 60.0);
-      System.out.println("Returned Vel CF: " + driveEncoder.getVelocityConversionFactor());
+      System.out.println("Returned Vel CF: " + driveReportedVelocityFactor);
       result = false;
     }
-    if (Math.abs(angleEncoder.getPositionConversionFactor() - (360.0 / cc.kSteeringGR)) > 0.1) {
+
+    double angleReportedPositionConversionFactor = angleMotor.configAccessor.encoder.getPositionConversionFactor();
+    if (Math.abs(angleReportedPositionConversionFactor - (360.0 / cc.kSteeringGR)) > 0.1) {
       System.out.println("*** ERROR *** " + myprefix + " position conversion factor incorrect for angle");
       System.out.println("Expected Angle Pos CF: " + 360.0 / cc.kSteeringGR);
-      System.out.println("Returned Angle Pos CF: " + angleEncoder.getPositionConversionFactor());
+      System.out.println("Returned Angle Pos CF: " + angleReportedPositionConversionFactor);
       result = false;
     }
-    if (Math.abs(angleEncoder.getVelocityConversionFactor() - (360.0 / cc.kSteeringGR / 60)) > 0.1) {
+
+    double angleReportedVelocityConversionFactor = angleMotor.configAccessor.encoder.getVelocityConversionFactor();
+    if (Math.abs(angleReportedVelocityConversionFactor - (360.0 / cc.kSteeringGR / 60)) > 0.1) {
       System.out.println("*** ERROR *** " + myprefix + " velocity conversion factor incorrect for angle");
       System.out.println("Expected Angle Vel CF: " + (360.0 / cc.kSteeringGR / 60));
-      System.out.println("Returned Angle Vel CF: " + angleEncoder.getVelocityConversionFactor());
+      System.out.println("Returned Angle Vel CF: " + angleReportedVelocityConversionFactor);
       result = false;
     }
+
     if (Math.abs(angle_cancoder - internal_angle) > 0.1) {
       System.out.println("*** ERROR *** " + myprefix + " angle encoder save error");
       System.out.println("Expected internal angle: " + angle_cancoder);
@@ -508,22 +518,29 @@ public class SwerveModuleMK3 {
     }
   }
 
-  SparkPIDController getDrivePID() {
+  SparkClosedLoopController getDrivePID() {
     return driveMotorPID;
   }
 
-  SparkPIDController getAnglePID() {
+  SparkClosedLoopController getAnglePID() {
     return angleMotorPID;
   }
 
   public void setBrakeMode() {
-    driveMotor.setIdleMode(IdleMode.kBrake);
-    angleMotor.setIdleMode(IdleMode.kBrake);
+    driveConfig.idleMode(IdleMode.kBrake);
+    angleConfig.idleMode(IdleMode.kBrake);
+
+    driveMotor.configure(driveConfig, null, null);
+    angleMotor.configure(angleConfig,  null, null);
   }
 
   public void setCoastMode() {
-    driveMotor.setIdleMode(IdleMode.kCoast);
-    angleMotor.setIdleMode(IdleMode.kCoast);
+    driveConfig.idleMode(IdleMode.kCoast);
+    angleConfig.idleMode(IdleMode.kCoast);
+
+    driveMotor.configure(driveConfig,  null, null);
+    angleMotor.configure(angleConfig,  null, null);
+
   }
 
 }
