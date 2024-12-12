@@ -12,10 +12,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -154,14 +151,14 @@ public class SwerveDrivetrain extends SubsystemBase {
     watchdog = new VisionWatchdog(3.0);
     canCoders = new CANcoder[mc.length];
 
-    var MT = CANSparkMax.MotorType.kBrushless;
+    var MT = SparkMax.MotorType.kBrushless;
     modules = new SwerveModuleMK3[mc.length];
     for (int i=0; i < mc.length; i++) {
 
       canCoders[i] = initCANcoder(mc[i].CANCODER_ID, mc[i].kAngleOffset);
       modules[i] = new SwerveModuleMK3(
-        new CANSparkMax(mc[i].DRIVE_MOTOR_ID, MT),
-        new CANSparkMax(mc[i].ANGLE_MOTOR_ID, MT),        
+        new SparkMax(mc[i].DRIVE_MOTOR_ID, MT),
+        new SparkMax(mc[i].ANGLE_MOTOR_ID, MT),        
         canCoders[i],
         mc[i].kAngleMotorInvert,
         mc[i].kAngleCmdInvert, 
