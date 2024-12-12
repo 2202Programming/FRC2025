@@ -2,7 +2,10 @@ package frc.lib2202.util;
 
 import static frc.lib2202.Constants.DT;
 
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -19,7 +22,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
  */
 public class PIDFController extends PIDController {
     // hardware refs if used
-    SparkPIDController sparkMaxController = null;
+    SparkClosedLoopController sparkMaxController = null;
     double m_smartMaxVel = 0.1;
     double m_smartMaxAccel = .01;
 
@@ -98,11 +101,18 @@ public class PIDFController extends PIDController {
      * @param smartMaxVel   optional, 0.1 [units/s]
      * @param smartMaxAccel optional 0.01 [units/s^2]
      */
-    public void copyTo(SparkPIDController dest, int slot) {
+    public void copyTo(SparkClosedLoopController dest, int slot) {
         copyTo(dest, slot, m_smartMaxVel, m_smartMaxAccel);
     }
 
-    public void copyTo(SparkPIDController dest, int slot, double smartMaxVel, double smartMaxAccel) {
+    public void copyTo(SparkClosedLoopController dest, int slot, double smartMaxVel, double smartMaxAccel) {
+    
+            SparkMaxConfig config = new SparkMaxConfig();
+
+            config.closedLoop.pidf(this.getP(), this.getI(), this.getD(), this.getF());
+
+            dest.configure(config, slot);
+
         dest.setP(this.getP(), slot);
         dest.setI(this.getI(), slot);
         dest.setD(this.getD(), slot);
@@ -116,7 +126,7 @@ public class PIDFController extends PIDController {
     }
 
     // compares an updated PIDF with this one and updates it and the hardware
-    public void copyChangesTo(SparkPIDController dest, int slot, PIDFController updated) {
+    public void copyChangesTo(SparkClosedLoopController dest, int slot, PIDFController updated) {
         // update pid values that have changed
         if (getP() != updated.getP()) {
             setP(updated.getP());

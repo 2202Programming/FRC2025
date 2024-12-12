@@ -119,93 +119,82 @@ public class SwerveModuleMK3 {
 
     driveConfig
         .inverted(invertDrive)
+        .smartCurrentLimit(limits.driveStallAmp, limits.freeAmp)
         .idleMode(IdleMode.kBrake);
     driveConfig.encoder     // set driveEncoder to use units of the wheelDiameter, meters
         .positionConversionFactor(Math.PI * cc.wheelDiameter / cc.kDriveGR) // mo-rot to wheel units
         .velocityConversionFactor((Math.PI * cc.wheelDiameter / cc.kDriveGR) / 60.0); // mo-rpm wheel units
     driveConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(1.0, 0.0, 0.0);
+        .pidf(cc.drivePIDF.getP(), cc.drivePIDF.getI(), cc.drivePIDF.getD(), cc.drivePIDF.getF());
 
     angleConfig
         .inverted(invertAngleMtr)
+        .smartCurrentLimit(limits.angleStallAmp, limits.freeAmp)
         .idleMode(IdleMode.kBrake);
     angleConfig.encoder // set angle endcoder to return values in deg and deg/s
         .positionConversionFactor(360.0 / cc.kSteeringGR) // mo-rotations to degrees
         .velocityConversionFactor(360.0 / cc.kSteeringGR / 60.0); // rpm to deg/s
     angleConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .pid(1.0, 0.0, 0.0);
+        .pidf(cc.anglePIDF.getP(), cc.anglePIDF.getI(), cc.anglePIDF.getD(), cc.anglePIDF.getF());
 
-    driveMtr.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    angleMtr.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    REVLibError driveError = driveMtr.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    REVLibError angleError = angleMtr.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    if(driveError != REVLibError.kOk)
+      System.out.println("*** ERROR *** " + prefix + " Drive Motor Flash Failed. Error val=" + driveError);
+    if(angleError != REVLibError.kOk)
+      System.out.println("*** ERROR *** " + prefix + " Angle Motor Flash Failed. Error val=" + angleError);     
 
-    // Always restore factory defaults at least once for new sparks - it removes gremlins - no longer an option JR
-    // driveMotor.restoreFactoryDefaults(specs.burnFlash());
-    // sleep(specs.burnFlash() ? 1000 : 0); // only need if flash is true
-    // angleMotor.restoreFactoryDefaults(specs.burnFlash());
-    // sleep(specs.burnFlash() ? 1000 : 0); // only need if flash is true
-
-    // account for command sign differences if needed
+   // account for command sign differences if needed
     angleCmdInvert = (invertAngleCmd) ? -1.0 : 1.0;
     //dpl removed, set in parent setMagOffset(offsetDegrees);
 
     // Drive Motor config
 
-    driveMotorPID = driveMotor.getPIDController();
+    driveMotorPID = driveMotor.getClosedLoopController();
     driveEncoder = driveMotor.getEncoder();
 
-    sleep(100);
     // Angle Motor config
 
-    angleMotorPID = angleMotor.getPIDController();
+    angleMotorPID = angleMotor.getClosedLoopController();
     angleEncoder = angleMotor.getEncoder();
 
+//Probably not needed? We check once.
+    // // burn the motor flash if BURN_FLASH is true in frc.robot.Constants.CAN
+    // if (specs.burnFlash()) {
+    //   REVLibError angleError = angleMotor.burnFlash();
+    //   sleep(1500); // takes 1 sec to burn per Dean
 
+    //   int counter = 0;
+    //   while (angleError.value != 0) {
+    //     System.out.println(prefix + " angle error: " + angleError.value);
+    //     counter++;
+    //     if (counter > 20) {
+    //       System.out.println("*** ERROR *** " + prefix + " Angle Motor Flash Failed.");
+    //       break;
+    //     }
+    //     sleep(100);
+    //   }
+    //   System.out.println(myprefix + " Angle motor flash success.");
 
-    // SparkMax PID values
-    cc.anglePIDF.copyTo(angleMotorPID, kSlot); // position mode
-    cc.drivePIDF.copyTo(driveMotorPID, kSlot); // velocity mode
-
-    // new current limits
-    driveMotor.setSmartCurrentLimit(limits.driveStallAmp, limits.freeAmp);
-    angleMotor.setSmartCurrentLimit(limits.angleStallAmp, limits.freeAmp);
-    sleep(100);
-
-    // burn the motor flash if BURN_FLASH is true in frc.robot.Constants.CAN
-    if (specs.burnFlash()) {
-      REVLibError angleError = angleMotor.burnFlash();
-      sleep(1500); // takes 1 sec to burn per Dean
-
-      int counter = 0;
-      while (angleError.value != 0) {
-        System.out.println(prefix + " angle error: " + angleError.value);
-        counter++;
-        if (counter > 20) {
-          System.out.println("*** ERROR *** " + prefix + " Angle Motor Flash Failed.");
-          break;
-        }
-        sleep(100);
-      }
-      System.out.println(myprefix + " Angle motor flash success.");
-
-      REVLibError driveError = driveMotor.burnFlash();
-      sleep(1500); // takes 1 sec to burn per Dean
-      counter = 0;
-      while (driveError.value != 0) {
-        System.out.println(prefix + " drive error: " + driveError.value);
-        counter++;
-        if (counter > 20) {
-          System.out.println("*** ERROR *** " + prefix + " Drive Motor Flash Failed.");
-          break;
-        }
-        sleep(100);
-      }
-      System.out.println(myprefix + " Drive motor flash success.");
-    } else {
-      System.out.println("Skipped burning flash.");
-    }
+    //   REVLibError driveError = driveMotor.burnFlash();
+    //   sleep(1500); // takes 1 sec to burn per Dean
+    //   counter = 0;
+    //   while (driveError.value != 0) {
+    //     System.out.println(prefix + " drive error: " + driveError.value);
+    //     counter++;
+    //     if (counter > 20) {
+    //       System.out.println("*** ERROR *** " + prefix + " Drive Motor Flash Failed.");
+    //       break;
+    //     }
+    //     sleep(100);
+    //   }
+    //   System.out.println(myprefix + " Drive motor flash success.");
+    // } else {
+    //   System.out.println("Skipped burning flash.");
+    // }
     /*
      * setNTPrefix - causes the network table entries to be created and updated on
      * the periodic() call.
