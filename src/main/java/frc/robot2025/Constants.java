@@ -4,6 +4,8 @@
 
 package frc.robot2025;
 
+import com.pathplanner.lib.config.RobotConfig;
+
 import frc.lib2202.util.AprilTag2d;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide

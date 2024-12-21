@@ -6,12 +6,14 @@ package frc.lib2202.subsystem.swerve;
 
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
-//wip import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.VecBuilder;
@@ -125,6 +127,7 @@ public class SwerveDrivetrain extends SubsystemBase {
   private Pose2d llPose;
   private Pose2d pvPose;
   public final Field2d m_field;  /* = new Field2d(); */
+  private RobotConfig GUIconfig;
 
   public SwerveDrivetrain() {
     limits = RobotContainer.getRobotSpecs().getRobotLimits();
@@ -203,21 +206,26 @@ public class SwerveDrivetrain extends SubsystemBase {
 
     offsetDebug();
 
+    try{
+      GUIconfig = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
+    
     // Configure the AutoBuilder last
-    AutoBuilder.configureHolonomic(
+    AutoBuilder.configure(
         this::getPose, // Robot pose supplier
         this::autoPoseSet, // Method to reset odometry (will be called if your auto has a starting pose)
         this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
         this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+        new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
             new PIDConstants(7.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(7.0, 0.0, 0.0), // Rotation PID constants
-            limits.kMaxSpeed, // Max module speed, in m/s
-            0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig()), // Default path replanning config. See the API for the options here
+            new PIDConstants(7.0, 0.0, 0.0) // Rotation PID constants
+        ),
+        GUIconfig,
         () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
@@ -245,7 +253,7 @@ public class SwerveDrivetrain extends SubsystemBase {
    */
   private CANcoder initCANcoder(int cc_ID, double cc_offset_deg) {
     CANcoder canCoder = new CANcoder(cc_ID, canBusName);
-    StatusSignal<Double> abspos = canCoder.getAbsolutePosition();
+    StatusSignal abspos = canCoder.getAbsolutePosition();
     System.out.println("CANCoder(" + cc_ID + ") before offset, position = " + 
       abspos.waitForUpdate(longWaitSeconds, true) +
       " (" + abspos.getValueAsDouble()*360.0+" deg)" );
