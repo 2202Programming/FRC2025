@@ -11,6 +11,7 @@ import com.pathplanner.lib.path.PathPoint;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib2202.builder.RobotContainer;
@@ -30,8 +31,15 @@ public class runPathResetStart extends Command {
 
   @Override
   public void initialize() {
+    PathPlannerPath path;
 
-    PathPlannerPath path = PathPlannerPath.fromPathFile("test_1m");
+    try{
+      path = PathPlannerPath.fromPathFile("test_1m");
+    } catch (Exception e) {
+        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+        path = null;
+    }
+
     PathPoint startPoint = path.getPoint(0);
     Pose2d startPose = new Pose2d(
         new Translation2d(startPoint.position.getX(), startPoint.position.getY()),
