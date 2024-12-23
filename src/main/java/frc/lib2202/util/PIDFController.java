@@ -2,7 +2,11 @@ package frc.lib2202.util;
 
 import static frc.lib2202.Constants.DT;
 
+import com.revrobotics.REVLibError;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -101,56 +105,60 @@ public class PIDFController extends PIDController {
      * @param smartMaxVel   optional, 0.1 [units/s]
      * @param smartMaxAccel optional 0.01 [units/s^2]
      */
-    public void copyTo(SparkClosedLoopController dest, int slot) {
-        copyTo(dest, slot, m_smartMaxVel, m_smartMaxAccel);
+    public void copyTo(SparkMax motorController) {
+        copyTo(motorController, m_smartMaxVel, m_smartMaxAccel);
     }
 
-    public void copyTo(SparkClosedLoopController dest, int slot, double smartMaxVel, double smartMaxAccel) {
+    public void copyTo(SparkMax motorController, double smartMaxVel, double smartMaxAccel) {
     
-            SparkMaxConfig config = new SparkMaxConfig();
+        SparkMaxConfig motorConfig = new SparkMaxConfig();
 
-            config.closedLoop.pidf(this.getP(), this.getI(), this.getD(), this.getF());
+        //need to check - if we just update a few parameters in SparkMaxConfig, do the rest stay the same as previously set?
+        //otherwise do we need to pull all the prior parameters out of the motorController's sparkmaxconfig and reapply them?
+        motorConfig.closedLoop.pidf(this.getP(), this.getI(), this.getD(), this.getF());
+        motorConfig.closedLoop.iZone(this.getIZone());
+        motorConfig.closedLoop.maxMotion.maxAcceleration(smartMaxAccel);
+        motorConfig.closedLoop.maxMotion.maxVelocity(smartMaxVel);
 
-            dest.configure(config, slot);
-
-        dest.setP(this.getP(), slot);
-        dest.setI(this.getI(), slot);
-        dest.setD(this.getD(), slot);
-        dest.setFF(this.getF(), slot);
-        dest.setIZone(this.getIZone(), slot);
-        dest.setSmartMotionMaxVelocity(smartMaxVel, slot);
-        dest.setSmartMotionMaxAccel(smartMaxAccel, slot);
-        sparkMaxController = dest;
-        m_smartMaxVel = smartMaxVel;
-        m_smartMaxAccel = smartMaxAccel;
+        REVLibError driveError = motorController.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        
+        if(driveError != REVLibError.kOk)
+        System.out.println("*** ERROR *** SparkMax Flash Failed during copyTo command. Error val=" + driveError);
     }
 
     // compares an updated PIDF with this one and updates it and the hardware
-    public void copyChangesTo(SparkClosedLoopController dest, int slot, PIDFController updated) {
+    public void copyChangesTo(SparkMax dest, PIDFController updated) {
+
+        Boolean changed = false;
+
         // update pid values that have changed
         if (getP() != updated.getP()) {
             setP(updated.getP());
-            dest.setP(getP(), slot);
+            changed = true;
         }
 
         if (getI() != updated.getI()) {
             setI(updated.getI());
-            dest.setI(getI(), slot);
+            changed = true;
         }
 
         if (getD() != updated.getD()) {
             setD(updated.getD());
-            dest.setD(getD(), slot);
+            changed = true;
         }
 
         if (getF() != updated.getF()) {
             setF(updated.getF());
-            dest.setFF(getF(), slot);
+            changed = true;
         }
 
         if (getIZone() != updated.getIZone()) {
             setIZone(updated.getIZone());
-            dest.setIZone(getIZone(), slot);
+            changed = true;
+        }
+
+        if (changed) {
+            copyTo(dest);
         }
     }
 
