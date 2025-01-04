@@ -261,7 +261,8 @@ public class SwerveDrivetrain extends SubsystemBase {
     
     //TODO: Do we need this?  Not in 2025 lib
     //configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    
+    configs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+
     configs.MagnetSensor.MagnetOffset = cc_offset_deg/360.0; // put offset deg on +/- 0.5 range
     configs.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     canCoder.clearStickyFaults(longWaitSeconds);

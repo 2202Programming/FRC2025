@@ -365,6 +365,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
 
     //TODO: do we need this?  Not available in 2025 lib
     //configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    configs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
     
     configs.MagnetSensor.MagnetOffset = 0.0;
     configs.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
