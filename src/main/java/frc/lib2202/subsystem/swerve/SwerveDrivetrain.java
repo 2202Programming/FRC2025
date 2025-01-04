@@ -8,7 +8,6 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -259,7 +258,10 @@ public class SwerveDrivetrain extends SubsystemBase {
       " (" + abspos.getValueAsDouble()*360.0+" deg)" );
 
     CANcoderConfiguration configs = new CANcoderConfiguration();      
-    configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    
+    //TODO: Do we need this?  Not in 2025 lib
+    //configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    
     configs.MagnetSensor.MagnetOffset = cc_offset_deg/360.0; // put offset deg on +/- 0.5 range
     configs.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     canCoder.clearStickyFaults(longWaitSeconds);

@@ -10,7 +10,6 @@ package frc.robot2025.subsystems.sensors;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.hal.can.CANJNI;
@@ -363,7 +362,10 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     // According to doc this should report absolute position from [-0.5, 0.5)
     // rotations
     // (clock wise is positive)
-    configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+
+    //TODO: do we need this?  Not available in 2025 lib
+    //configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    
     configs.MagnetSensor.MagnetOffset = 0.0;
     configs.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
     c.getConfigurator().apply(configs);
