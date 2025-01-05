@@ -35,37 +35,28 @@ public class BindingsOther {
         OperatorBindings(dc);
     }
 
+    // wrap the pathloading with try/catch
+    static PathPlannerPath loadFromFile(String pathName) {
+        try{
+            // Load the path you want to follow using its name in the GUI
+            return PathPlannerPath.fromPathFile(pathName);
+        } catch (Exception e) {
+            DriverStation.reportError("Big oops loading pn="+ pathName + ":" + e.getMessage(), e.getStackTrace());
+            return null;
+        }
+    }
+
+
+
     static void DriverBinding(HID_Xbox_Subsystem dc) {
         var driver = dc.Driver();
 
         var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
 
-        PathPlannerPath pathBlue1;
-    try{
-        // Load the path you want to follow using its name in the GUI
-        pathBlue1 = PathPlannerPath.fromPathFile("blue1");
-        } catch (Exception e) {
-        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-        pathBlue1 = null;
-    }
+        PathPlannerPath pathBlue1 = loadFromFile("blue1");
+        PathPlannerPath pathRed1 = loadFromFile("red1");
+        PathPlannerPath pathTest_1m = loadFromFile("test_1m");
 
-    PathPlannerPath pathRed1;
-    try{
-        // Load the path you want to follow using its name in the GUI
-        pathRed1 = PathPlannerPath.fromPathFile("red1");
-        } catch (Exception e) {
-        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-        pathRed1 = null;
-    }
-
-    PathPlannerPath pathTest_1m;
-    try{
-        // Load the path you want to follow using its name in the GUI
-        pathTest_1m = PathPlannerPath.fromPathFile("test_1m");
-        } catch (Exception e) {
-        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-        pathTest_1m = null;
-    }
         switch (bindings) {
 
             case DriveTest:
@@ -74,15 +65,16 @@ public class BindingsOther {
 
                 // This appears to break if initial pose is too close to path start pose
                 // (zero-length path?)
-                driver.x().onTrue(new SequentialCommandGroup(
+                if (pathBlue1 != null)
+                    driver.x().onTrue(new SequentialCommandGroup(
                         new InstantCommand(drivetrain::printPose),
                         AutoBuilder.pathfindThenFollowPath(pathBlue1,
                                 new PathConstraints(3.0, 3.0,
                                         Units.degreesToRadians(540),
                                         Units.degreesToRadians(720))),
                         new InstantCommand(drivetrain::printPose)));
-
-                driver.b().onTrue(new SequentialCommandGroup(
+                if (pathRed1 != null)
+                    driver.b().onTrue(new SequentialCommandGroup(
                         new InstantCommand(drivetrain::printPose),
                         AutoBuilder.pathfindThenFollowPath(pathRed1,
                                 new PathConstraints(3.0, 3.0,
@@ -94,7 +86,8 @@ public class BindingsOther {
                 new PDPMonitorCmd(); // auto scheduled, runs when disabled
                 // This appears to break if initial pose is too close to path start pose
                 // (zero-length path?)
-                driver.a().onTrue(new SequentialCommandGroup(
+                if (pathTest_1m != null)
+                    driver.a().onTrue(new SequentialCommandGroup(
                         new InstantCommand(drivetrain::printPose),
                         AutoBuilder.pathfindThenFollowPath(pathTest_1m,
                                 new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
@@ -109,15 +102,14 @@ public class BindingsOther {
                         new InstantCommand(drivetrain::printPose)));
                 break;
 
-
-
             default:
                 break;
         }
     }
 
     static void OperatorBindings(HID_Xbox_Subsystem dc) {
-        var operator = dc.Operator();
+        @SuppressWarnings("unused")
+        var operator = dc.Operator();    
 
 
         switch (bindings) {

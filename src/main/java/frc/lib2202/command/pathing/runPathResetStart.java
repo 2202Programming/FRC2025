@@ -31,26 +31,26 @@ public class runPathResetStart extends Command {
 
   @Override
   public void initialize() {
+
     PathPlannerPath path;
-
-    try{
+    try {
       path = PathPlannerPath.fromPathFile("test_1m");
+      PathPoint startPoint = path.getPoint(0);
+      Pose2d startPose = new Pose2d(
+          new Translation2d(startPoint.position.getX(), startPoint.position.getY()),
+          new Rotation2d(0.0)
+      );
+  
+      pathCommand = AutoBuilder.followPath(path);
+  
+      drivetrain.autoPoseSet(startPose);
+      new InstantCommand(drivetrain::printPose).schedule();
+      pathCommand.schedule();
+    
     } catch (Exception e) {
-        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-        path = null;
+      DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+      DriverStation.reportError("Big oops: No path cmd scheduled during initialize()", null);
     }
-
-    PathPoint startPoint = path.getPoint(0);
-    Pose2d startPose = new Pose2d(
-        new Translation2d(startPoint.position.getX(), startPoint.position.getY()),
-        new Rotation2d(0.0)
-    );
-
-    pathCommand = AutoBuilder.followPath(path);
-
-    drivetrain.autoPoseSet(startPose);
-    new InstantCommand(drivetrain::printPose).schedule();
-    pathCommand.schedule();
    }
 
   @Override
