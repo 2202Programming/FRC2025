@@ -50,7 +50,7 @@ public class runPathResetStart extends Command {
     } catch (Exception e) {
       DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
       DriverStation.reportError("Big oops: No path cmd scheduled during initialize()", null);
-    }    
+    }
    }
 
   @Override

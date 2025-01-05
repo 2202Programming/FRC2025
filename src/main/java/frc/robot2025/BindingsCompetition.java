@@ -1,7 +1,7 @@
 package frc.robot2025;
 
 
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
@@ -33,7 +33,9 @@ public final class BindingsCompetition {
 
 
     static void OperatorBindings(HID_Xbox_Subsystem dc) {
+        @SuppressWarnings("unused")
         var sideboard = dc.SwitchBoard();
+        @SuppressWarnings("unused")
         var operator = dc.Operator();
 
         // Switchboard buttons too

@@ -3,12 +3,11 @@ package frc.lib2202.util;
 import static frc.lib2202.Constants.DT;
 
 import com.revrobotics.REVLibError;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -98,68 +97,85 @@ public class PIDFController extends PIDController {
      * 
      * copyTo() copies this pid's values down to a hardward PID implementation
      * 
-     * @param dest          device
+     * @param motorController  device to change
+     * @param motorConfig      device's config object
      * @param slot          control slot on device
      * 
      *                      optional smartMax vel and accel limits may be given
      * @param smartMaxVel   optional, 0.1 [units/s]
      * @param smartMaxAccel optional 0.01 [units/s^2]
      */
-    public void copyTo(SparkMax motorController) {
-        copyTo(motorController, m_smartMaxVel, m_smartMaxAccel);
+    public void copyTo(SparkMax motorController, SparkMaxConfig motorConfig, ClosedLoopSlot slot) {
+        copyTo(motorController, motorConfig, slot, m_smartMaxVel, m_smartMaxAccel);
     }
 
-    public void copyTo(SparkMax motorController, double smartMaxVel, double smartMaxAccel) {
-    
-        SparkMaxConfig motorConfig = new SparkMaxConfig();
+    public void copyTo(SparkMax motorController, SparkMaxConfig motorConfig) {
+        copyTo(motorController, motorConfig, ClosedLoopSlot.kSlot0, m_smartMaxVel, m_smartMaxAccel);
+    }
 
+    public void copyTo(SparkMax motorController, SparkMaxConfig motorConfig, ClosedLoopSlot slot, 
+                       double smartMaxVel, double smartMaxAccel) {
+        m_smartMaxVel = smartMaxVel;
+        m_smartMaxAccel = smartMaxAccel;
+       
         //need to check - if we just update a few parameters in SparkMaxConfig, do the rest stay the same as previously set?
         //otherwise do we need to pull all the prior parameters out of the motorController's sparkmaxconfig and reapply them?
-        motorConfig.closedLoop.pidf(this.getP(), this.getI(), this.getD(), this.getF());
-        motorConfig.closedLoop.iZone(this.getIZone());
-        motorConfig.closedLoop.maxMotion.maxAcceleration(smartMaxAccel);
-        motorConfig.closedLoop.maxMotion.maxVelocity(smartMaxVel);
+        motorConfig.closedLoop.pidf(this.getP(), this.getI(), this.getD(), this.getF(), slot);
+        motorConfig.closedLoop.iZone(this.getIZone(), slot);
+        motorConfig.closedLoop.maxMotion.maxAcceleration(smartMaxAccel, slot);
+        motorConfig.closedLoop.maxMotion.maxVelocity(smartMaxVel, slot);
 
-        REVLibError driveError = motorController.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        REVLibError driveError = motorController.configure(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
         
         if(driveError != REVLibError.kOk)
         System.out.println("*** ERROR *** SparkMax Flash Failed during copyTo command. Error val=" + driveError);
     }
 
-    // compares an updated PIDF with this one and updates it and the hardware
-    public void copyChangesTo(SparkMax dest, PIDFController updated) {
+    public void copyChangesTo(SparkMax controller, SparkMaxConfig motorConfig, PIDFController updated) {
+        copyChangesTo(controller, motorConfig, ClosedLoopSlot.kSlot0, updated);
+    }
 
-        Boolean changed = false;
+    // compares an updated PIDF with this one and updates it and the hardware
+    public void copyChangesTo(SparkMax motorController, SparkMaxConfig motorConfig, ClosedLoopSlot slot, PIDFController updated) {
+        boolean changed = false;
+        var pidCfg =  motorConfig.closedLoop;
 
         // update pid values that have changed
         if (getP() != updated.getP()) {
             setP(updated.getP());
+            pidCfg.p(getP(), slot);
             changed = true;
         }
 
         if (getI() != updated.getI()) {
             setI(updated.getI());
+            pidCfg.i(getI(), slot);
             changed = true;
         }
 
         if (getD() != updated.getD()) {
             setD(updated.getD());
+            pidCfg.d(getD(), slot);
             changed = true;
         }
 
         if (getF() != updated.getF()) {
             setF(updated.getF());
+            pidCfg.velocityFF(getF(), slot);
             changed = true;
         }
 
         if (getIZone() != updated.getIZone()) {
             setIZone(updated.getIZone());
+            pidCfg.iZone(getIZone(), slot);
             changed = true;
         }
 
         if (changed) {
-            copyTo(dest);
+            motorController.configureAsync(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);                
         }
     }
+
+    //TODO - add back for the CTRE controllers (find in older repo)
 
 }
