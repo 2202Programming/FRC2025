@@ -14,9 +14,6 @@ import frc.robot2025.Constants.Tag_Pose;
  */
 public class RegisteredCommands {
 
-    //Timeouts allow paths to continue in auto even if we miss a Note.   
-    static final double ShooterTimeOut = 3.0;
-
     public static SendableChooser<Command> RegisterCommands() {
         SendableChooser<Command> autoChooser;
 

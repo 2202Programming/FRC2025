@@ -26,9 +26,12 @@ import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.sensors.Sensors_Subsystem;
 
+
+// this is the spec file for the swervebot with nothing on it, scrapped from last year. -er
+
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
-  // Subsystems and other hardware on 2024 Robot rev Alpha
-  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "032381BF")
+  // Subsystems and other hardware
+  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2024", "032381BF")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -47,23 +50,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       //below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {return new DTMonitorCmd();})
       ;
-      
-      /*  ALPHABOT PARTIALLY DISSAMBLED
-      .add(Intake.class)
-      .add(Command.class, "IntakeWatcher", () -> {
-        return RobotContainer.getSubsystem(Intake.class).getWatcher();
-      })
-      .add(Shooter.class)
-      .add(Command.class, "ShooterWatcher", () -> {
-        // cast to get the correct type of shooter
-        return (RobotContainer.getSubsystem(Shooter.class)).getWatcher();
-      })
-      .add(Transfer.class)
-      .add(Command.class, "TransferWatcher", () -> {
-        return RobotContainer.getSubsystem(Transfer.class).getWatcher();
-      });
-      */
-      
+    
 
   // set this true at least once after robot hw stabilizes
   boolean burnFlash = false;
