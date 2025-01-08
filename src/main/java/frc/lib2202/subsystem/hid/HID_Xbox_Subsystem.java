@@ -71,7 +71,10 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   //XYRot / Swerve (field or robot relative)
   ExpoShaper velXShaper;    // left/right  
   ExpoShaper velYShaper;    // forward/backward 
+  ExpoShaper velXJoystickShaper;
+  ExpoShaper velYJoystickShaper;
   ExpoShaper swRotShaper;   // rotation for XYRot
+  ExpoShaper swJoystickRotShaper;
   ExpoShaper swSpecificRotShaper;
 
   //values updated each frame
@@ -103,9 +106,13 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
 
     // XYRot or Swerve Drive
     // Rotation on Left-X axis,  X-Y throttle on Right
+
+    velXJoystickShaper = new ExpoShaper(velExpo, () -> joystick.getX());
+    velYJoystickShaper = new ExpoShaper(velExpo, () -> joystick.getY());
     velXShaper = new ExpoShaper(velExpo,  () -> driver.getRightY()); // X robot is Y axis on Joystick
     velYShaper = new ExpoShaper(velExpo,  () -> driver.getRightX()); // Y robot is X axis on Joystick
     swRotShaper = new ExpoShaper(rotExpo, () -> driver.getLeftX());
+    swJoystickRotShaper = new ExpoShaper(rotExpo, () -> joystickOperator.getX());
     swSpecificRotShaper = new ExpoShaper(rotExpo, () -> joystickOperator.getTwist());
     // deadzone for swerve
     velXShaper.setDeadzone(deadzone);
@@ -166,9 +173,9 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
 
     //XYRot - field axis, pos X away from driver station, pos y to left side of field
     //Added scale-factors for low-speed creeper mode
-    velX = -velXShaper.get() * scale_xy;    //invert, so right stick moves robot, right, lowering Y
-    velY = -velYShaper.get() * scale_xy;    //invert, so forward stick is positive, increase X
-    xyRot =(-swRotShaper.get() * scale_rot) - (swSpecificRotShaper.get() * twist_rot); //invert, so positive is CCW
+    velX = (-velXShaper.get() * scale_xy) - velXJoystickShaper.get() * scale_xy;    //invert, so right stick moves robot, right, lowering Y
+    velY = -(velYShaper.get() * scale_xy) - velYJoystickShaper.get() * scale_xy;    //invert, so forward stick is positive, increase X
+    xyRot =(-swRotShaper.get() * scale_rot) - (swSpecificRotShaper.get() * twist_rot) - (swJoystickRotShaper.get() * scale_rot); //invert, so positive is CCW
   }
   
   //public void setLimitRotation(boolean enableLimit) {
