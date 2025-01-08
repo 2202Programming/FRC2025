@@ -6,18 +6,17 @@ package frc.base;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib2202.builder.RobotSpecDefault;
-import frc.robot2025.RobotSpec_SwerveBot;
+import frc.robot2025.RobotSpec_AlphaBot2025;
 
 public final class Main {
   private Main() {
     // create robot specs for supported robots in this binary
     new RobotSpecDefault();
-    new RobotSpec_SwerveBot();
+    new RobotSpec_AlphaBot2025();
 
 
   }
-  public static String serialnum="032D2062"; // robot2024 comp bot
-
+ 
   public static void main(String... args) {
     new Main();
     RobotBase.startRobot(Robot::new);
