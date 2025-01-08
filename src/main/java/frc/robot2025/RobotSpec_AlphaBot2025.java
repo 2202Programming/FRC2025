@@ -28,7 +28,7 @@ import frc.robot2025.subsystems.sensors.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2024 Robot rev Alpha
-  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2024", "032381BF")
+  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "032381BF")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
