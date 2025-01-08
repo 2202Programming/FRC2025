@@ -251,17 +251,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     return m_Zaccel;
   }
 
-  /*
-   * not sure why these would be needed - Mr.L 2//22/2023
-   * public double getTotalTilt() {
-   * return Math.sqrt(Math.pow(getPitch(), 2) + Math.pow(getRoll(), 2));
-   * }
-   * 
-   * public double getTotalTiltRate() {
-   * return Math.sqrt(Math.pow(getPitchRate(), 2) + Math.pow(getRollRate(), 2));
-   * }
-   */
-
   /**
    * Return the heading of the robot in degrees.
    *

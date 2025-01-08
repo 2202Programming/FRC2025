@@ -24,8 +24,7 @@ public class BindingsOther {
 
     // enum for bindings add when needed
     public enum Bindings {
-        Competition,
-        DriveTest, Shooter_test, IntakeTesting, auto_shooter_test, new_bot_test, comp_not_comp, Etude
+        Competition, DriveTest
     }
 
     static Bindings bindings = Bindings.DriveTest;
