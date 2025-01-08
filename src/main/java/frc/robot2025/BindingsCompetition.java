@@ -9,6 +9,7 @@ import frc.lib2202.command.swerve.TargetCentricDrive;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.robot2025.Constants.Tag_Pose;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
+import frc.lib2202.subsystem.hid.m_Joystick;
 
 /*
  * Please don't edit this without leads/mentor/driveteam review
@@ -24,11 +25,14 @@ public final class BindingsCompetition {
     private static void DriverBinding(HID_Xbox_Subsystem dc) {
         var driver = dc.Driver();
         var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
+        var Joystick = dc.Joystick();
 
         // Driver buttons
         driver.leftTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
         driver.y().onTrue(new AllianceAwareGyroReset(true));
         driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
+        Joystick.trigger(m_Joystick.ButtonType.Trigger).whileTrue(new RobotCentricDrive(drivetrain, dc));
+        Joystick.trigger(m_Joystick.ButtonType.LeftOne).onTrue(new AllianceAwareGyroReset(true));
     }
 
 
