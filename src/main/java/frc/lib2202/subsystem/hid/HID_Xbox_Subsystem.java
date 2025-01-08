@@ -51,6 +51,8 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   private final CommandXboxController driver;
   private final CommandXboxController operator;
   private final CommandSwitchboardController switchBoard;
+  private final ThrustMaster joystick;
+  private final ThrustMaster joystickOperator;
 
   // Buttons onStartup - in case you want to do something based on controls
   // being held at power up or on switchboard.
@@ -86,7 +88,8 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     driver = (CommandXboxController) registerController(Id.Driver, new CommandXboxController(Id.Driver.value));
     operator = (CommandXboxController) registerController(Id.Operator, new CommandXboxController(Id.Operator.value));
     switchBoard = (CommandSwitchboardController) registerController(Id.SwitchBoard, new CommandSwitchboardController(Id.SwitchBoard.value));
-   
+    joystick = (ThrustMaster) registerController(Id.Joystick, new ThrustMaster(Id.Joystick.value));
+    joystickOperator = (ThrustMaster) registerController(Id.JoystickOperator, new ThrustMaster(Id.JoystickOperator.value));
     this.deadzone = deadzone;
     /**
      * All Joysticks are read and shaped without sign conventions.
@@ -132,6 +135,8 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   public CommandXboxController Driver() {return driver; }
   public CommandXboxController Operator() {return operator;}
   public CommandSwitchboardController SwitchBoard() {return switchBoard; }
+  public ThrustMaster Joystick() {return joystick; }
+  public ThrustMaster JoystickOperator() {return joystickOperator; }
 
   /**
    * constructor of the implementing class.
