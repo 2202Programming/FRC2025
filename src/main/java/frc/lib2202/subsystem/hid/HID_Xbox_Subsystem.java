@@ -59,16 +59,20 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   int initDriverButtons;
   int initAssistentButtons;
   int initSwitchBoardButtons;
+  int initJoystickButtons;
+  int initJoystickOperatorButtons;
 
   //boolean limitRotation = true;
   //Scale back the sticks for precision control
   double scale_xy = 1.0;
   double scale_rot = 1.0;
+  double twist_rot = 0.7;
 
   //XYRot / Swerve (field or robot relative)
   ExpoShaper velXShaper;    // left/right  
   ExpoShaper velYShaper;    // forward/backward 
   ExpoShaper swRotShaper;   // rotation for XYRot
+  ExpoShaper swSpecificRotShaper;
 
   //values updated each frame
   double vel, z_rot;           //arcade
@@ -102,21 +106,25 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     velXShaper = new ExpoShaper(velExpo,  () -> driver.getRightY()); // X robot is Y axis on Joystick
     velYShaper = new ExpoShaper(velExpo,  () -> driver.getRightX()); // Y robot is X axis on Joystick
     swRotShaper = new ExpoShaper(rotExpo, () -> driver.getLeftX());
-
+    swSpecificRotShaper = new ExpoShaper(rotExpo, () -> joystickOperator.getTwist());
     // deadzone for swerve
     velXShaper.setDeadzone(deadzone);
     velYShaper.setDeadzone(deadzone);
     swRotShaper.setDeadzone(deadzone);
+    swSpecificRotShaper.setDeadzone(deadzone);
 
     // read some values to remove unused warning
     // CHANGED for 2022
     operator.getRightX();
     switchBoard.getRawAxis(0);
+    joystick.getRawAxis(0);
 
     // read initial buttons for each device - maybe used for configurions
     initDriverButtons = getButtonsRaw(Id.Driver);
     initAssistentButtons = getButtonsRaw(Id.Operator);
     initSwitchBoardButtons = getButtonsRaw(Id.SwitchBoard);
+    initJoystickButtons = getButtonsRaw(Id.Joystick);
+    initJoystickOperatorButtons = getButtonsRaw(Id.JoystickOperator);
   }
 
   /**
@@ -158,9 +166,9 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
 
     //XYRot - field axis, pos X away from driver station, pos y to left side of field
     //Added scale-factors for low-speed creeper mode
-    velX = -velXShaper.get() * scale_xy;    //invert, so right stick moves robot, right, lowering Y 
+    velX = -velXShaper.get() * scale_xy;    //invert, so right stick moves robot, right, lowering Y
     velY = -velYShaper.get() * scale_xy;    //invert, so forward stick is positive, increase X
-    xyRot = -swRotShaper.get() * scale_rot; //invert, so positive is CCW 
+    xyRot =(-swRotShaper.get() * scale_rot) - (swSpecificRotShaper.get() * twist_rot); //invert, so positive is CCW
   }
   
   //public void setLimitRotation(boolean enableLimit) {
@@ -242,6 +250,8 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
       return initAssistentButtons;
     case SwitchBoard:
       return initSwitchBoardButtons;
+    case Joystick:
+      return initJoystickButtons;
     default:
       return 0;
     }
@@ -286,6 +296,10 @@ public boolean isConnected(Id id){
       return operator.getHID().isConnected();
     case SwitchBoard:
       return switchBoard.getHID().isConnected();
+    case Joystick:
+      return joystick.getHID().isConnected();
+    case JoystickOperator:
+      return joystickOperator.getHID().isConnected();
     default:
       return false;
   }
