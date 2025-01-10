@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 *
 * @see Joystick
 */
-public class TMJoystick extends CommandGenericHID {
+public class TMJoystickControls extends CommandGenericHID {
  /** Default X axis channel. */
  public static final byte kDefaultXChannel = 0;
  /** Default Y axis channel. */
@@ -83,7 +83,7 @@ public class TMJoystick extends CommandGenericHID {
   * @param port The port index on the Driver Station that the joystick is plugged
   *             into.
   */
- public TMJoystick(final int port) {
+ public TMJoystickControls(final int port) {
    super(port);
   m_g_hid = super.getHID();
 
@@ -247,7 +247,7 @@ public class TMJoystick extends CommandGenericHID {
   *         loop}.
   * @see #Button(EventLoop)
   */
- public Trigger trigger(TMJoystick.ButtonType button) {
+ public Trigger trigger(TMJoystickControls.ButtonType button) {
    return trigger(button, CommandScheduler.getInstance().getDefaultButtonLoop());
  }
 
@@ -260,7 +260,7 @@ public class TMJoystick extends CommandGenericHID {
   *         the given
   *         loop.
   */
- public Trigger trigger(TMJoystick.ButtonType button, EventLoop loop) {
+ public Trigger trigger(TMJoystickControls.ButtonType button, EventLoop loop) {
    return Button(button, loop).castTo(Trigger::new);
  }
 
