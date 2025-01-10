@@ -1,10 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
-
 package frc.lib2202.subsystem.hid;
-
 
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -12,7 +9,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.event.BooleanEvent;
 import edu.wpi.first.wpilibj.event.EventLoop;
-
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
 * Extension of the Joystick class that adds support for additional buttons on
@@ -20,22 +19,15 @@ import edu.wpi.first.wpilibj.event.EventLoop;
 *
 * @see Joystick
 */
-public class m_Joystick extends GenericHID {
+public class TMJoystick extends CommandGenericHID {
  /** Default X axis channel. */
  public static final byte kDefaultXChannel = 0;
-
-
  /** Default Y axis channel. */
  public static final byte kDefaultYChannel = 1;
-
-
  /** Default Z axis channel. */
  public static final byte kDefaultZChannel = 2;
-
-
  /** Default twist axis channel. */
  public static final byte kDefaultTwistChannel = 2;
-
 
  /** Default throttle axis channel. */
  public static final byte kDefaultThrottleChannel = 3;
@@ -54,11 +46,8 @@ public class m_Joystick extends GenericHID {
    /** Throttle axis. */
    kThrottle(4);
 
-
    /** AxisType value. */
    public final int value;
-
-
    AxisType(int value) {
      this.value = value;
    }
@@ -70,18 +59,14 @@ public class m_Joystick extends GenericHID {
    Trigger(1),
    UpTop(2), LeftTop(3), RightTop(4),
 
-
    LeftOne(5), LeftTwo(6), LeftThree(7),
    LeftFour(8), LeftFive(9), LeftSix(10),
-
 
    RightOne(11), RightTwo(12), RightThree(13),
    RightFour(14), RightFive(15), RightSix(16);
 
-
    /** ButtonType value. */
    public final int value;
-
 
    ButtonType(int value) {
      this.value = value;
@@ -90,7 +75,7 @@ public class m_Joystick extends GenericHID {
 
 
  private final byte[] m_axes = new byte[AxisType.values().length];
-
+ private final GenericHID m_g_hid;
 
  /**
   * Construct an instance of a joystick.
@@ -98,16 +83,15 @@ public class m_Joystick extends GenericHID {
   * @param port The port index on the Driver Station that the joystick is plugged
   *             into.
   */
- public m_Joystick(final int port) {
+ public TMJoystick(final int port) {
    super(port);
-
+  m_g_hid = super.getHID();
 
    m_axes[AxisType.kX.value] = kDefaultXChannel;
    m_axes[AxisType.kY.value] = kDefaultYChannel;
    m_axes[AxisType.kZ.value] = kDefaultZChannel;
    m_axes[AxisType.kTwist.value] = kDefaultTwistChannel;
    m_axes[AxisType.kThrottle.value] = kDefaultThrottleChannel;
-
 
    HAL.report(tResourceType.kResourceType_Joystick, port + 1);
  }
@@ -213,7 +197,7 @@ public class m_Joystick extends GenericHID {
   * @return The state of the button.
   */
  public boolean getButton(ButtonType button) {
-   return getRawButton(button.value);
+   return m_g_hid.getRawButton(button.value);
  }
 
 
@@ -237,7 +221,7 @@ public class m_Joystick extends GenericHID {
   * @return Whether the button was pressed since the last check.
   */
  public boolean getButtonPressed(ButtonType button) {
-   return getRawButtonPressed(button.value);
+   return m_g_hid.getRawButtonPressed(button.value);
  }
 
 
@@ -247,8 +231,42 @@ public class m_Joystick extends GenericHID {
   * @return Whether the button was released since the last check.
   */
  public boolean getButtonReleased(ButtonType button) {
-   return getRawButtonReleased(button.value);
+   return m_g_hid.getRawButtonReleased(button.value);
  }
+
+
+/*---------------------- EXTENSION BUTTONS -------------------- */
+
+
+ /**
+  * Constructs an event instance around designated buttons digital signal.
+  *
+  * @return an event instance representing designated digital signal attached to
+  *         the {@link
+  *         CommandScheduler#getDefaultButtonLoop() default scheduler button
+  *         loop}.
+  * @see #Button(EventLoop)
+  */
+ public Trigger trigger(TMJoystick.ButtonType button) {
+   return trigger(button, CommandScheduler.getInstance().getDefaultButtonLoop());
+ }
+
+
+ /**
+  * Constructs an event instance around designated digital signal.
+  *
+  * @param loop the event loop instance to attach the event to.
+  * @return an event instance representing designated digital signal attached to
+  *         the given
+  *         loop.
+  */
+ public Trigger trigger(TMJoystick.ButtonType button, EventLoop loop) {
+   return Button(button, loop).castTo(Trigger::new);
+ }
+
 }
+
+
+
 
 
