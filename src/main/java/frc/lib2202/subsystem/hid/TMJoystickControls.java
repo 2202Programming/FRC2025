@@ -36,7 +36,7 @@ public class TMJoystick extends CommandGenericHID {
  /** Represents an analog axis on a joystick. */
  public enum AxisType {
    /** X axis. */
-   kX(0),
+   kX(0), 
    /** Y axis. */
    kY(1),
    /** Z axis. */
@@ -98,7 +98,7 @@ public class TMJoystick extends CommandGenericHID {
 
 
  /**
-  * Get the X value of the joystick. This depends on the mapping of the joystick
+  * Get the X value of the joystick which depends on the mapping of the joystick
   * connected to the
   * current port.
   *

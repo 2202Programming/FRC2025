@@ -66,7 +66,6 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   //Scale back the sticks for precision control
   double scale_xy = 1.0;
   double scale_rot = 1.0;
-  double twist_rot = 0.7;
 
   //XYRot / Swerve (field or robot relative)
   ExpoShaper velXShaper;    // left/right  
@@ -75,7 +74,6 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   ExpoShaper velYJoystickShaper;
   ExpoShaper swRotShaper;   // rotation for XYRot
   ExpoShaper swJoystickRotShaper;
-  ExpoShaper swSpecificRotShaper;
 
   //values updated each frame
   double vel, z_rot;           //arcade
@@ -96,7 +94,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     operator = (CommandXboxController) registerController(Id.Operator, new CommandXboxController(Id.Operator.value));
     switchBoard = (CommandSwitchboardController) registerController(Id.SwitchBoard, new CommandSwitchboardController(Id.SwitchBoard.value));
     joystick = (TMJoystick) registerController(Id.Joystick, new TMJoystick(Id.Joystick.value));
-    joystickOperator = (TMJoystick) registerController(Id.JoystickOperator, new TMJoystick(Id.JoystickOperator.value));
+  
     this.deadzone = deadzone;
     /**
      * All Joysticks are read and shaped without sign conventions.
@@ -113,12 +111,10 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     velYShaper = new ExpoShaper(velExpo,  () -> driver.getRightX()); // Y robot is X axis on Joystick
     swRotShaper = new ExpoShaper(rotExpo, () -> driver.getLeftX());
     swJoystickRotShaper = new ExpoShaper(rotExpo, () -> joystickOperator.getX());
-    swSpecificRotShaper = new ExpoShaper(rotExpo, () -> joystickOperator.getTwist());
     // deadzone for swerve
     velXShaper.setDeadzone(deadzone);
     velYShaper.setDeadzone(deadzone);
     swRotShaper.setDeadzone(deadzone);
-    swSpecificRotShaper.setDeadzone(deadzone);
 
     // read some values to remove unused warning
     // CHANGED for 2022
@@ -151,7 +147,6 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   public CommandXboxController Operator() {return operator;}
   public CommandSwitchboardController SwitchBoard() {return switchBoard; }
   public TMJoystick Joystick() {return joystick; }
-  public TMJoystick JoystickOperator() {return joystickOperator; }
 
   /**
    * constructor of the implementing class.
@@ -175,7 +170,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     //Added scale-factors for low-speed creeper mode
     velX = (-velXShaper.get() * scale_xy) - velXJoystickShaper.get() * scale_xy;    //invert, so right stick moves robot, right, lowering Y
     velY = -(velYShaper.get() * scale_xy) - velYJoystickShaper.get() * scale_xy;    //invert, so forward stick is positive, increase X
-    xyRot =(-swRotShaper.get() * scale_rot) - (swSpecificRotShaper.get() * twist_rot) - (swJoystickRotShaper.get() * scale_rot); //invert, so positive is CCW
+    xyRot =(-swRotShaper.get() * scale_rot) - (swJoystickRotShaper.get() * scale_rot); //invert, so positive is CCW
   }
   
   //public void setLimitRotation(boolean enableLimit) {
@@ -305,8 +300,6 @@ public boolean isConnected(Id id){
       return switchBoard.getHID().isConnected();
     case Joystick:
       return joystick.getHID().isConnected();
-    case JoystickOperator:
-      return joystickOperator.getHID().isConnected();
     default:
       return false;
   }
