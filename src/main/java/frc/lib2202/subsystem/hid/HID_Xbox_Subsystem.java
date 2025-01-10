@@ -7,6 +7,7 @@
 
 package frc.lib2202.subsystem.hid;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import edu.wpi.first.math.MathUtil;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj.GenericHID;
 import frc.lib2202.subsystem.hid.DriverControls.Id;
 import frc.lib2202.subsystem.hid.SwitchboardController.SBButton;
 
@@ -86,6 +88,9 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   public HashMap<Id, CommandGenericHID> deviceMap = new HashMap<Id, CommandGenericHID>();
 
   public HID_Xbox_Subsystem(final double velExpo, final double rotExpo, final double deadzone) {
+
+    //Scan devices - figure out what we have connected
+    scan_devices();
 
     // register the devices
     driver = (CommandXboxController) registerController(Id.Driver, new CommandXboxController(Id.Driver.value));
@@ -301,5 +306,17 @@ public boolean isConnected(Id id){
       return false;
   }
 }
+
+  void scan_devices(){
+    // doesn't seem to work in sim/debug or with real DS in sim.
+    //ArrayList<CommandGenericHID> devices = new ArrayList<CommandGenericHID>();
+    for (int i=0; i < 5; i++){
+      String name = DriverStation.getJoystickName(i);
+      int t = DriverStation.getJoystickType(i);
+      
+      System.out.println("port "+ i + " name="+ name + "  type=" + t  );
+      
+    }
+  }
 
 }
