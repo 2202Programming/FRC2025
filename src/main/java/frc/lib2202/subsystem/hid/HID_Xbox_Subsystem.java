@@ -52,7 +52,6 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   private final CommandXboxController operator;
   private final CommandSwitchboardController switchBoard;
   private final TMJoystick joystick;
-  private final TMJoystick joystickOperator;
 
   // Buttons onStartup - in case you want to do something based on controls
   // being held at power up or on switchboard.
@@ -60,7 +59,6 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
   int initAssistentButtons;
   int initSwitchBoardButtons;
   int initJoystickButtons;
-  int initJoystickOperatorButtons;
 
   //boolean limitRotation = true;
   //Scale back the sticks for precision control
@@ -110,7 +108,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     velXShaper = new ExpoShaper(velExpo,  () -> driver.getRightY()); // X robot is Y axis on Joystick
     velYShaper = new ExpoShaper(velExpo,  () -> driver.getRightX()); // Y robot is X axis on Joystick
     swRotShaper = new ExpoShaper(rotExpo, () -> driver.getLeftX());
-    swJoystickRotShaper = new ExpoShaper(rotExpo, () -> joystickOperator.getX());
+    swJoystickRotShaper = new ExpoShaper(rotExpo, () -> joystick.getX());
     // deadzone for swerve
     velXShaper.setDeadzone(deadzone);
     velYShaper.setDeadzone(deadzone);
@@ -127,7 +125,6 @@ public class HID_Xbox_Subsystem extends SubsystemBase {
     initAssistentButtons = getButtonsRaw(Id.Operator);
     initSwitchBoardButtons = getButtonsRaw(Id.SwitchBoard);
     initJoystickButtons = getButtonsRaw(Id.Joystick);
-    initJoystickOperatorButtons = getButtonsRaw(Id.JoystickOperator);
   }
 
   /**
