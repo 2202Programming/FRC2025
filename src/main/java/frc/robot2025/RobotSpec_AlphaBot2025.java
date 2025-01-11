@@ -10,8 +10,7 @@ import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
-import frc.lib2202.command.swerve.AllianceAwareGyroReset;
-import frc.lib2202.command.swerve.FieldCentricDrive;
+import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.Limelight;
 import frc.lib2202.subsystem.VisionPoseEstimator;
@@ -144,18 +143,13 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public void setBindings() {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
-    // pick one of the next two lines
-    // cant use - parts removed from bot
-    // BindingsCompetition.ConfigureCompetition(dc);
+    
+    // TODO - figure better way to handle bindings
+    BindingsCompetition.ConfigureCompetition(dc);
+    BindingsOther.ConfigureOther(dc);
 
-    var driver = dc.Driver();
-    //var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
-
-    // Driver buttons
-    driver.leftTrigger().whileTrue(new FieldCentricDrive());
-    driver.y().onTrue(new AllianceAwareGyroReset(true));
-    //driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
-
+    // start anyting else 
+    new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
   }
 
   @Override

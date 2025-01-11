@@ -1,18 +1,10 @@
 package frc.lib2202.subsystem.hid;
 
+@Deprecated
 public class DriverControls {
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-  }
-
-  public enum Id {
-    Driver(0), Operator(1), SwitchBoard(2), JoystickOperator(3), Joystick(4);
-    public final int value;
-
-    Id(int value) {
-      this.value = value;
-    }
   }
 
   public enum DriverMode {

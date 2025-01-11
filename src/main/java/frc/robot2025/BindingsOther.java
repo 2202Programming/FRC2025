@@ -10,8 +10,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
-import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
@@ -21,11 +21,9 @@ import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
  * Bindings here for testing, 
  */
 public class BindingsOther {
-
     // enum for bindings add when needed
     public enum Bindings {
-        Competition,
-        DriveTest, Shooter_test, IntakeTesting, auto_shooter_test, new_bot_test, comp_not_comp, Etude
+        Competition,  DriveTest,
     }
 
     static Bindings bindings = Bindings.DriveTest;
@@ -49,8 +47,9 @@ public class BindingsOther {
 
 
     static void DriverBinding(HID_Xbox_Subsystem dc) {
-        var driver = dc.Driver();
+        var generic_driver = dc.Driver();
 
+        
         var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
 
         PathPlannerPath pathBlue1 = loadFromFile("blue1");
@@ -60,6 +59,10 @@ public class BindingsOther {
         switch (bindings) {
 
             case DriveTest:
+                // deal with xbox or joystick controller for driver
+                if (generic_driver instanceof CommandXboxController) {
+                    CommandXboxController driver = (CommandXboxController)generic_driver;
+            
                 driver.leftBumper().whileTrue(new RobotCentricDrive(drivetrain, dc));
                 driver.b().onTrue(new AllianceAwareGyroReset(false));
 
@@ -83,7 +86,7 @@ public class BindingsOther {
                         new InstantCommand(drivetrain::printPose)));
 
                 // Start any watcher commands
-                new PDPMonitorCmd(); // auto scheduled, runs when disabled
+               
                 // This appears to break if initial pose is too close to path start pose
                 // (zero-length path?)
                 if (pathTest_1m != null)
@@ -100,6 +103,11 @@ public class BindingsOther {
                                 new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
                                         Units.degreesToRadians(720))),
                         new InstantCommand(drivetrain::printPose)));
+
+                }
+                else {
+                    // put driver TMjoystick commands here
+                }
                 break;
 
             default:

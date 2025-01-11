@@ -56,7 +56,7 @@ public class TMJoystickController extends CommandGenericHID {
 
  /** Represents a digital button on a joystick. */
  public enum ButtonType {
-   Trigger(1),
+   TriggerButton(1),  //changed from Trigger to avoid confusion with class Trigger
    UpTop(2), LeftTop(3), RightTop(4),
 
    LeftOne(5), LeftTwo(6), LeftThree(7),
