@@ -55,6 +55,7 @@ public class BindingsOther {
         PathPlannerPath pathBlue1 = loadFromFile("blue1");
         PathPlannerPath pathRed1 = loadFromFile("red1");
         PathPlannerPath pathTest_1m = loadFromFile("test_1m");
+        drivetrain.configureAutoBuilder();
 
         switch (bindings) {
 
