@@ -52,8 +52,8 @@ public class BindingsOther {
         
         var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
 
-        PathPlannerPath pathBlue1 = loadFromFile("blue1");
-        PathPlannerPath pathRed1 = loadFromFile("red1");
+        PathPlannerPath pathBlue1 = loadFromFile("test_1m");
+        PathPlannerPath pathRed1 = loadFromFile("test_1m");
         PathPlannerPath pathTest_1m = loadFromFile("test_1m");
 
         switch (bindings) {
