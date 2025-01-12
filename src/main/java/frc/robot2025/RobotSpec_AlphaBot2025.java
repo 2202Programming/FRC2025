@@ -1,5 +1,7 @@
 package frc.robot2025;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.MperFT;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -34,7 +36,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         pdp.clearStickyFaults();
         return pdp;
       })
-      //.add(PneumaticsControl.class)
+      // .add(PneumaticsControl.class)
       // .add(BlinkyLights.class, "LIGHTS")
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
@@ -43,35 +45,17 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Limelight.class)
       .add(SwerveDrivetrain.class) // must be after LL and Sensors
       .add(VisionPoseEstimator.class)
-      //below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Command.class, "DT_Monitor", () -> {return new DTMonitorCmd();})
-      ;
-      
-      /*  ALPHABOT PARTIALLY DISSAMBLED
-      .add(Intake.class)
-      .add(Command.class, "IntakeWatcher", () -> {
-        return RobotContainer.getSubsystem(Intake.class).getWatcher();
-      })
-      .add(Shooter.class)
-      .add(Command.class, "ShooterWatcher", () -> {
-        // cast to get the correct type of shooter
-        return (RobotContainer.getSubsystem(Shooter.class)).getWatcher();
-      })
-      .add(Transfer.class)
-      .add(Command.class, "TransferWatcher", () -> {
-        return RobotContainer.getSubsystem(Transfer.class).getWatcher();
+      // below are optional watchers for shuffeleboard data - disable if need too.
+      .add(Command.class, "DT_Monitor", () -> {
+        return new DTMonitorCmd();
       });
-      */
-      
 
   // set this true at least once after robot hw stabilizes
   boolean burnFlash = false;
   boolean swerve = true;
 
   // Robot Speed Limits
-  double maxSpeed = 15.0 * MperFT; // [m/s]
-  double maxRotationRate = 180.0;  // [deg/s]
-  RobotLimits robotLimits = new RobotLimits(maxSpeed, maxRotationRate);
+  RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
 
   // Chassis
   double kWheelCorrectionFactor = .957;
@@ -119,22 +103,22 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     ModuleConfig[] modules = new ModuleConfig[4];
     modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
         29, 24, 25,
-        41.484) //43.85746387)
+        41.484)
         .setInversions(false, true, false);
 
     modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
         30, 26, 27,
-        -66.621) //-65.21481)
+        -66.621)
         .setInversions(true, true, false);
 
     modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
         28, 22, 23,
-        24.785) // 24.096825)
+        24.785)
         .setInversions(false, true, false);
 
     modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
         31, 20, 21,
-        -40.781) // -43.066333125)
+        -40.781)
         .setInversions(true, true, false);
 
     return modules;
@@ -143,12 +127,12 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public void setBindings() {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
-    
+
     // TODO - figure better way to handle bindings
     BindingsCompetition.ConfigureCompetition(dc);
     BindingsOther.ConfigureOther(dc);
 
-    // start anyting else 
+    // start anyting else
     new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
   }
 
@@ -160,17 +144,16 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public SendableChooser<Command> getRegisteredCommands() {
     // no robot parts to support thse now
-    //return RegisteredCommands.RegisterCommands();
+    // return RegisteredCommands.RegisterCommands();
     return null;
   }
 
   @Override
-    public void setDefaultCommands() {
-       SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
-        if (drivetrain != null) {
-            drivetrain.setDefaultCommand(new RobotCentricDrive());
-          }
+  public void setDefaultCommands() {
+    SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
+    if (drivetrain != null) {
+      drivetrain.setDefaultCommand(new RobotCentricDrive());
     }
-
+  }
 
 }
