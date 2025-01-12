@@ -48,12 +48,11 @@ public class BindingsOther {
 
     static void DriverBinding(HID_Xbox_Subsystem dc) {
         var generic_driver = dc.Driver();
-
-        
         var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
-
-        PathPlannerPath pathBlue1 = loadFromFile("blue1");
-        PathPlannerPath pathRed1 = loadFromFile("red1");
+        
+        //TODO - handle paths better, maybe move configAutoBuilder out of swerve code
+        PathPlannerPath pathBlue1 = loadFromFile("test_1m");//"blue1");
+        PathPlannerPath pathRed1 = loadFromFile("test_1m");//"red1");
         PathPlannerPath pathTest_1m = loadFromFile("test_1m");
 
         switch (bindings) {
