@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot2025.RegisteredCommands;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -103,7 +104,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
 
     getRobotSpecs().setBindings();
-    autoChooser = getRobotSpecs().getRegisteredCommands();
+    autoChooser = RegisteredCommands.RegisterCommands();
     getRobotSpecs().setDefaultCommands();
   }
 
