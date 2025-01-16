@@ -105,6 +105,7 @@ public class RobotContainer {
 
     getRobotSpecs().setBindings();
     autoChooser = RegisteredCommands.RegisterCommands();
+    getRobotSpecs().getRegisteredCommands();
     getRobotSpecs().setDefaultCommands();
   }
 
@@ -114,7 +115,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return (autoChooser != null) ? autoChooser.getSelected() :  null;
+    return autoChooser.getSelected();
   }
 
 }

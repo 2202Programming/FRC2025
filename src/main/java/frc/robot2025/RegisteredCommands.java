@@ -20,12 +20,8 @@ public class RegisteredCommands {
     public static SendableChooser<Command> RegisterCommands() {
         SendableChooser<Command> autoChooser;
 
-
-
-        
         NamedCommands.registerCommand("RotateTo", 
                 new RotateUntilSeeTags(Tag_Pose.ID4, Tag_Pose.ID7));
-
 
         autoChooser = AutoBuilder.buildAutoChooser();
         // select our auto
