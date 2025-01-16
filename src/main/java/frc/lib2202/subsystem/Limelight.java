@@ -4,6 +4,7 @@
 
 package frc.lib2202.subsystem;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.Constants;
 import frc.lib2202.builder.RobotContainer;
+import frc.lib2202.subsystem.LimelightHelpers;
 import frc.lib2202.subsystem.LimelightHelpers.LimelightTarget_Fiducial;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 
@@ -34,6 +36,8 @@ public class Limelight extends SubsystemBase {
   private NetworkTableEntry NT_hasTarget;
   private NetworkTableEntry nt_bluepose_x;
   private NetworkTableEntry nt_bluepose_y;
+  private NetworkTableEntry nt_bluepose2_x;
+  private NetworkTableEntry nt_bluepose2_y;
   private NetworkTableEntry outputTx;
   private NetworkTableEntry outputTv;
   private NetworkTableEntry pipelineNTE;
@@ -75,6 +79,7 @@ public class Limelight extends SubsystemBase {
   // private Pose2d megaPose;
   private Pose2d teamPose = new Pose2d(); // todo hack inits to avoid NPE 4/8/2023
   private Pose2d bluePose = new Pose2d();
+  private Pose2d bluePose2 = new Pose2d();
   final private String LL_NAME = "";// "limelight" for if left blank
   private int numAprilTags;
   private double visionTimestamp;
@@ -94,6 +99,8 @@ public class Limelight extends SubsystemBase {
     // these are "output" entries for user debugging
     nt_bluepose_x = outputTable.getEntry("/LL Blue Pose X");
     nt_bluepose_y = outputTable.getEntry("/LL Blue Pose Y");
+    nt_bluepose_x = outputTable.getEntry("/LL Blue Pose2 X");
+    nt_bluepose_y = outputTable.getEntry("/LL Blue Pose2 Y");
     nt_numApriltags = outputTable.getEntry("/LL_Num_Apriltag");
     NT_hasTarget = outputTable.getEntry("/LL hasTarget");
     outputTv = outputTable.getEntry("/Limelight Valid");
@@ -125,8 +132,9 @@ public class Limelight extends SubsystemBase {
     pipeline = pipelineNTE.getInteger(0);
 
       // LL apriltags stuff
+      setRobotOrientationLL(); //runs once per frame for megatag2
       LimelightHelpers.LimelightResults llresults = LimelightHelpers.getLatestResults("");
-      numAprilTags = llresults.targetingResults.targets_Fiducials.length;
+      numAprilTags = llresults.targets_Fiducials.length;
       nt_numApriltags.setInteger(numAprilTags);
       visionTimestamp = Timer.getFPGATimestamp() - (LimelightHelpers.getLatency_Pipeline(LL_NAME) / 1000.0)
           - (LimelightHelpers.getLatency_Capture(LL_NAME) / 1000.0);
@@ -135,13 +143,26 @@ public class Limelight extends SubsystemBase {
         bluePose = LimelightHelpers.getBotPose2d_wpiBlue(LL_NAME);
         teamPose = LimelightHelpers.getBotPose2d_wpiBlue(LL_NAME); // assume/default blue for now
 
+        if(Math.abs(RobotContainer.getRobotSpecs().getHeadingProvider().getHeading().getDegrees()) < 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+        {
+          LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+          bluePose2 = mt2.pose;
+        }
+
         var alliance = DriverStation.getAlliance();
         if (alliance.isPresent() && alliance.get() == Alliance.Red)
           //aliance info exists AND is red
           teamPose = LimelightHelpers.getBotPose2d_wpiRed(LL_NAME);
       }
+
     }
-  
+   
+  public void setRobotOrientationLL() {
+    var yaw = RobotContainer.getRobotSpecs().getHeadingProvider();
+    yaw.getHeading();
+    //Robot yaw in degrees. 0 = robot facing red alliance wall in FRC
+    LimelightHelpers.SetRobotOrientation("limelight", yaw.getHeading().getDegrees(), 0, 0, 0, 0, 0);
+  }
 
   public double getVisionTimestamp() {
     return visionTimestamp;
@@ -149,6 +170,10 @@ public class Limelight extends SubsystemBase {
 
   public Pose2d getBluePose() {
     return bluePose;
+  }
+
+  public Pose2d getBluePose2() {
+    return bluePose2;
   }
 
   public Pose2d getTeamPose() {
@@ -173,7 +198,7 @@ public class Limelight extends SubsystemBase {
   
   public double[] getAprilTagID(){
     LimelightTarget_Fiducial[] apriltag = 
-    LimelightHelpers.getLatestResults("").targetingResults.targets_Fiducials;
+    LimelightHelpers.getLatestResults("").targets_Fiducials;
     double[] tagIDs = new double[apriltag.length];
     for(int i = 0; i < apriltag.length; i++){
       tagIDs[i] = apriltag[i].fiducialID;
@@ -184,7 +209,7 @@ public class Limelight extends SubsystemBase {
     return LimelightHelpers.getTA("");
   }
   public LimelightTarget_Fiducial[] getAprilTagsFromHelper(){
-    return LimelightHelpers.getLatestResults("").targetingResults.targets_Fiducials;
+    return LimelightHelpers.getLatestResults("").targets_Fiducials;
   }
 
   public double getFilteredArea() {
@@ -265,7 +290,10 @@ public class Limelight extends SubsystemBase {
         nt_bluepose_x.setDouble(bluePose.getX());
         nt_bluepose_y.setDouble(bluePose.getY());
       }
-
+      if (bluePose2 != null) {
+        nt_bluepose_x.setDouble(bluePose2.getX());
+        nt_bluepose_y.setDouble(bluePose2.getY());
+      }
       outputTv.setValue(targetValid);
       outputTx.setDouble(x);
 
