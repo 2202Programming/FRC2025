@@ -99,8 +99,8 @@ public class Limelight extends SubsystemBase {
     // these are "output" entries for user debugging
     nt_bluepose_x = outputTable.getEntry("/LL Blue Pose X");
     nt_bluepose_y = outputTable.getEntry("/LL Blue Pose Y");
-    nt_bluepose_x = outputTable.getEntry("/LL Blue Pose2 X");
-    nt_bluepose_y = outputTable.getEntry("/LL Blue Pose2 Y");
+    nt_bluepose2_x = outputTable.getEntry("/LL Blue Pose2 X");
+    nt_bluepose2_y = outputTable.getEntry("/LL Blue Pose2 Y");
     nt_numApriltags = outputTable.getEntry("/LL_Num_Apriltag");
     NT_hasTarget = outputTable.getEntry("/LL hasTarget");
     outputTv = outputTable.getEntry("/Limelight Valid");
@@ -133,27 +133,46 @@ public class Limelight extends SubsystemBase {
 
       // LL apriltags stuff
       setRobotOrientationLL(); //runs once per frame for megatag2
-      LimelightHelpers.LimelightResults llresults = LimelightHelpers.getLatestResults("");
-      numAprilTags = llresults.targets_Fiducials.length;
-      nt_numApriltags.setInteger(numAprilTags);
-      visionTimestamp = Timer.getFPGATimestamp() - (LimelightHelpers.getLatency_Pipeline(LL_NAME) / 1000.0)
-          - (LimelightHelpers.getLatency_Capture(LL_NAME) / 1000.0);
 
-      if (numAprilTags > 0) {
-        bluePose = LimelightHelpers.getBotPose2d_wpiBlue(LL_NAME);
-        teamPose = LimelightHelpers.getBotPose2d_wpiBlue(LL_NAME); // assume/default blue for now
+      LimelightHelpers.PoseEstimate mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      boolean doRejectUpdate = false;
+
+      if(mt1.tagCount == 1 && mt1.rawFiducials.length == 1) //stricter criteria if only 1 tag seen
+      {
+        if(mt1.rawFiducials[0].ambiguity > .7)
+        {
+          doRejectUpdate = true;
+        }
+        if(mt1.rawFiducials[0].distToCamera > 3)
+        {
+          doRejectUpdate = true;
+        }
+      }
+      if(mt1.tagCount == 0)
+      {
+        doRejectUpdate = true;
+      }
+      if (!doRejectUpdate)
+      {
+        bluePose = mt1.pose;
 
         if(Math.abs(RobotContainer.getRobotSpecs().getHeadingProvider().getHeading().getDegrees()) < 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
         {
-          LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
           bluePose2 = mt2.pose;
         }
-
-        var alliance = DriverStation.getAlliance();
-        if (alliance.isPresent() && alliance.get() == Alliance.Red)
-          //aliance info exists AND is red
-          teamPose = LimelightHelpers.getBotPose2d_wpiRed(LL_NAME);
       }
+      numAprilTags = mt1.tagCount;
+      if (numAprilTags > 0) {
+        targetValid = true;
+      }
+      else {
+        targetValid = false;
+      }
+
+      nt_numApriltags.setInteger(numAprilTags);
+      visionTimestamp = Timer.getFPGATimestamp() - (LimelightHelpers.getLatency_Pipeline(LL_NAME) / 1000.0)
+          - (LimelightHelpers.getLatency_Capture(LL_NAME) / 1000.0);
 
     }
    
@@ -291,8 +310,8 @@ public class Limelight extends SubsystemBase {
         nt_bluepose_y.setDouble(bluePose.getY());
       }
       if (bluePose2 != null) {
-        nt_bluepose_x.setDouble(bluePose2.getX());
-        nt_bluepose_y.setDouble(bluePose2.getY());
+        nt_bluepose2_x.setDouble(bluePose2.getX());
+        nt_bluepose2_y.setDouble(bluePose2.getY());
       }
       outputTv.setValue(targetValid);
       outputTx.setDouble(x);
