@@ -39,14 +39,16 @@ public class BlinkyLights extends SubsystemBase {
     static public Color8Bit YELLOW = new Color8Bit(255, 255, 0);
 
     // State vars
-    CANdle candle_l;
-    CANdle candle_r;
+    CANdle candle_tl;
+    CANdle candle_tr;
+    CANdle candle_bl;
+    CANdle candle_br;
     Color8Bit currentColor;
 
     final BlinkyLightUser defaultUser;
 
     // constructor
-    public BlinkyLights(int id_left, int id_right) {
+    public BlinkyLights(int id_top_left, int id_top_right, int id_bottom_left, int id_bottom_right) {
         defaultUser = new BlinkyLightUser(this) {
             @Override
             public Color8Bit colorProvider() {
@@ -54,10 +56,14 @@ public class BlinkyLights extends SubsystemBase {
             }
         };
         //configure hardware
-        candle_l = new CANdle(id_left);
-        candle_r = new CANdle(id_right);
-        config(candle_l);
-        config(candle_r);
+        candle_tl = new CANdle(id_top_left);
+        candle_tr = new CANdle(id_top_right);
+        candle_bl = new CANdle(id_bottom_left);
+        candle_br = new CANdle(id_bottom_right);
+        config(candle_tl);
+        config(candle_tr);
+        config(candle_bl);
+        config(candle_br);
 
         //set to default user's requests
         setCurrentUser(defaultUser);
@@ -120,8 +126,10 @@ public class BlinkyLights extends SubsystemBase {
     };
 
     void setColor(Color8Bit color) {
-        candle_l.setLEDs(color.red, color.green, color.blue);
-        candle_r.setLEDs(color.red, color.green, color.blue);
+        candle_tl.setLEDs(color.red, color.green, color.blue);
+        candle_tr.setLEDs(color.red, color.green, color.blue);
+        candle_bl.setLEDs(color.red, color.green, color.blue);
+        candle_br.setLEDs(color.red, color.green, color.blue);
         currentColor = color;
     }
 
@@ -134,21 +142,27 @@ public class BlinkyLights extends SubsystemBase {
 
     void setBlinking(Color8Bit color) {
         Animation animation = new StrobeAnimation(color.red, color.green, color.blue, 0, 0.5, 8);
-        candle_l.animate(animation, 0);
-        candle_r.animate(animation, 0);
+        candle_tl.animate(animation, 0);
+        candle_tr.animate(animation, 0);
+        candle_bl.animate(animation, 0);
+        candle_br.animate(animation, 0);
     }
 
     void stopBlinking() {
-        candle_l.clearAnimation(0);
-        candle_r.clearAnimation(0);
+        candle_tl.clearAnimation(0);
+        candle_tr.clearAnimation(0);
+        candle_bl.clearAnimation(0);
+        candle_br.clearAnimation(0);
     }
 
     /*
      * Brightness on a scale from 0-1, with 1 being max brightness
      */
     void setBrightness(double brightness) {
-        candle_l.configBrightnessScalar(brightness);
-        candle_r.configBrightnessScalar(brightness);
+        candle_tl.configBrightnessScalar(brightness);
+        candle_tr.configBrightnessScalar(brightness);
+        candle_bl.configBrightnessScalar(brightness);
+        candle_br.configBrightnessScalar(brightness);
     }
 
     public void setAllianceColors() {
