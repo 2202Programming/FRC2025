@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "test_1m"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Example Path"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "RotateTo"
+            "pathName": "Pos1 to D1"
           }
         }
       ]
