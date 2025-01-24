@@ -4,6 +4,7 @@
 
 package frc.lib2202.subsystem;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import com.ctre.phoenix.led.Animation;
@@ -27,7 +28,8 @@ public class BlinkyLights extends SubsystemBase {
     // candle frame update rate, larger saves on CAN BUS
     static final int FrameStatusTime = 200; // [ms]
 
-    private static BlinkyLightUser currentUser = null;
+    //removed static to support multiple uses on different light groups
+    private BlinkyLightUser currentUser = null;
 
     // Some common colors
     static public Color8Bit BLACK = new Color8Bit(0, 0, 0);
@@ -38,38 +40,32 @@ public class BlinkyLights extends SubsystemBase {
     static public Color8Bit ORANGE = new Color8Bit(255, 145, 0);
     static public Color8Bit YELLOW = new Color8Bit(255, 255, 0);
 
-    // State vars
-    CANdle candle_tl;
-    CANdle candle_tr;
-    CANdle candle_bl;
-    CANdle candle_br;
+    // State vars, handle N candle sets
+    ArrayList<CANdle> m_candles;
     Color8Bit currentColor;
 
     final BlinkyLightUser defaultUser;
 
-    // constructor
-    public BlinkyLights(int id_top_left, int id_top_right, int id_bottom_left, int id_bottom_right) {
+    public BlinkyLights(int... can_ids){
+        m_candles = new ArrayList<CANdle>();
         defaultUser = new BlinkyLightUser(this) {
             @Override
             public Color8Bit colorProvider() {
                 return ORANGE;
             }
         };
-        //configure hardware
-        candle_tl = new CANdle(id_top_left);
-        candle_tr = new CANdle(id_top_right);
-        candle_bl = new CANdle(id_bottom_left);
-        candle_br = new CANdle(id_bottom_right);
-        config(candle_tl);
-        config(candle_tr);
-        config(candle_bl);
-        config(candle_br);
 
+        for(int id : can_ids){
+            var candle = new CANdle(id);
+            config(candle);
+            m_candles.add(candle);
+        }
         //set to default user's requests
         setCurrentUser(defaultUser);
         setColor(currentUser.colorProvider());
         setBrightness(1.0);
     }
+
 
     // blinkylights config
     void config(CANdle cdl) {
@@ -126,10 +122,9 @@ public class BlinkyLights extends SubsystemBase {
     };
 
     void setColor(Color8Bit color) {
-        candle_tl.setLEDs(color.red, color.green, color.blue);
-        candle_tr.setLEDs(color.red, color.green, color.blue);
-        candle_bl.setLEDs(color.red, color.green, color.blue);
-        candle_br.setLEDs(color.red, color.green, color.blue);
+        for(CANdle c : m_candles) {
+            c.setLEDs(color.red, color.green, color.blue);
+        }    
         currentColor = color;
     }
 
@@ -142,27 +137,24 @@ public class BlinkyLights extends SubsystemBase {
 
     void setBlinking(Color8Bit color) {
         Animation animation = new StrobeAnimation(color.red, color.green, color.blue, 0, 0.5, 8);
-        candle_tl.animate(animation, 0);
-        candle_tr.animate(animation, 0);
-        candle_bl.animate(animation, 0);
-        candle_br.animate(animation, 0);
+        for(CANdle c : m_candles) {
+        c.animate(animation, 0);
+        }
     }
 
     void stopBlinking() {
-        candle_tl.clearAnimation(0);
-        candle_tr.clearAnimation(0);
-        candle_bl.clearAnimation(0);
-        candle_br.clearAnimation(0);
+        for(CANdle c : m_candles) {
+        c.clearAnimation(0);
+        }
     }
 
     /*
      * Brightness on a scale from 0-1, with 1 being max brightness
      */
     void setBrightness(double brightness) {
-        candle_tl.configBrightnessScalar(brightness);
-        candle_tr.configBrightnessScalar(brightness);
-        candle_bl.configBrightnessScalar(brightness);
-        candle_br.configBrightnessScalar(brightness);
+        for(CANdle c : m_candles) {
+            c.configBrightnessScalar(brightness);
+        }        
     }
 
     public void setAllianceColors() {

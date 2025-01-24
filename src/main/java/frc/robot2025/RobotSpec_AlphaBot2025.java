@@ -14,6 +14,7 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Limelight;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
@@ -37,7 +38,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return pdp;
       })
       // .add(PneumaticsControl.class)
-      // .add(BlinkyLights.class, "LIGHTS")
+      .add(BlinkyLights.class, "LIGHTS", () -> {
+        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
+      })
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
