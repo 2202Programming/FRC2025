@@ -116,10 +116,10 @@ public class SwerveDrivetrain extends SubsystemBase {
       modules[i] = new SwerveModuleMK3(
           mtrClass,
           // handle either flex or max for modules
-          (mtrClass == SparkFlex.class) ? new SparkMax(mc[i].DRIVE_MOTOR_ID, MotorType.kBrushless) : 
-                                          new SparkFlex(mc[i].DRIVE_MOTOR_ID, MotorType.kBrushless),
-          (mtrClass == SparkFlex.class) ? new SparkMax(mc[i].ANGLE_MOTOR_ID, MotorType.kBrushless)  :
-                                          new SparkFlex(mc[i].ANGLE_MOTOR_ID, MotorType.kBrushless),
+          (mtrClass == SparkMax.class) ? new SparkMax(mc[i].DRIVE_MOTOR_ID, MotorType.kBrushless) : 
+                                         new SparkFlex(mc[i].DRIVE_MOTOR_ID, MotorType.kBrushless),
+          (mtrClass == SparkMax.class) ? new SparkMax(mc[i].ANGLE_MOTOR_ID, MotorType.kBrushless)  :
+                                         new SparkFlex(mc[i].ANGLE_MOTOR_ID, MotorType.kBrushless),
 
           canCoders[i],
           mc[i].kAngleMotorInvert,

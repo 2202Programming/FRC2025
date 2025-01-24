@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -106,15 +107,15 @@ public class PIDFController extends PIDController {
      * @param smartMaxVel   optional, 0.1 [units/s]
      * @param smartMaxAccel optional 0.01 [units/s^2]
      */
-    public void copyTo(SparkBase motorController, SparkMaxConfig motorConfig, ClosedLoopSlot slot) {
+    public void copyTo(SparkBase motorController, SparkBaseConfig motorConfig, ClosedLoopSlot slot) {
         copyTo(motorController, motorConfig, slot, m_smartMaxVel, m_smartMaxAccel);
     }
 
-    public void copyTo(SparkBase motorController, SparkMaxConfig motorConfig) {
+    public void copyTo(SparkBase motorController, SparkBaseConfig motorConfig) {
         copyTo(motorController, motorConfig, ClosedLoopSlot.kSlot0, m_smartMaxVel, m_smartMaxAccel);
     }
 
-    public void copyTo(SparkBase motorController, SparkMaxConfig motorConfig, ClosedLoopSlot slot, 
+    public void copyTo(SparkBase motorController, SparkBaseConfig motorConfig, ClosedLoopSlot slot, 
                        double smartMaxVel, double smartMaxAccel) {
         m_smartMaxVel = smartMaxVel;
         m_smartMaxAccel = smartMaxAccel;

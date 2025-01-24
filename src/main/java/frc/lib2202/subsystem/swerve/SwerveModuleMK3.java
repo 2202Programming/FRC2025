@@ -8,6 +8,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.EncoderConfigAccessor;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -48,9 +50,9 @@ public class SwerveModuleMK3 {
 
   // Rev devices
   private final SparkBase driveMotor;
-  private final SparkMaxConfig driveCfg;
+  private final SparkBaseConfig driveCfg;
   private final SparkBase angleMotor;
-  private final SparkMaxConfig angleCfg;
+  private final SparkBaseConfig angleCfg;
   private final SparkClosedLoopController driveMotorPID;
   private final SparkClosedLoopController angleMotorPID; // sparkmax PID can only use internal NEO encoders
   private final RelativeEncoder angleEncoder; // aka internalAngle
@@ -148,7 +150,7 @@ public class SwerveModuleMK3 {
       // account for command sign differences if needed
     angleCmdInvert = (invertAngleCmd) ? -1.0 : 1.0;
     
-    driveCfg = new SparkMaxConfig();
+    driveCfg = (mType == SparkMax.class) ? new SparkMaxConfig() : new SparkFlexConfig();
     // Drive Motor config
     driveCfg.inverted(invertDrive)
             .idleMode(IdleMode.kBrake)
@@ -168,7 +170,7 @@ public class SwerveModuleMK3 {
     
     sleep(100);
     // Angle Motor config
-    angleCfg = new SparkMaxConfig();
+    angleCfg = (mType == SparkMax.class) ? new SparkMaxConfig() : new SparkFlexConfig();
     angleCfg.inverted(invertAngleMtr)
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(limits.angleStallAmp, limits.freeAmp)
