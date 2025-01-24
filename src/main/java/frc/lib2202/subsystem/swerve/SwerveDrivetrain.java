@@ -15,7 +15,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -75,6 +77,11 @@ public class SwerveDrivetrain extends SubsystemBase {
 
 
   public SwerveDrivetrain() {
+      this(SparkMax.class);
+  }
+
+  @SuppressWarnings("rawtypes")
+  public SwerveDrivetrain(Class mtrClass) {
     m_field = new Field2d();
 
     cc = RobotContainer.getRobotSpecs().getChassisConfig();
@@ -104,9 +111,16 @@ public class SwerveDrivetrain extends SubsystemBase {
     // create cancoders and swerve modules
     for (int i = 0; i < mc.length; i++) {
       canCoders[i] = initCANcoder(mc[i].CANCODER_ID, mc[i].kAngleOffset);
+
+
       modules[i] = new SwerveModuleMK3(
-          new SparkMax(mc[i].DRIVE_MOTOR_ID, SparkMax.MotorType.kBrushless),
-          new SparkMax(mc[i].ANGLE_MOTOR_ID, SparkMax.MotorType.kBrushless),
+          mtrClass,
+          // handle either flex or max for modules
+          (mtrClass == SparkMax.class) ? new SparkMax(mc[i].DRIVE_MOTOR_ID, MotorType.kBrushless) : 
+                                         new SparkFlex(mc[i].DRIVE_MOTOR_ID, MotorType.kBrushless),
+          (mtrClass == SparkMax.class) ? new SparkMax(mc[i].ANGLE_MOTOR_ID, MotorType.kBrushless)  :
+                                         new SparkFlex(mc[i].ANGLE_MOTOR_ID, MotorType.kBrushless),
+
           canCoders[i],
           mc[i].kAngleMotorInvert,
           mc[i].kAngleCmdInvert,

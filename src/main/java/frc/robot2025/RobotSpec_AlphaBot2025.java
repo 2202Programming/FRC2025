@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.MperFT;
 
+import com.revrobotics.spark.SparkFlex;
+
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -29,7 +31,8 @@ import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.sensors.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
-  // Subsystems and other hardware on 2024 Robot rev Alpha
+  // Subsystems and other hardware on 2025 Robot rev Alpha
+  // $env:serialnum = "032381BF"
   final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "032381BF")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
@@ -46,7 +49,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       })
       .add(Sensors_Subsystem.class)
       .add(Limelight.class)
-      .add(SwerveDrivetrain.class) // must be after LL and Sensors
+      .add(SwerveDrivetrain.class, () ->{
+          return new SwerveDrivetrain(SparkFlex.class);
+      }) // must be after LL and Sensors
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
