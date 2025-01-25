@@ -21,6 +21,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   //what kind of sensors will we have on this bot. Not fully sure yet. Double check with mechanical
   private double elevator_speed; //what will "speed" be in? I'm thinking inches per second right now \*_*/
   private double elevator_height; //in inches
+  private double elevator_height_setpoint; //in inches
   
 
   public Elevator_Subsystem() {
@@ -33,15 +34,23 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
    
   public double get_Elevator_Height() {
-    return 0.0; //some sort of calculation, or durring the peridic we keep updating the positon of the elevator.
+    return elevator_height; //some sort of calculation during the peridic, where we keep updating the positon of the elevator.
   }
 
   public void Elevator_Set_ToHeight(double height) {
-
+    elevator_height_setpoint = height;
   }
 
   public void set_Elevator_Speed(double speed){ 
     this.elevator_speed = speed;
+  }
+
+  public double get_elevator_setpoint() {
+    return elevator_height_setpoint;
+  }
+
+  public double get_elevator_speed() {
+    return elevator_speed;
   }
 
   
