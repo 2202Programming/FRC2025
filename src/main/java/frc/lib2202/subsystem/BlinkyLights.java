@@ -42,12 +42,14 @@ public class BlinkyLights extends SubsystemBase {
 
     // State vars, handle N candle sets
     ArrayList<CANdle> m_candles;
+    ArrayList<Color8Bit> colors;
     Color8Bit currentColor;
 
     final BlinkyLightUser defaultUser;
 
     public BlinkyLights(int... can_ids){
         m_candles = new ArrayList<CANdle>();
+        colors = new ArrayList<Color8Bit>();
         defaultUser = new BlinkyLightUser(this) {
             @Override
             public Color8Bit colorProvider() {
@@ -59,6 +61,8 @@ public class BlinkyLights extends SubsystemBase {
             var candle = new CANdle(id);
             config(candle);
             m_candles.add(candle);
+            //default color
+            colors.add(WHITE);
         }
         //set to default user's requests
         setCurrentUser(defaultUser);
@@ -122,10 +126,17 @@ public class BlinkyLights extends SubsystemBase {
     };
 
     void setColor(Color8Bit color) {
-        for(CANdle c : m_candles) {
-            c.setLEDs(color.red, color.green, color.blue);
-        }    
+        for(int i = 0; i < m_candles.size(); i++) {
+            m_candles.get(i).setLEDs(color.red, color.green, color.blue);
+            colors.set(i, color);
+        }  
         currentColor = color;
+    }
+    void setIndividualColor(int CANdleNum, Color8Bit color) {
+        if (CANdleNum < m_candles.size()) {
+            m_candles.get(CANdleNum).setLEDs(color.red, color.green, color.blue);
+            colors.set(CANdleNum, color);
+        }
     }
 
     void setBlinking(boolean blink) {
@@ -216,6 +227,17 @@ public class BlinkyLights extends SubsystemBase {
         public Color8Bit colorProvider() {
             return WHITE;
         };
+        /**
+         * Used in commands, override as you wish
+         * Order: Color, CANdleNum
+         * @return an object array that contains the Color to set to (first), and secondly, the CANdle number to set to
+         */
+        public ArrayList<Object> individualColorProvider() {
+            ArrayList<Object> arr = new ArrayList<>();
+            arr.add(WHITE);
+            arr.add(0);
+            return arr;
+        };
 
         // used in commands, Override to your preferences
         public boolean requestBlink() {
@@ -252,8 +274,13 @@ public class BlinkyLights extends SubsystemBase {
         @Override
         public void execute() {
             Color8Bit newColor = myUser.colorProvider();
-
+            Color8Bit newIndividualColor = (Color8Bit) myUser.individualColorProvider().get(0);
             // avoid CAN bus traffic if color isn't changing
+            for(int i = 0; i < m_candles.size(); i++) {
+                if (colors.get(i) != newIndividualColor) {
+                    setIndividualColor((int) myUser.individualColorProvider().get(1), newIndividualColor);
+                }
+            }
             if (!currentColor.equals(newColor)) {
                 currentColor = newColor;
                 setColor(currentColor);
