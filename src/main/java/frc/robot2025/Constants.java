@@ -192,6 +192,8 @@ public final class Constants {
     // lights
     public static final int CANDLE1 = 3;
     public static final int CANDLE2 = 4;
+    public static final int CANDLE3 = 5;
+    public static final int CANDLE4 = 6;
 
     // Warning: CAN 7 is used for CANCoder on swerveBot aka Tim 2.0
 
