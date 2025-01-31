@@ -182,7 +182,7 @@ public class SubsystemConfig {
         put(name, new SubsystemDefinition<T>(clz, factory));
         return this;
     }
-
+    
     // Facory adds must have a type, use class name since none given
     public <T> SubsystemConfig add(Class<T> clz, Supplier<Object> factory) {
         String name = clz.getSimpleName();

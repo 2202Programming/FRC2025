@@ -1,3 +1,8 @@
+Main.java
+==========
+Add RobotSpec_<> constructors to Main.java.  Each must have the serialnum for the
+RoboRio used by that machine. 
+
 Setting serialnum for debug
 ===========================
 
