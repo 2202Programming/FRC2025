@@ -1,0 +1,3 @@
+[submodule "src/main/java/frc/lib2202"]
+	path = src/main/java/frc/lib2202
+	url = https://github.com/2202Programming/Lib2202.git
