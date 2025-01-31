@@ -1,8 +1,11 @@
 package frc.robot2025;
 
-import static frc.lib2202.Constants.MperFT;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static frc.lib2202.Constants.MperFT;
+
+import com.revrobotics.spark.SparkFlex;
+
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -12,10 +15,7 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
-import frc.lib2202.command.swerve.AllianceAwareGyroReset;
-import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.subsystem.Limelight;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
@@ -26,46 +26,33 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.subsystems.sensors.Sensors_Subsystem;
+import frc.robot2025.subsystems.Limelight;
+import frc.robot2025.subsystems.Sensors_Subsystem;
 
-public class RobotSpec_AlphaBot2024 implements IRobotSpec {
+public class RobotSpec_CompBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2024 Robot rev Alpha
-  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2024", "032381BF")
+  final SubsystemConfig ssconfig = new SubsystemConfig("CompBot2025", "11111111") //TODO FIX serialnum
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
         pdp.clearStickyFaults();
         return pdp;
       })
-      //.add(PneumaticsControl.class)
+      // .add(PneumaticsControl.class)
       // .add(BlinkyLights.class, "LIGHTS")
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
-      .add(frc.robot2025.subsystems.sensors.Sensors_Subsystem.class)
+      .add(Sensors_Subsystem.class)
       .add(Limelight.class)
-      .add(SwerveDrivetrain.class) // must be after LL and Sensors
+     .add(SwerveDrivetrain.class, () ->{
+          return new SwerveDrivetrain(SparkFlex.class);
+      }) // must be after LL and Sensors
       .add(VisionPoseEstimator.class)
-      //below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Command.class, "DT_Monitor", () -> {return new DTMonitorCmd();})
-      ;
-      
-      /*  ALPHABOT PARTIALLY DISSAMBLED
-      .add(Intake.class)
-      .add(Command.class, "IntakeWatcher", () -> {
-        return RobotContainer.getSubsystem(Intake.class).getWatcher();
-      })
-      .add(Shooter.class)
-      .add(Command.class, "ShooterWatcher", () -> {
-        // cast to get the correct type of shooter
-        return (RobotContainer.getSubsystem(Shooter.class)).getWatcher();
-      })
-      .add(Transfer.class)
-      .add(Command.class, "TransferWatcher", () -> {
-        return RobotContainer.getSubsystem(Transfer.class).getWatcher();
+      // below are optional watchers for shuffeleboard data - disable if need too.
+      .add(Command.class, "DT_Monitor", () -> {
+        return new DTMonitorCmd();
       });
-      */
-      
 
   // set this true at least once after robot hw stabilizes
   boolean burnFlash = false;
@@ -74,16 +61,15 @@ public class RobotSpec_AlphaBot2024 implements IRobotSpec {
   // Robot Speed Limits
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
 
-
   // Chassis
   double kWheelCorrectionFactor = .957;
-  double kSteeringGR = 21.428;
-  double kDriveGR = 6.12;
+  double kSteeringGR = 21.42857; //Mk4i 
+  double kDriveGR = 6.12; //Mk4i L3
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
   final ChassisConfig chassisConfig = new ChassisConfig(
-      MperFT * (25.0 / 12.0) / 2.0, // x
-      MperFT * (20.75 / 12.0) / 2.0, // y
+      MperFT * (23.287 / 12.0) / 2.0, // x, based off onshape measurements
+      MperFT * (23.386 / 12.0) / 2.0, // y, based off onshape measurements
       kWheelCorrectionFactor, // scale [] <= 1.0
       kWheelDiameter,
       kSteeringGR,
@@ -92,7 +78,7 @@ public class RobotSpec_AlphaBot2024 implements IRobotSpec {
       new PIDFController(0.01, 0.0, 0.0, 0.0) // angle
   );
 
-  public RobotSpec_AlphaBot2024() {
+  public RobotSpec_CompBot2025() {
     // finish BetaBot's drivePIDF
     chassisConfig.drivePIDF.setIZone(0.2);
     // add the specs to the ssconfig
@@ -121,22 +107,22 @@ public class RobotSpec_AlphaBot2024 implements IRobotSpec {
     ModuleConfig[] modules = new ModuleConfig[4];
     modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
         29, 24, 25,
-        41.484) //43.85746387)
+        41.484)
         .setInversions(false, true, false);
 
     modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
         30, 26, 27,
-        -66.621) //-65.21481)
+        -66.621)
         .setInversions(true, true, false);
 
     modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
         28, 22, 23,
-        24.785) // 24.096825)
+        24.785)
         .setInversions(false, true, false);
 
     modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
         31, 20, 21,
-        -40.781) // -43.066333125)
+        -40.781)
         .setInversions(true, true, false);
 
     return modules;
@@ -162,17 +148,16 @@ public class RobotSpec_AlphaBot2024 implements IRobotSpec {
   @Override
   public SendableChooser<Command> getRegisteredCommands() {
     // no robot parts to support thse now
-    //return RegisteredCommands.RegisterCommands();
+    // return RegisteredCommands.RegisterCommands();
     return null;
   }
 
   @Override
-    public void setDefaultCommands() {
-       SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
-        if (drivetrain != null) {
-            drivetrain.setDefaultCommand(new RobotCentricDrive());
-          }
+  public void setDefaultCommands() {
+    SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
+    if (drivetrain != null) {
+      drivetrain.setDefaultCommand(new RobotCentricDrive());
     }
-
+  }
 
 }

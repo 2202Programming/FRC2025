@@ -5,12 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot2025.subsystems.sensors;
+package frc.robot2025.subsystems;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
@@ -37,8 +34,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    * This class will collect various robot sensors and ensure they are sampled and
    * filtered together.
    * 
-   * Sensor sets include: NavX Chasis signals Lidar?
-   * 
    * 
    */
   private NetworkTable table;
@@ -47,12 +42,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   private NetworkTableEntry nt_canUtilization;
   private NetworkTableEntry nt_canTxError;
   private NetworkTableEntry nt_canRxError;
-
-  private NetworkTableEntry nt_cancoder_bl;
-  private NetworkTableEntry nt_cancoder_br;
-  private NetworkTableEntry nt_cancoder_fl;
-  private NetworkTableEntry nt_cancoder_fr;
-  private NetworkTableEntry nt_activeIMU;
 
   private NetworkTableEntry nt_yaw;
   private NetworkTableEntry nt_roll;
@@ -71,7 +60,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   }
 
   public enum GyroStatus {
-    UsingNavx("Navx"),
     UsingPigeon("Pigeon");
 
     private String name;
@@ -109,8 +97,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   double m_yaw_bias; // [deg] measured, but not corrected for
 
   double m_yaw_d;
-  final RotationPositions m_rot = new RotationPositions();
-
+ 
   // configurion setting
   YawSensor c_yaw_type = YawSensor.kPigeon;
   GyroStatus c_gryo_status = GyroStatus.UsingPigeon;
@@ -135,12 +122,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     nt_canRxError = table.getEntry("CanRxError");
     nt_canTxError = table.getEntry("CanTxError");
 
-    // position angle encoders
-    nt_cancoder_bl = table.getEntry("cc_bl");
-    nt_cancoder_br = table.getEntry("cc_br");
-    nt_cancoder_fl = table.getEntry("cc_fl");
-    nt_cancoder_fr = table.getEntry("cc_fr");
-    nt_activeIMU = table.getEntry("Active IMU");
     nt_yaw = table.getEntry("Active Yaw");
     nt_rotation = table.getEntry("Rotation");
     nt_pitch = positionTable.getEntry("Pitch");
@@ -172,8 +153,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
     m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
    
-   
-    // getRotationPositions(m_rot);
 
     // TODO m_xyz_dps not set
     m_yaw_d = m_xyz_dps[2];
@@ -204,12 +183,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
       nt_canUtilization.setDouble(m_canStatus.percentBusUtilization);
       nt_canRxError.setNumber(m_canStatus.receiveErrorCount);
       nt_canTxError.setNumber(m_canStatus.transmitErrorCount);
-
-      nt_cancoder_bl.setDouble(m_rot.back_left);
-      nt_cancoder_br.setDouble(m_rot.back_right);
-      nt_cancoder_fl.setDouble(m_rot.front_left);
-      nt_cancoder_fr.setDouble(m_rot.front_right);
-      nt_activeIMU.setString(c_gryo_status.toString());
 
       nt_yaw.setDouble(getYaw());
       nt_rotation.setDouble(getRotation2d().getDegrees());
@@ -335,44 +308,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     return m_yaw_d;
   }
 
-  /*****
-  public RotationPositions getRotationPositions(RotationPositions pos) {
-    // pos.back_left = rot_encoder_bl.getAbsolutePosition(); in phohenix 5 range is
-    // (-180,180)
-    // Phoenix 6 is [-0.5, 0.5) rotations
-    // so multiply this by 360 so that it returns degrees
-    pos.back_left = rot_encoder_bl.getAbsolutePosition().getValueAsDouble() * 360.0;
-    pos.back_right = rot_encoder_br.getAbsolutePosition().getValueAsDouble() * 360.0;
-    pos.front_left = rot_encoder_fl.getAbsolutePosition().getValueAsDouble() * 360.0;
-    pos.front_right = rot_encoder_fr.getAbsolutePosition().getValueAsDouble() * 360.0;
-
-    return pos;
-  }
-**********/
-
-  /**
-   * init() - setup cancoder the way we need them.
-   * This CANcoder returns value in rotation with phoenix 6 [-0.5, 0.5)
-   * 
-   * @param c
-   * @return CANcoder just initialized
-   */
-  CANcoder init(CANcoder c) {
-    CANcoderConfiguration configs = new CANcoderConfiguration();
-    // According to doc this should report absolute position from [-0.5, 0.5)
-    // rotations
-    // (clock wise is positive)
-
-    //TODO: do we need this?  Not available in 2025 lib
-    //configs.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    configs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
-    
-    configs.MagnetSensor.MagnetOffset = 0.0;
-    configs.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-    c.getConfigurator().apply(configs);
-    c.clearStickyFaults();
-    return c;
-  }
 
   public void setAutoStartPose(Pose2d pose) {
     autoStartPose = new Pose2d(pose.getTranslation(), pose.getRotation());
