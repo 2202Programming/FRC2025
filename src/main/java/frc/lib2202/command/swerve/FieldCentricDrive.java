@@ -57,6 +57,8 @@ public class FieldCentricDrive extends Command {
     ySpeed = yspeedLimiter.calculate(dc.getVelocityY()) * limits.kMaxSpeed;
     rot = rotLimiter.calculate(dc.getXYRotation()) * limits.kMaxAngularSpeed;
 
+    ySpeed = 0; //* DO NOT COMMIT. DEBUGGING SWERVE. */
+    rot = 0; //* This one TOO! */
     // Clamp speeds/rot from the Joysticks
     xSpeed = MathUtil.clamp(xSpeed, -limits.kMaxSpeed, limits.kMaxSpeed);
     ySpeed = MathUtil.clamp(ySpeed, -limits.kMaxSpeed, limits.kMaxSpeed);

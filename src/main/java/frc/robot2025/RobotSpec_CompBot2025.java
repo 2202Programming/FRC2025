@@ -15,6 +15,7 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
+import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.VisionPoseEstimator;
@@ -159,7 +160,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
   public void setDefaultCommands() {
     SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
     if (drivetrain != null) {
-      drivetrain.setDefaultCommand(new RobotCentricDrive());
+      drivetrain.setDefaultCommand(new FieldCentricDrive());
     }
   }
 
