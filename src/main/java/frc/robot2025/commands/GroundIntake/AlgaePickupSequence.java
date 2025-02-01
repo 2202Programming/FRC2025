@@ -11,10 +11,12 @@ import frc.lib2202.builder.RobotContainer;
 
 public class AlgaePickupSequence extends Command {
 
-  public enum Phase {
-    Rest, AlgaePickup, AlgaeRest, WaitForAlgae
+  public enum State {
+    WaitForAlgae, // wait for lg to trip
+    AlgaeRest, // when algae is in robot for transport to processor
+    Finished // 
   }
-  Phase phase;
+  State state;
   final GroundIntake groundIntake;
   boolean hasAlgae;
 
@@ -28,28 +30,25 @@ public class AlgaePickupSequence extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    phase = Phase.AlgaePickup;
+    groundIntake.setGroundIntakePosition(Position.ALGAE_PICKUP);
+    groundIntake.setGroundIntakeWheelSpeed(1.0); // placeholder
+    state = State.WaitForAlgae;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    switch(phase){
-      case AlgaePickup:
-        groundIntake.setGroundIntakePosition(Position.ALGAE_PICKUP);
-        groundIntake.setGroundIntakeWheelSpeed(1.0);
-        phase = Phase.WaitForAlgae;
-        break;
+    switch(state){
 
       case WaitForAlgae:
         hasAlgae = groundIntake.senseGamePiece();
-        phase = hasAlgae ? Phase.AlgaeRest : Phase.WaitForAlgae;
+        state = hasAlgae ? State.AlgaeRest : State.WaitForAlgae;
         break;
 
       case AlgaeRest:
         groundIntake.setGroundIntakePosition(Position.ALGAE_REST);
         groundIntake.setGroundIntakeWheelSpeed(0.0);
-        phase = Phase.Finished;
+        state = State.Finished;
         break;
 
       case Finished:
@@ -60,13 +59,13 @@ public class AlgaePickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    groundIntake.setGroundIntakePosition(groundIntake.senseGamePiece() ? Position.ALGAE_REST : Position.Zero);
+    groundIntake.setGroundIntakePosition(groundIntake.senseGamePiece() ? Position.ALGAE_REST : Position.ZERO);
     groundIntake.setGroundIntakeWheelSpeed(0.0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return state == State.Finished;
   }
 }
