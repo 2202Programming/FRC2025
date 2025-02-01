@@ -16,6 +16,7 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
@@ -28,6 +29,7 @@ import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.PneumaticsControl;
 
 public class RobotSpec_CompBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2024 Robot rev Alpha
@@ -38,8 +40,8 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
         pdp.clearStickyFaults();
         return pdp;
       })
-      // .add(PneumaticsControl.class)
-      // .add(BlinkyLights.class, "LIGHTS")
+      .add(PneumaticsControl.class)
+      .add(BlinkyLights.class, "LIGHTS")
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
