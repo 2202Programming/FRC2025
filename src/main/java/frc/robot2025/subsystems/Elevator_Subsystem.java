@@ -23,9 +23,21 @@ public class Elevator_Subsystem extends SubsystemBase {
   /** Creates a new Elevator_Subsystem. */
 
   //get once we have prototype (USE ELLANA'S CODE AS EXAMPLE)
-  private enum Levels {
-    LCoral, LOne, LTwo, LThree, LFour //may add heights that corralate to these, double check with andrew on how to do
+  public enum Levels {
+    LCoral(75.5), 
+    LOne(0), 
+    LTwo(75.5), 
+    LThree(116), 
+    LFour(176),
+    Ground(0); //change to accurate heights (in CM) THESE ARE NOT ACCURATE
+
+    public double height;
+
+    private Levels(double height) {
+      this.height = height;
+    }
   }; 
+
   private final PIDController elevatorPidController;
   private final PIDFController elevatorPIDF;
   private NeoServo elevator_Servo1;
@@ -36,7 +48,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private double elevator_height_setpoint; //in cm
 
   private int gear_Ratio = 5;  //throw in constants?
-  private int chain_Ratio = 314159;
+  private int chain_Ratio = 314159; //TODO get valid number
   
 
   public Elevator_Subsystem() {
@@ -60,17 +72,17 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    elevator_Servo1.periodic();
   }
    
   public double get_Elevator_Height() {
     return elevator_Servo1.getPosition(); //some sort of calculation needed
   }
 
-  public void Elevator_Set_ToHeight(double height) {
-    elevator_height_setpoint = height;
-    elevator_Servo1.setSetpoint(height);
-  
+  public void Elevator_Set_ToHeight(Levels level) {
+    // double height = reverse of the equation from motor rotations to cm
+    //elevator_height_setpoint = height;
+    //elevator_Servo1.setSetpoint(height);  TODO this. In general. We could also throw the conversion in periodic
   }
 
   public double get_elevator_setpoint() {
