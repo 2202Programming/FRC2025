@@ -67,7 +67,8 @@ public RobotCentricDrive() {
     xSpeed = xspeedLimiter.calculate(dc.getVelocityX()) * limits.kMaxSpeed;
     ySpeed = yspeedLimiter.calculate(dc.getVelocityY()) * limits.kMaxSpeed;
     rot = rotLimiter.calculate(dc.getXYRotation()) * limits.kMaxAngularSpeed;
-
+    
+    ySpeed = 0 ; //for calibration
     // Clamp speeds/rot from the Joysticks
     xSpeed = MathUtil.clamp(xSpeed, -limits.kMaxSpeed, limits.kMaxSpeed);
     ySpeed = MathUtil.clamp(ySpeed, -limits.kMaxSpeed, limits.kMaxSpeed);

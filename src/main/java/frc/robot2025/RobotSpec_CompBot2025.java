@@ -27,13 +27,13 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.subsystems.Limelight;
+import frc.lib2202.subsystem.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.PneumaticsControl;
 
 public class RobotSpec_CompBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2024 Robot rev Alpha
-  final SubsystemConfig ssconfig = new SubsystemConfig("CompBot2025", "11111111") //TODO FIX serialnum
+  final SubsystemConfig ssconfig = new SubsystemConfig("CompBot2025", "03282B65") 
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -41,7 +41,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
         return pdp;
       })
       .add(PneumaticsControl.class)
-      .add(BlinkyLights.class, "LIGHTS")
+      //.add(BlinkyLights.class, "LIGHTS")
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
@@ -50,11 +50,12 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
      .add(SwerveDrivetrain.class, () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
-      .add(VisionPoseEstimator.class)
+      //.add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Command.class, "DT_Monitor", () -> {
+      /* .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
-      });
+      }) */
+      ;
 
   // set this true at least once after robot hw stabilizes
   boolean burnFlash = false;
@@ -64,14 +65,14 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
 
   // Chassis
-  double kWheelCorrectionFactor = .957;
+  double kWheelCorrectionFactor = 1.0;
   double kSteeringGR = 21.42857; //Mk4i 
   double kDriveGR = 6.12; //Mk4i L3
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
   final ChassisConfig chassisConfig = new ChassisConfig(
-      MperFT * (23.287 / 12.0) / 2.0, // x, based off onshape measurements
-      MperFT * (23.386 / 12.0) / 2.0, // y, based off onshape measurements
+      0.57785 / 2.0, // x, based on direct measurements
+      0.57785 / 2.0, // y, based on direct measurements
       kWheelCorrectionFactor, // scale [] <= 1.0
       kWheelDiameter,
       kSteeringGR,
@@ -108,23 +109,23 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
   public ModuleConfig[] getModuleConfigs() {
     ModuleConfig[] modules = new ModuleConfig[4];
     modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        29, 24, 25,
-        41.484)
+        29, 22, 23,
+        43.06603125)
         .setInversions(false, true, false);
 
     modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        30, 26, 27,
-        -66.621)
+        30, 27, 26,
+        -66.708890625)
         .setInversions(true, true, false);
 
     modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        28, 22, 23,
-        24.785)
+        28, 21, 20,
+        49.7459375)
         .setInversions(false, true, false);
 
     modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        31, 20, 21,
-        -40.781)
+        31, 24, 25,
+        -65.56615625)
         .setInversions(true, true, false);
 
     return modules;
