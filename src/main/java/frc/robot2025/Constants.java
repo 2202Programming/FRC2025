@@ -47,22 +47,22 @@ public final class Constants {
     // DT
     // synced as of 1/25/25 
     // https://docs.google.com/spreadsheets/d/1CyHzJscPIuvs0eFUY_qruQcuFui_w2nIXeXUyMwRKBU
+// i tried putting them in numerical order but the IO tables are sorta inconsistant with ordering so nothing I can do
+    public static final int BL_Angle = 20;
+    public static final int BL_Drive = 21;
+    public static final int BL_CANCoder = 28;
 
-    public static final int FR_Angle = 0;
-    public static final int FR_Drive = 0;
-    public static final int FR_CANCoder = 0;
+    public static final int FL_Angle = 23;
+    public static final int FL_Drive = 22;
+    public static final int FL_CANCoder = 29;
 
-    public static final int FL_Angle = 0;
-    public static final int FL_Drive = 0;
-    public static final int FL_CANCoder = 0;
+    public static final int BR_Angle = 25;
+    public static final int BR_Drive = 24;
+    public static final int BR_CANCoder = 31;
 
-    public static final int BL_Angle = 0;
-    public static final int BL_Drive = 0;
-    public static final int BL_CANCoder = 0;
-
-    public static final int BR_Angle = 0;
-    public static final int BR_Drive = 0;
-    public static final int BR_CANCoder = 0;
+    public static final int FR_Angle = 26;
+    public static final int FR_Drive = 27;
+    public static final int FR_CANCoder = 30;
 
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
