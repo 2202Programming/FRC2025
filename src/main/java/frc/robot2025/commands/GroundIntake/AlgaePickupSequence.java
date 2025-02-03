@@ -14,7 +14,7 @@ public class AlgaePickupSequence extends Command {
   public enum State {
     WaitForAlgae, // wait for lg to trip
     AlgaeRest, // when algae is in robot for transport to processor
-    Finished // 
+    Finished // sequence is finished, gamepiece is in position for transport
   }
   State state;
   final GroundIntake groundIntake;
