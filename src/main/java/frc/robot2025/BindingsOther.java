@@ -10,12 +10,13 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
-import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
+import frc.lib2202.subsystem.hid.HID_Subsystem;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 
 /*
  * Bindings here for testing, 
@@ -28,7 +29,7 @@ public class BindingsOther {
 
     static Bindings bindings = Bindings.DriveTest;
 
-    public static void ConfigureOther(HID_Xbox_Subsystem dc) {
+    public static void ConfigureOther(HID_Subsystem dc) {
         DriverBinding(dc);
         OperatorBindings(dc);
     }
@@ -46,9 +47,9 @@ public class BindingsOther {
 
 
 
-    static void DriverBinding(HID_Xbox_Subsystem dc) {
+    static void DriverBinding(HID_Subsystem dc) {
         var generic_driver = dc.Driver();
-        var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
+        DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
         
         //TODO - handle paths better, maybe move configAutoBuilder out of swerve code
         PathPlannerPath pathBlue1 = loadFromFile("test_1m");//"blue1");
@@ -62,47 +63,94 @@ public class BindingsOther {
                 if (generic_driver instanceof CommandXboxController) {
                     CommandXboxController driver = (CommandXboxController)generic_driver;
             
-                driver.leftBumper().whileTrue(new RobotCentricDrive(drivetrain, dc));
-                driver.b().onTrue(new AllianceAwareGyroReset(false));
+                    driver.leftBumper().whileTrue(new RobotCentricDrive(drivetrain, dc));
+                    driver.b().onTrue(new AllianceAwareGyroReset(false));
 
-                // This appears to break if initial pose is too close to path start pose
-                // (zero-length path?)
-                if (pathBlue1 != null)
+                    // This appears to break if initial pose is too close to path start pose
+                    // (zero-length path?)
+                    if (pathBlue1 != null)
+                        driver.x().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindThenFollowPath(pathBlue1,
+                                    new PathConstraints(3.0, 3.0,
+                                            Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+                    if (pathRed1 != null)
+                        driver.b().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindThenFollowPath(pathRed1,
+                                    new PathConstraints(3.0, 3.0,
+                                            Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+
+                    // Start any watcher commands
+                
+                    // This appears to break if initial pose is too close to path start pose
+                    // (zero-length path?)
+                    if (pathTest_1m != null)
+                        driver.a().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindThenFollowPath(pathTest_1m,
+                                    new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+
                     driver.x().onTrue(new SequentialCommandGroup(
-                        new InstantCommand(drivetrain::printPose),
-                        AutoBuilder.pathfindThenFollowPath(pathBlue1,
-                                new PathConstraints(3.0, 3.0,
-                                        Units.degreesToRadians(540),
-                                        Units.degreesToRadians(720))),
-                        new InstantCommand(drivetrain::printPose)));
-                if (pathRed1 != null)
-                    driver.b().onTrue(new SequentialCommandGroup(
-                        new InstantCommand(drivetrain::printPose),
-                        AutoBuilder.pathfindThenFollowPath(pathRed1,
-                                new PathConstraints(3.0, 3.0,
-                                        Units.degreesToRadians(540),
-                                        Units.degreesToRadians(720))),
-                        new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindToPose(new Pose2d(new Translation2d(1.73, 5.38), new Rotation2d(0.0)),
+                                    new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
 
-                // Start any watcher commands
-               
-                // This appears to break if initial pose is too close to path start pose
-                // (zero-length path?)
-                if (pathTest_1m != null)
-                    driver.a().onTrue(new SequentialCommandGroup(
-                        new InstantCommand(drivetrain::printPose),
-                        AutoBuilder.pathfindThenFollowPath(pathTest_1m,
-                                new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
-                                        Units.degreesToRadians(720))),
-                        new InstantCommand(drivetrain::printPose)));
+                }
+                else if (generic_driver instanceof CommandPS4Controller) {
 
-                driver.x().onTrue(new SequentialCommandGroup(
-                        new InstantCommand(drivetrain::printPose),
-                        AutoBuilder.pathfindToPose(new Pose2d(new Translation2d(1.73, 5.38), new Rotation2d(0.0)),
-                                new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
-                                        Units.degreesToRadians(720))),
-                        new InstantCommand(drivetrain::printPose)));
+                    CommandPS4Controller driver = (CommandPS4Controller)generic_driver;
+            
+                    driver.L1().whileTrue(new RobotCentricDrive(drivetrain, dc));
+                    driver.circle().onTrue(new AllianceAwareGyroReset(false));
 
+                    // This appears to break if initial pose is too close to path start pose
+                    // (zero-length path?)
+                    if (pathBlue1 != null)
+                        driver.square().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindThenFollowPath(pathBlue1,
+                                    new PathConstraints(3.0, 3.0,
+                                            Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+                    if (pathRed1 != null)
+                        driver.circle().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindThenFollowPath(pathRed1,
+                                    new PathConstraints(3.0, 3.0,
+                                            Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+
+                    // Start any watcher commands
+                
+                    // This appears to break if initial pose is too close to path start pose
+                    // (zero-length path?)
+                    if (pathTest_1m != null)
+                        driver.cross().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindThenFollowPath(pathTest_1m,
+                                    new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+
+                        driver.square().onTrue(new SequentialCommandGroup(
+                            new InstantCommand(drivetrain::printPose),
+                            AutoBuilder.pathfindToPose(new Pose2d(new Translation2d(1.73, 5.38), new Rotation2d(0.0)),
+                                    new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
+                                            Units.degreesToRadians(720))),
+                            new InstantCommand(drivetrain::printPose)));
+
+                
                 }
                 else {
                     // put driver TMjoystick commands here
@@ -114,7 +162,7 @@ public class BindingsOther {
         }
     }
 
-    static void OperatorBindings(HID_Xbox_Subsystem dc) {
+    static void OperatorBindings(HID_Subsystem dc) {
         @SuppressWarnings("unused")
         var operator = dc.Operator();    
 
