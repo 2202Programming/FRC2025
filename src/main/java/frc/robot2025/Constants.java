@@ -201,6 +201,7 @@ public final class Constants {
     public static final int SHOOTER_L = 15;
     public static final int SHOOTER_R = 16;
     public static final int SHOOTER_ANGLE = 35;
+    public static final int CLIMBER = 10; //placeholder
 
     // Drive Train IDs 20 - 31
     // drive train CAN addresses are set above with CANModuleConfig to support
@@ -236,9 +237,6 @@ public final class Constants {
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
 
-    // Climber
-    public static final int CLIMBER = 36; // palceholder
-
     //Amp Mechanism
     public static final int AMP_MECHANISM = 10; //find out
 
@@ -268,10 +266,7 @@ public final class Constants {
   }
 
   public final class DigitalIO {
-    public static final int Transfer_LightGate = 0;
-    public static final int Intake_LightGate = 1;
-    public static final int Shooter_HighLimitSwitch = 3; 
-    public static final int Shooter_LowLimitSwitch = 2;
+    public static final int EndEffector_LIGHTGATE = 0;
   }
 
   public static final class Transfer_Constants {

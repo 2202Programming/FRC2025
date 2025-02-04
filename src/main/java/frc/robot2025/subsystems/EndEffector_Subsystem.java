@@ -14,10 +14,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.command.WatcherCmd;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.Constants.DigitalIO;
 
 public class EndEffector_Subsystem extends SubsystemBase {
   final SparkMax mtr;
@@ -31,15 +33,15 @@ public class EndEffector_Subsystem extends SubsystemBase {
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
   PIDFController pidConsts_freeSpin = new PIDFController(0.0, 0.0, 0.0, 0.0);
   final double velocityConversionFactor = 1.0;
+  DigitalInput lightGate = new DigitalInput(DigitalIO.EndEffector_Lightgate);
 
   /** Creates a new EE_Subsystem. */
-  public EE_Subsystem() {
+  public EndEffector_Subsystem() {
     mtr = new SparkMax(CAN.AMP_MECHANISM, SparkMax.MotorType.kBrushless);
     encoder = mtr.getEncoder();
     controller = motor_config(mtr, pid, false);
     // encoder = config.encoder(mtr); we want it in rpm, shouldn't need
     controller = mtr.getClosedLoopController();
-    
   }
 
   @Override
@@ -59,10 +61,13 @@ public class EndEffector_Subsystem extends SubsystemBase {
     controller.setReference(RPM,  ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     cmdRPM = RPM;
   }
+  public boolean hasPiece(){
+    return lightGate.get();
+  }
   
 
     public WatcherCmd getWatcher() {
-    return new ShooterWatcherCmd();
+    return new EndEffectorWatcherCmd();
   }
 
   SparkClosedLoopController motor_config(SparkMax mtr, PIDFController hwPidConsts, boolean inverted) {
@@ -79,16 +84,17 @@ public class EndEffector_Subsystem extends SubsystemBase {
     return mtrpid;
   }
 
-   class ShooterWatcherCmd extends WatcherCmd {
+   class EndEffectorWatcherCmd extends WatcherCmd {
     NetworkTableEntry nt_cmdRPM;
     NetworkTableEntry nt_measRPM;
     NetworkTableEntry nt_kP;
     NetworkTableEntry nt_kF;
+    NetworkTableEntry nt_hasPiece;
 
     // add nt for pos when we add it
     @Override
     public String getTableName() {
-      return EE_Subsystem.this.getName();
+      return EndEffector_Subsystem.this.getName();
     }
 
     public void ntcreate() {
@@ -97,6 +103,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
       nt_measRPM = table.getEntry("measRPM");
       nt_kP = table.getEntry("kP");
       nt_kF = table.getEntry("kF");
+      nt_hasPiece = table.getEntry("hasPiece");
     }
 
     public void ntupdate() {
@@ -104,6 +111,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
       nt_measRPM.setDouble(measRPM);
       nt_kP.setDouble(pid.getP());
       nt_kF.setDouble(pid.getF());
+      nt_hasPiece.setBoolean(hasPiece());
     }
   }
 
