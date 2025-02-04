@@ -28,7 +28,6 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_CompBot2025 implements IRobotSpec {
@@ -42,17 +41,18 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
       })
       // .add(PneumaticsControl.class)
       // .add(BlinkyLights.class, "LIGHTS")
-      
-      .add(Sensors_Subsystem.class)
-      .add(BaseLimelight.class, "limelight", () ->{
-        return new frc.lib2202.subsystem.Limelight("ll1");
-      })
-      .add(DriveTrainInterface.class, "drivetrain", () ->{
-          return new SwerveDrivetrain(SparkFlex.class);
-      }) // must be after LL and Sensors
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
+      .add(Sensors_Subsystem.class)
+      .add(BaseLimelight.class, "limelight", () ->{
+        return new frc.robot2025.subsystems.Limelight();
+      })
+      // for now, SDT must be after LL and Sensors
+      .add(DriveTrainInterface.class, "drivetrain", () ->{
+          return new SwerveDrivetrain(SparkFlex.class);
+      }) 
+      
       .add(VisionPoseEstimator.class, "vpe", () ->{
         return new VisionPoseEstimator("limelight");
       })

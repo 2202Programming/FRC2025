@@ -2,6 +2,7 @@ package frc.robot2025;
 
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.command.swerve.TargetCentricDrive;
@@ -35,7 +36,7 @@ public final class BindingsCompetition {
         else if (generic_driver instanceof CommandXboxController) {
             // XBox
             CommandXboxController driver = (CommandXboxController)generic_driver;
-            driver.leftTrigger().whileTrue(new RobotCentricDrive());
+            driver.leftTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
             driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
         }
