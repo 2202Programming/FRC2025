@@ -18,6 +18,8 @@ import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.BaseLimelight;
 import frc.lib2202.subsystem.BlinkyLights;
+import frc.lib2202.subsystem.Odometry;
+import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
@@ -56,6 +58,11 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(DriveTrainInterface.class, "drivetrain", () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
+      .add(OdometryInterface.class, "odometry", () ->{
+        var obj = new Odometry();
+        obj.new OdometryWatcher();
+        return obj;
+    })
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
