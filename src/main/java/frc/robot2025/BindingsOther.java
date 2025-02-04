@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 
@@ -50,6 +51,7 @@ public class BindingsOther {
     static void DriverBinding(HID_Subsystem dc) {
         var generic_driver = dc.Driver();
         DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
+        OdometryInterface odometry = RobotContainer.getSubsystem("odometry");
         
         //TODO - handle paths better, maybe move configAutoBuilder out of swerve code
         PathPlannerPath pathBlue1 = loadFromFile("test_1m");//"blue1");
@@ -70,20 +72,20 @@ public class BindingsOther {
                     // (zero-length path?)
                     if (pathBlue1 != null)
                         driver.x().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindThenFollowPath(pathBlue1,
                                     new PathConstraints(3.0, 3.0,
                                             Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
                     if (pathRed1 != null)
                         driver.b().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindThenFollowPath(pathRed1,
                                     new PathConstraints(3.0, 3.0,
                                             Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
 
                     // Start any watcher commands
                 
@@ -91,18 +93,18 @@ public class BindingsOther {
                     // (zero-length path?)
                     if (pathTest_1m != null)
                         driver.a().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindThenFollowPath(pathTest_1m,
                                     new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
 
                     driver.x().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindToPose(new Pose2d(new Translation2d(1.73, 5.38), new Rotation2d(0.0)),
                                     new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
 
                 }
                 else if (generic_driver instanceof CommandPS4Controller) {
@@ -116,20 +118,20 @@ public class BindingsOther {
                     // (zero-length path?)
                     if (pathBlue1 != null)
                         driver.square().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindThenFollowPath(pathBlue1,
                                     new PathConstraints(3.0, 3.0,
                                             Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
                     if (pathRed1 != null)
                         driver.circle().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindThenFollowPath(pathRed1,
                                     new PathConstraints(3.0, 3.0,
                                             Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
 
                     // Start any watcher commands
                 
@@ -137,18 +139,18 @@ public class BindingsOther {
                     // (zero-length path?)
                     if (pathTest_1m != null)
                         driver.cross().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindThenFollowPath(pathTest_1m,
                                     new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
 
                         driver.square().onTrue(new SequentialCommandGroup(
-                            new InstantCommand(drivetrain::printPose),
+                            new InstantCommand(odometry::printPose),
                             AutoBuilder.pathfindToPose(new Pose2d(new Translation2d(1.73, 5.38), new Rotation2d(0.0)),
                                     new PathConstraints(3.0, 3.0, Units.degreesToRadians(540),
                                             Units.degreesToRadians(720))),
-                            new InstantCommand(drivetrain::printPose)));
+                            new InstantCommand(odometry::printPose)));
 
                 
                 }
