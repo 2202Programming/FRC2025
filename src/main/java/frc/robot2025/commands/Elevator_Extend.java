@@ -22,14 +22,13 @@ public class Elevator_Extend extends Command {
     this.elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.hasCoral = hasCoral;
     this.setPoint = setPoint;
-    elevator_Subsystem.Elevator_Set_ToHeight(setPoint);
     intendedPoint = setPoint.height;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
+    elevator_Subsystem.set_toHeight(setPoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,13 +39,13 @@ public class Elevator_Extend extends Command {
   @Override
   public void end(boolean interrupted) {
     if (interrupted) {
-      elevator_Subsystem.Elevator_Set_ToHeight(Levels.Ground);
+      elevator_Subsystem.set_toHeight(Levels.Ground);
     }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return 0.5 == Math.abs(elevator_Subsystem.get_Elevator_Height() - intendedPoint); //change depending on acceptable error
+    return elevator_Subsystem.at_setpoint(); //change depending on acceptable error
   }
 }

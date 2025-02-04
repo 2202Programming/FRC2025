@@ -22,7 +22,6 @@ import frc.robot2025.Constants.CAN;
 public class Elevator_Subsystem extends SubsystemBase {
   /** Creates a new Elevator_Subsystem. */
 
-  //get once we have prototype (USE ELLANA'S CODE AS EXAMPLE)
   public enum Levels {
     LCoral(75.5), 
     LOne(0), 
@@ -39,7 +38,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   }; 
 
   private final PIDController elevatorPidController;
-  private final PIDFController elevatorPIDF;
+  private final PIDFController elevatorMechanicalPid;
   private NeoServo elevator_Servo1;
   private SparkMax elevator_motor2;
   private SparkMaxConfig motor2_Config;
@@ -49,15 +48,19 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   private int gear_Ratio = 5;  //throw in constants?
   private int chain_Ratio = 314159; //TODO get valid number
+  private int pully_Radius = 0; //TODO get valid number
+  private int pully_Stages = 3; //TODO get valid number
   
 
   public Elevator_Subsystem() {
     elevatorPidController = new PIDController(0, 0, 0);
-    elevatorPIDF = new PIDFController(0, 0, 0, 0);
-    elevator_Servo1 = new NeoServo(CAN.Elevator ,elevatorPidController, elevatorPIDF, false);
+    elevatorMechanicalPid = new PIDFController(0, 0, 0, 0);
+    elevator_Servo1 = new NeoServo(CAN.Elevator ,elevatorPidController, elevatorMechanicalPid, false);
     elevator_motor2 = new SparkMax(-10, MotorType.kBrushless); //TODO change CAN ID
     
     //lines 51-55 config motor 2 the same as the first motor 
+    elevator_Servo1.setConversionFactor((1/gear_Ratio)*pully_Radius*pully_Stages*chain_Ratio); //probably wrong, double check
+    elevator_Servo1.setTolerance(0.5, 1.0);
     motor2_Config = new SparkMaxConfig();
         motor2_Config.inverted(false)
                .idleMode(IdleMode.kBrake);
@@ -73,24 +76,34 @@ public class Elevator_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     elevator_Servo1.periodic();
+    elevator_height = get_Height(); //maybe not needed, maybe throw in network tables
   }
    
-  public double get_Elevator_Height() {
-    return elevator_Servo1.getPosition(); //some sort of calculation needed
+  public double get_Height() {
+    return 0.0; //(elevator_Servo1.getPosition() / gear_Ratio) * chain_Ratio * Math.PI * 2 * pully_Radius * pully_Stages; //TODO fix. Please
   }
 
-  public void Elevator_Set_ToHeight(Levels level) {
-    // double height = reverse of the equation from motor rotations to cm
-    //elevator_height_setpoint = height;
-    //elevator_Servo1.setSetpoint(height);  TODO this. In general. We could also throw the conversion in periodic
+  public void set_toHeight(Levels level) {
+    elevator_Servo1.setSetpoint(level.height); 
+  }
+  public void set_toHeight(double height) {
+    elevator_Servo1.setSetpoint(height); 
   }
 
-  public double get_elevator_setpoint() {
+  public double get_setpoint() {
     return elevator_height_setpoint;
   }
 
-  public double get_elevator_speed() {
+  public double get_speed() {
     return elevator_Servo1.getVelocity();
+  }
+
+  public void set_speed(double speed) {
+    elevator_Servo1.setVelocityCmd(1.0);
+  }
+
+  public boolean at_setpoint() {
+    return elevator_Servo1.atSetpoint();
   }
 
   
