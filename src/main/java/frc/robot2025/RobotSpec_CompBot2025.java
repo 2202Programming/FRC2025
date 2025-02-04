@@ -16,9 +16,11 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.subsystem.BaseLimelight;
 import frc.lib2202.subsystem.VisionPoseEstimator;
-import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
+import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
@@ -40,15 +42,20 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
       })
       // .add(PneumaticsControl.class)
       // .add(BlinkyLights.class, "LIGHTS")
-      .add(HID_Xbox_Subsystem.class, "DC", () -> {
-        return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
-      })
+      
       .add(Sensors_Subsystem.class)
-      .add(Limelight.class)
-     .add(SwerveDrivetrain.class, () ->{
+      .add(BaseLimelight.class, "limelight", () ->{
+        return new frc.lib2202.subsystem.Limelight("ll1");
+      })
+      .add(DriveTrainInterface.class, "drivetrain", () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
-      .add(VisionPoseEstimator.class)
+      .add(HID_Subsystem.class, "DC", () -> {
+        return new HID_Subsystem(0.3, 0.9, 0.05);
+      })
+      .add(VisionPoseEstimator.class, "vpe", () ->{
+        return new VisionPoseEstimator("limelight");
+      })
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
@@ -130,7 +137,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
 
   @Override
   public void setBindings() {
-    HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
+    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
     BindingsCompetition.ConfigureCompetition(dc);
@@ -154,7 +161,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
 
   @Override
   public void setDefaultCommands() {
-    SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
+    DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
     if (drivetrain != null) {
       drivetrain.setDefaultCommand(new RobotCentricDrive());
     }
