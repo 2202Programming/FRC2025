@@ -62,7 +62,7 @@ public class BindingsOther {
                 if (generic_driver instanceof CommandXboxController) {
                     CommandXboxController driver = (CommandXboxController)generic_driver;
             
-                driver.leftBumper().whileTrue(new RobotCentricDrive(drivetrain, dc));
+                driver.leftBumper().whileTrue(new RobotCentricDrive());
                 driver.b().onTrue(new AllianceAwareGyroReset(false));
 
                 // This appears to break if initial pose is too close to path start pose
