@@ -46,7 +46,7 @@ public final class BindingsCompetition {
             CommandPS4Controller driver = (CommandPS4Controller)generic_driver;
             driver.L2().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.triangle().onTrue(new AllianceAwareGyroReset(true));
-            driver.R2().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
+            driver.R2().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7, "limelight"));
         }
     }
 

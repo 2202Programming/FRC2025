@@ -53,7 +53,9 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
-      .add(VisionPoseEstimator.class)
+      .add(VisionPoseEstimator.class, "vpe", () ->{
+        return new VisionPoseEstimator("limelight");
+      })
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
