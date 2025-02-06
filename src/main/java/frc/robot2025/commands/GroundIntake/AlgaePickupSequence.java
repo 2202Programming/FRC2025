@@ -30,8 +30,8 @@ public class AlgaePickupSequence extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    groundIntake.setGroundIntakePosition(Position.ALGAE_PICKUP);
-    groundIntake.setGroundIntakeWheelSpeed(1.0); // placeholder
+    groundIntake.setPosition(Position.ALGAE_PICKUP);
+    groundIntake.setWheelSpeed(1.0); // placeholder
     state = State.WaitForAlgae;
   }
 
@@ -46,8 +46,8 @@ public class AlgaePickupSequence extends Command {
         break;
 
       case AlgaeRest:
-        groundIntake.setGroundIntakePosition(Position.ALGAE_REST);
-        groundIntake.setGroundIntakeWheelSpeed(0.0);
+        groundIntake.setPosition(Position.ALGAE_REST);
+        groundIntake.setWheelSpeed(0.0);
         state = State.Finished;
         break;
 
@@ -59,8 +59,9 @@ public class AlgaePickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    groundIntake.setGroundIntakePosition(groundIntake.senseGamePiece() ? Position.ALGAE_REST : Position.ZERO);
-    groundIntake.setGroundIntakeWheelSpeed(0.0);
+    // Mr L asks, do we really want to start moving right away??? does the driver need to backup first?
+    groundIntake.setPosition(groundIntake.senseGamePiece() ? Position.ALGAE_REST : Position.ZERO);
+    groundIntake.setWheelSpeed(0.0);
   }
 
   // Returns true when the command should end.

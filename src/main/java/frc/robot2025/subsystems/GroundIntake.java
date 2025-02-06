@@ -26,6 +26,7 @@ import frc.robot2025.Constants.DigitalIO;
 public class GroundIntake extends SubsystemBase {
   //TODO change degree values once we know actual positions. these are placeholders - er
   public enum Position {
+    POWERUP(0.0, 0.0),      // pwr up could be different from ZERO
     ZERO(0.0, 0.0),
     ALGAE_PICKUP(45.0, 135.0),
     ALGAE_PLACE(20.0, 10.0), // algae place
@@ -35,8 +36,8 @@ public class GroundIntake extends SubsystemBase {
     CORAL_REST(15.0, 45.0),
     FLOOR(135.0, 135.0);
 
-    double topval;
-    double btmval;
+    public double topval;
+    public double btmval;
 
     private Position(double topval, double btmval) {
       this.topval = topval;
@@ -62,6 +63,9 @@ public class GroundIntake extends SubsystemBase {
   PIDFController topHwAngleVelPID = new PIDFController(0.0050, 0.0, 0.0, 0.0075); // placeholder PIDs
   PIDFController btmHwAngleVelPID = new PIDFController(0.0050, 0.0, 0.0, 0.0075);
 
+  // Where we are heading, use atSetpoint to see if we are there
+  Position currentPos = Position.POWERUP;
+
   public GroundIntake() {
     topServo = new NeoServo(CAN.IntakeTop, topPositionPID, topHwAngleVelPID, true);
     btmServo = new NeoServo(CAN.IntakeBtm, btmPositionPID, btmHwAngleVelPID, true);
@@ -84,18 +88,35 @@ public class GroundIntake extends SubsystemBase {
     wheelMtr.configure(wheelMtr_cfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     wheelMtr_ctrl = wheelMtr.getClosedLoopController();
+
+    // Initialize our servo's power up conditions, does not change desired setpoint, 
+    // it just sets the encoder values directly
+    topServo.setPosition(currentPos.topval);
+    btmServo.setPosition(currentPos.btmval);
+
+    // set our requested setpoint with our public api POWERUP
+    setPosition(currentPos); // changes setpoints
   }
 
-  public void setGroundIntakePosition(Position cmd) {
+  public void setPosition(Position cmd) {
+    currentPos = cmd;
     topServo.setSetpoint(cmd.topval);
     btmServo.setSetpoint(cmd.btmval);
   }
 
-  public boolean isAtSetpoint() {
-    return topServo.atSetpoint() && btmServo.atSetpoint();
+  public boolean isTopAtSetpoint() {
+    return topServo.atSetpoint();
   }
 
-  public void setGroundIntakeWheelSpeed(double speed){
+  public boolean isBottomAtSetpoint() {
+    return btmServo.atSetpoint();
+  }
+
+  public boolean isAtSetpoint() {
+    return isTopAtSetpoint() && isBottomAtSetpoint();
+  }
+
+  public void setWheelSpeed(double speed){
     wheelMtr_ctrl.setReference(speed, ControlType.kVelocity);
   }
 

@@ -27,8 +27,8 @@ public class CoralPlace extends Command {
       @Override
       public void initialize() {
         if(hasCoral == true){
-          groundIntake.setGroundIntakePosition(Position.CORAL_PLACE);
-          groundIntake.setGroundIntakeWheelSpeed(0.0);
+          groundIntake.setPosition(Position.CORAL_PLACE);
+          groundIntake.setWheelSpeed(0.0);
           if(groundIntake.isAtSetpoint()){
             state = State.Eject;
           }
@@ -42,7 +42,7 @@ public class CoralPlace extends Command {
         switch(state){
         
           case Eject:
-            groundIntake.setGroundIntakeWheelSpeed(-1.0);
+            groundIntake.setWheelSpeed(-1.0);
             hasCoral = groundIntake.senseGamePiece();
             if(!hasCoral){
               state = State.DefaultPos;
@@ -50,8 +50,8 @@ public class CoralPlace extends Command {
             break;
     
           case DefaultPos:
-          groundIntake.setGroundIntakePosition(Position.ZERO);
-          groundIntake.setGroundIntakeWheelSpeed(0.0);
+          groundIntake.setPosition(Position.ZERO);
+          groundIntake.setWheelSpeed(0.0);
           state = State.Finished;
             break;
           
@@ -64,11 +64,11 @@ public class CoralPlace extends Command {
       @Override
       public void end(boolean interrupted) {
         if(hasCoral == true){
-          groundIntake.setGroundIntakePosition(Position.CORAL_REST);
-          groundIntake.setGroundIntakeWheelSpeed(0.0);      
+          groundIntake.setPosition(Position.CORAL_REST);
+          groundIntake.setWheelSpeed(0.0);      
         } else {
-          groundIntake.setGroundIntakePosition(Position.ZERO);
-          groundIntake.setGroundIntakeWheelSpeed(0.0);
+          groundIntake.setPosition(Position.ZERO);
+          groundIntake.setWheelSpeed(0.0);
         }
       }
     
