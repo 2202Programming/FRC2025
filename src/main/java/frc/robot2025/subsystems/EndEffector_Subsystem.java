@@ -23,10 +23,10 @@ import frc.robot2025.Constants.DigitalIO;
 
 public class EndEffector_Subsystem extends SubsystemBase {
   final SparkMax mtr;
-  SparkClosedLoopController controller;
+  final SparkClosedLoopController controller;
   final RelativeEncoder encoder;
   SparkBaseConfig config;
-  final double kF = 1.0 / 5500.0; //placeholder
+  final double kF = 1.0 / 5500.0; // placeholder
   public final double adjustment = 0.0;
   private double cmdRPM;
   private double measRPM;
@@ -40,15 +40,14 @@ public class EndEffector_Subsystem extends SubsystemBase {
     mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless);
     encoder = mtr.getEncoder();
     controller = motor_config(mtr, pid, false);
-    // encoder = config.encoder(mtr); we want it in rpm, shouldn't need
-    controller = mtr.getClosedLoopController();
+
   }
 
   @Override
   public void periodic() {
     measRPM = encoder.getVelocity();
-    // This method will be called once per scheduler run
   }
+
   public boolean isAtRPM(double tolerance) {
     return (Math.abs(measRPM - cmdRPM) < tolerance);
   }
@@ -56,37 +55,36 @@ public class EndEffector_Subsystem extends SubsystemBase {
   public void setRPM(double RPM) {
     if (RPM == 0.0) {
       controller.setIAccum(0.0);
-      controller.setReference(RPM,  ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-    } 
-    controller.setReference(RPM,  ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+      controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    }
+    controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     cmdRPM = RPM;
   }
-  public boolean hasPiece(){
+
+  public boolean hasPiece() {
     return lightGate.get();
   }
-  
 
-    
-
+  // configure our motor controller and retun it
   SparkClosedLoopController motor_config(SparkMax mtr, PIDFController hwPidConsts, boolean inverted) {
     mtr.clearFaults();
-    config.encoder.velocityConversionFactor(velocityConversionFactor); //idk if this is the best way to do it?
+    config.encoder.velocityConversionFactor(velocityConversionFactor); // idk if this is the best way to do it?
     // mtr.restoreFactoryDefaults(); //removed from API, shouldn't need
     var mtrpid = mtr.getClosedLoopController();
     pid.copyTo(mtr, config);
-    config.closedLoop.iZone(150.0); //placeholder
-    pidConsts_freeSpin.copyTo(mtr, config); 
+    config.closedLoop.iZone(150.0); // placeholder
+    pidConsts_freeSpin.copyTo(mtr, config);
     config.closedLoop.iMaxAccum(150.0);
-    // mtr.setInverted(inverted);  //deprecated
+    // mtr.setInverted(inverted); //deprecated
     config.idleMode(IdleMode.kBrake);
     return mtrpid;
   }
 
   public WatcherCmd getWatcher() {
-    return new EndEffectorWatcherCmd();
+    return this.new EndEffectorWatcherCmd();
   }
 
-   class EndEffectorWatcherCmd extends WatcherCmd {
+  class EndEffectorWatcherCmd extends WatcherCmd {
     NetworkTableEntry nt_cmdRPM;
     NetworkTableEntry nt_measRPM;
     NetworkTableEntry nt_kP;

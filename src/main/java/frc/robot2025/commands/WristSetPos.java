@@ -25,19 +25,16 @@ public class WristSetPos extends Command {
     wrist.setWristSetpoint(pos);
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    wrist.setWristVelocity(0);
+    //wrist.setWristVelocity(0);  no need, position servo is running for wrist
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return wrist.atSetPoint();
   }
 }

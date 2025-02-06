@@ -16,7 +16,7 @@ public class ClimberSetPos extends Command {
   public ClimberSetPos(double pos) {
     climber = RobotContainer.getSubsystem(Climber.class);
     this.pos = pos;
-    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
@@ -24,10 +24,6 @@ public class ClimberSetPos extends Command {
   public void initialize() {
     climber.setSetpoint(pos);
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
@@ -38,6 +34,6 @@ public class ClimberSetPos extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+   return climber.atSetpoint();
   }
 }

@@ -50,6 +50,7 @@ public class DropSequence extends Command {
       case ElevatorUp:
         elevator.setHeight(level);
         wrist.setWristSetpoint(wristLevel);
+        //next state conditions
         if(elevator.atSetpoint() && wrist.atSetPoint()){
           wrist.setWristVelocity(0);
           elevator.setVelocity(0);
@@ -58,6 +59,9 @@ public class DropSequence extends Command {
         break;
       case Drop:
       if(count == 0){
+
+        //Mr.L do we KNOW we are ready to drop?  Drivetrain still moving? Aligned?
+        // any how, good first cut.
         endEffector.setRPM(500.0); //placeholder
       }
       if(++count >= DELAY_COUNT){
@@ -73,6 +77,8 @@ public class DropSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // Mr.L - do we want to start the elevator/wrist moving down right away???
+    // Does the drivetrain have to backup any?
     elevator.setHeight(0); //pickup level
     wrist.setWristSetpoint(0); //default pos
   }
