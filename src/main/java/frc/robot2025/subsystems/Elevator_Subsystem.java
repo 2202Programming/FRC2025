@@ -11,8 +11,10 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+import frc.lib2202.command.WatcherCmd;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
@@ -22,9 +24,13 @@ import frc.robot2025.Constants.CAN;
 public class Elevator_Subsystem extends SubsystemBase {
   /** Creates a new Elevator_Subsystem. */
 
+  /*
+   * All placeholders 2/5/25
+   *  maybe add algae level
+   */
   public enum Levels {
     LCoral(75.5), 
-    LOne(0), 
+    LOne(30), 
     LTwo(75.5), 
     LThree(116), 
     LFour(176),
@@ -39,71 +45,122 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   private final PIDController elevatorPidController;
   private final PIDFController elevatorMechanicalPid;
-  private NeoServo elevator_Servo1;
-  private SparkMax elevator_motor2;
-  private SparkMaxConfig motor2_Config;
-  //what kind of sensors will we have on this bot. Not fully sure yet. Double check with mechanical
-  private double elevator_height; //in cm
-  private double elevator_height_setpoint; //in cm
+  private NeoServo elevatorServoMain; 
+  private SparkMax elevatorServoFollow;
+  private SparkMaxConfig followMotorConfig;
+  private double desiredVel; //in cm/s
 
-  private int gear_Ratio = 5;  //throw in constants?
-  private int chain_Ratio = 314159; //TODO get valid number
-  private int pully_Radius = 0; //TODO get valid number
-  private int pully_Stages = 3; //TODO get valid number
+  final int STALL_CURRENT = 20;
+  final int FREE_CURRENT = 40;
+  final int elevatorMaxVel = 50; // [cm/s]
+  final int elevatorMaxAccel = 40; // [cm/s]
+  final int elevatorPosTol = 1;
+  final int elevatorVelTol = 1;
+  final int maxPos = 100;
+  final int minPos = -10;
+
+  private double gearRatio = 1.0/5.0;  //throw in constants?
+  private int chainRatio = 314159; //TODO get valid number
+  private int pullyRadius = 0; //TODO get valid number
+  private int pullyStages = 3; //TODO get valid number
+  private double conversionFactor = pullyRadius * gearRatio * Math.PI / 30.0;
+
   
 
   public Elevator_Subsystem() {
+    desiredVel = 0;
     elevatorPidController = new PIDController(0, 0, 0);
     elevatorMechanicalPid = new PIDFController(0, 0, 0, 0);
-    elevator_Servo1 = new NeoServo(CAN.Elevator ,elevatorPidController, elevatorMechanicalPid, false);
-    elevator_motor2 = new SparkMax(-10, MotorType.kBrushless); //TODO change CAN ID
+    elevatorServoMain = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, false);
+    elevatorServoFollow = new SparkMax(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
     //lines 51-55 config motor 2 the same as the first motor 
-    elevator_Servo1.setConversionFactor((1/gear_Ratio)*pully_Radius*pully_Stages*chain_Ratio); //probably wrong, double check
-    elevator_Servo1.setTolerance(0.5, 1.0);
-    motor2_Config = new SparkMaxConfig();
-        motor2_Config.inverted(false)
+    elevatorServoMain.setConversionFactor(conversionFactor) //probably wrong, double check
+                      .setTolerance(elevatorPosTol, elevatorPosTol)
+                      .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
+                      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
+                      .burnFlash();
+    elevatorServoMain.setClamp(minPos, maxPos);
+    followMotorConfig = new SparkMaxConfig();
+        followMotorConfig.inverted(false)
                .idleMode(IdleMode.kBrake);
-    motor2_Config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
+    followMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
                 .outputRange(-1.0, 1.0);
     
-    elevator_motor2.configure(motor2_Config,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motor2_Config.follow(CAN.Elevator); //motor 2 follows the servo's behavior
-    elevator_height = 0;
+    elevatorServoFollow.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    followMotorConfig.follow(CAN.ELEVATOR_MAIN); //motor 2 follows the servo's behavior
   
   }
 
   @Override
   public void periodic() {
-    elevator_Servo1.periodic();
-    elevator_height = get_Height(); //maybe not needed, maybe throw in network tables
+    elevatorServoMain.periodic();
   }
    
-  public double get_Height() {
-    return 0.0; //(elevator_Servo1.getPosition() / gear_Ratio) * chain_Ratio * Math.PI * 2 * pully_Radius * pully_Stages; //TODO fix. Please
+  public double getHeight() {
+    return elevatorServoMain.getPosition();
   }
 
-  public void set_toHeight(Levels level) {
-    elevator_Servo1.setSetpoint(level.height); 
+  public void setHeight (Levels level) {
+    elevatorServoMain.setSetpoint(level.height); 
   }
-  public void set_toHeight(double height) {
-    elevator_Servo1.setSetpoint(height); 
-  }
-
-  public double get_setpoint() {
-    return elevator_height_setpoint;
+  public void setHeight (double height) {
+    elevatorServoMain.setSetpoint(height); 
   }
 
-  public double get_speed() {
-    return elevator_Servo1.getVelocity();
+  public double getSetpoint() {
+    return elevatorServoMain.getSetpoint();
   }
 
-  public void set_speed(double speed) {
-    elevator_Servo1.setVelocityCmd(1.0);
+  public double getVelocity() {
+    return elevatorServoMain.getVelocity();
   }
 
-  public boolean at_setpoint() {
-    return elevator_Servo1.atSetpoint();
+  public void setVelocity(double vel) {
+    desiredVel = vel;
+    elevatorServoMain.setVelocityCmd(vel);
+  }
+
+  public boolean atSetpoint() {
+    return elevatorServoMain.atSetpoint();
+  }
+
+  public double getDesiredVelocity() {
+    return desiredVel;
+  }
+public WatcherCmd getWatcher() {
+    return new ElevatorWatcherCmd();
+  }
+
+   class ElevatorWatcherCmd extends WatcherCmd {
+    NetworkTableEntry nt_cmdVel;
+    NetworkTableEntry nt_measVel;
+    NetworkTableEntry nt_desiredHeight;
+    NetworkTableEntry nt_currentHeight;
+    NetworkTableEntry nt_atHeight;
+
+    // add nt for pos when we add it
+    @Override
+    public String getTableName() {
+      return Elevator_Subsystem.this.getName();
+    }
+
+    public void ntcreate() {
+      NetworkTable table = getTable();
+      nt_cmdVel = table.getEntry("cmdVel");
+      nt_measVel = table.getEntry("measVel");
+      nt_desiredHeight = table.getEntry("desiredHeight");
+      nt_currentHeight = table.getEntry("currentHeight");
+      nt_atHeight = table.getEntry("atSetpoint");
+    }
+
+    public void ntupdate() {
+      nt_cmdVel.setDouble(getDesiredVelocity());
+      nt_measVel.setDouble(getVelocity());
+      nt_desiredHeight.setDouble(getSetpoint());
+      nt_currentHeight.setDouble(getHeight());
+      nt_atHeight.setBoolean(atSetpoint());
+    }
   }
 
   

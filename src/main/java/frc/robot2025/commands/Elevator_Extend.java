@@ -28,7 +28,7 @@ public class Elevator_Extend extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    elevator_Subsystem.set_toHeight(setPoint);
+    elevator_Subsystem.setHeight(setPoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -39,13 +39,13 @@ public class Elevator_Extend extends Command {
   @Override
   public void end(boolean interrupted) {
     if (interrupted) {
-      elevator_Subsystem.set_toHeight(Levels.Ground);
+      elevator_Subsystem.setHeight(Levels.Ground);
     }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return elevator_Subsystem.at_setpoint(); //change depending on acceptable error
+    return elevator_Subsystem.atSetpoint(); //change depending on acceptable error
   }
 }

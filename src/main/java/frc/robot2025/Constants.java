@@ -195,13 +195,12 @@ public final class Constants {
     public static final int CANDLE3 = 5;
     public static final int CANDLE4 = 6;
 
-    // Warning: CAN 7 is used for CANCoder on swerveBot aka Tim 2.0
-
-    // shooter CAN IDs -- MOTORS
-    public static final int SHOOTER_L = 15;
-    public static final int SHOOTER_R = 16;
-    public static final int SHOOTER_ANGLE = 35;
+    //CAN IDs
     public static final int CLIMBER = 10; //placeholder
+    public static final int ELEVATOR_MAIN = 36; //placeholder
+    public static final int ELEVATOR_FOLLOW = 37; //placeholder
+    public static final int WRIST = 38; //placeholder
+    public static final int END_EFFECTOR = 39; //placeholder
 
     // Drive Train IDs 20 - 31
     // drive train CAN addresses are set above with CANModuleConfig to support
@@ -224,24 +223,11 @@ public final class Constants {
     // PLACEHOLDERS - use 50 .. 59, max CAN addr is 64
     // Please move to correct location when ID is assigned
 
-    // Intake
-    public static final int INTAKE_MTR = 18;
-    public static final int ANGLE_MTR = 17;
 
-    // Transfer
-    public static final int TRANSFER_MOTOR = 19;
-
-    // Claw
-    public static final int CLAW_WHEEL_MOTOR = 16;
 
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
 
-    // Elevatos
-    public static final int Elevator = 36; // palceholder
-
-    //Amp Mechanism
-    public static final int AMP_MECHANISM = 10; //find out
 
 
     // Whether to burn flash or not
@@ -249,8 +235,7 @@ public final class Constants {
   }
 
   public static final class PWM{
-    public static final int LEFT_AMP_MECHANISM = 1;
-    public static final int RIGHT_AMP_MECHANISM = 0;
+
   }
 
   public static final class AnalogIn {
@@ -269,17 +254,9 @@ public final class Constants {
   }
 
   public final class DigitalIO {
-    public static final int EndEffector_LIGHTGATE = 0;
+    public static final int EndEffector_Lightgate = 0;
   }
 
-  public static final class Transfer_Constants {
-    public enum NoteCommandedLocation {
-      Transfer, Intake, Swap;
-    }
-
-    public static final double TRANSFER_MOTOR_ON = 0.8;
-    public static final double TRANSFER_MOTOR_REVERSE = -0.5;
-  }
 
   public static final class Tag_Pose {
     public static final AprilTag2d ID0 = new AprilTag2d(0, 0.0,0.0); //dont use tag ID 0, placeholder for array

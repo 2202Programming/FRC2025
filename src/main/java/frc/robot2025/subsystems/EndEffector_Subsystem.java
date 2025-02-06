@@ -37,7 +37,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
-    mtr = new SparkMax(CAN.AMP_MECHANISM, SparkMax.MotorType.kBrushless);
+    mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless);
     encoder = mtr.getEncoder();
     controller = motor_config(mtr, pid, false);
     // encoder = config.encoder(mtr); we want it in rpm, shouldn't need
@@ -66,9 +66,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
   
 
-    public WatcherCmd getWatcher() {
-    return new EndEffectorWatcherCmd();
-  }
+    
 
   SparkClosedLoopController motor_config(SparkMax mtr, PIDFController hwPidConsts, boolean inverted) {
     mtr.clearFaults();
@@ -82,6 +80,10 @@ public class EndEffector_Subsystem extends SubsystemBase {
     // mtr.setInverted(inverted);  //deprecated
     config.idleMode(IdleMode.kBrake);
     return mtrpid;
+  }
+
+  public WatcherCmd getWatcher() {
+    return new EndEffectorWatcherCmd();
   }
 
    class EndEffectorWatcherCmd extends WatcherCmd {

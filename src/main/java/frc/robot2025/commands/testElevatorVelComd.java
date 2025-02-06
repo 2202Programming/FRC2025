@@ -12,22 +12,22 @@ public class testElevatorVelComd extends Command {
   /** Creates a new testElevatorVelComd. */
    //should be done as a while true command 
   private final Elevator_Subsystem elevator_Subsystem;
-  double speed;
+  double vel;
   
-  public testElevatorVelComd(double speed) {
+  public testElevatorVelComd(double vel) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    this.speed = speed;
+    this.vel = vel;
     // Use addRequirements() here to declare subsystem dependencies.
   }
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    elevator_Subsystem.set_speed(speed);
+    elevator_Subsystem.setVelocity(vel);
   }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    elevator_Subsystem.set_speed(0);
+    elevator_Subsystem.setVelocity(0);
   }
 
   // Returns true when the command should end.

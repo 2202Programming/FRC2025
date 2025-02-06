@@ -29,8 +29,24 @@ public class Wrist extends SubsystemBase {
   final int wristVelTol = 1;
   final int maxPos = 100;
   final int minPos = -10;
+  double cmdVel = 0;
+
+  public enum WristLevels{
+    LCoral(75.5),
+    LOne(30),
+    LTwo(75.5),
+    LThree(116),
+    LFour(176),
+    Ground(0);
+
+    public double height;
+
+    private WristLevels(double height) {
+      this.height = height;
+    }
+  }; 
   public Wrist() {
-    wristServo = new NeoServo(CAN.AMP_MECHANISM, anglePositionPID, hwAngleVelPID, true, ClosedLoopSlot.kSlot0);
+    wristServo = new NeoServo(CAN.WRIST, anglePositionPID, hwAngleVelPID, true, ClosedLoopSlot.kSlot0);
     wristServo.setConversionFactor(360.0 / AngleGearRatio) // [deg] for internal encoder behind gears
     // .setConversionFactor(360.0) // [deg] external encoder on arm shaft
     .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
@@ -40,6 +56,9 @@ public class Wrist extends SubsystemBase {
     .burnFlash();
     wristServo.setClamp(minPos, maxPos);
   }
+  public void setWristPosition(WristLevels level){
+    wristServo.setPosition(level.height);
+  }
 public void setWristPosition(double pos){
   wristServo.setPosition(pos);
 }
@@ -47,13 +66,20 @@ public double getWristPosition(){
   return wristServo.getPosition();
 }
 public void setWristVelocity (double vel) {
+  cmdVel = vel;
   wristServo.setVelocityCmd(vel);
 }
 public double getVelocity() {
   return wristServo.getVelocity();
 } 
+public double getCmdVelocity(){
+  return cmdVel;
+}
 public void setWristSetpoint(double pos){
   wristServo.setSetpoint(pos);
+}
+public void setWristSetpoint(WristLevels wristLevel){
+  wristServo.setSetpoint(wristLevel.height);
 }
 public double getWristSetpoint() {
   return wristServo.getSetpoint();
@@ -65,35 +91,40 @@ public boolean atSetPoint(){
   return Math.abs(getWristPosition() - getWristSetpoint()) < wristPosTol;
 
 }
+@Override
+public void periodic() {
+  this.wristServo.periodic();
+  // This method will be called once per scheduler run
+}
 
 class WristWatcherCmd extends WatcherCmd{ 
-  NetworkTableEntry nt_cmdRPM;
-  NetworkTableEntry nt_measRPM;
-  NetworkTableEntry nt_kP;
-  NetworkTableEntry nt_kF;
-}
+  NetworkTableEntry nt_cmdVelocity;
+  NetworkTableEntry nt_measVelocity;
+  NetworkTableEntry nt_measPosition;
+  NetworkTableEntry nt_cmdPosition; //setpoint
+  NetworkTableEntry nt_atSetpoint;
+    // add nt for pos when we add it
+    @Override
+  public String getTableName() {
+    return Wrist.this.getName();
+  }
 
-public String getTableName() {
-  return Wrist.this.getName();
-}
 
 public void ntcreate() {
   NetworkTable table = getTable();
-  nt_cmdRPM = table.getEntry("cmdRPM");
-  nt_measRPM = table.getEntry("measRPM");
-  nt_kP = table.getEntry("kP");
-  nt_kF = table.getEntry("kF");
+  nt_cmdVelocity = table.getEntry("cmdVelocity");
+  nt_measVelocity = table.getEntry("measVelocity");
+  nt_measPosition = table.getEntry("measPosition");
+  nt_cmdPosition = table.getEntry("cmdPosition");
+  nt_atSetpoint = table.getEntry("atSetpoint");
 }
 
 public void ntupdate() {
-  nt_cmdRPM.setDouble(cmdRPM);
-  nt_measRPM.setDouble(measRPM);
-  nt_kP.setDouble(pid.getP());
-  nt_kF.setDouble(pid.getF());
+  nt_cmdVelocity.setDouble(getCmdVelocity());
+  nt_measVelocity.setDouble(getVelocity());
+  nt_measPosition.setDouble(getWristPosition());
+  nt_cmdPosition.setDouble(getWristSetpoint());
+  nt_atSetpoint.setBoolean(atSetPoint());
 }
-  @Override
-  public void periodic() {
-    this.wristServo.periodic();
-    // This method will be called once per scheduler run
-  }
+}
 }

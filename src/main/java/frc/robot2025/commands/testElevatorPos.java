@@ -23,7 +23,7 @@ public class testElevatorPos extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    elevator_Subsystem.set_toHeight(pos);
+    elevator_Subsystem.setHeight(pos);
   }
 
   // Called once the command ends or is interrupted.
@@ -35,6 +35,6 @@ public class testElevatorPos extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return elevator_Subsystem.at_setpoint();
+    return elevator_Subsystem.atSetpoint();
   }
 }
