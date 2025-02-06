@@ -202,35 +202,11 @@ public final class Constants {
     public static final int WRIST = 38; //placeholder
     public static final int END_EFFECTOR = 39; //placeholder
 
-    // Drive Train IDs 20 - 31
-    // drive train CAN addresses are set above with CANModuleConfig to support
-    // different robots
-    // See above CANModuleConfig definitions.
-    //
-    // Typically: Drv Ang CC Corner
-    // -- --- -- ----
-    // 20 21 31 BR
-    // 22 23 28 BL
-    // 24 25 29 FL
-    // 26 27 30 FR
-    //
-    // TODO: Triple check these numbers with controller client softare, CTRE and REV
-    // as the numbers differ from comments at end of this file and there seems
-    // to be an inconsistent ordering with the CANCoders.
-    //
-    // There are exceptions, check for your ROBOT.
-
-    // PLACEHOLDERS - use 50 .. 59, max CAN addr is 64
-    // Please move to correct location when ID is assigned
-
-
 
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
 
-
-
-    // Whether to burn flash or not
+    // Whether to burn flash or not  - deprecated
     public static final boolean BURN_FLASH = false; // swerve-mk3
   }
 
@@ -239,14 +215,14 @@ public final class Constants {
   }
 
   public static final class AnalogIn {
-    public static final int Pressure_Sensor = 0;
+    // public static final int Pressure_Sensor = 0;
     // public static final int MAGAZINE_ANGLE = 0;
   }
 
   // pnumatics control module 1
   public static final class PCM1 {
-    public static final int Forward = 0;
-    public static final int Reverse = 1;
+    //public static final int Forward = 0;
+    //public static final int Reverse = 1;
   }
 
   // pnumatics control module 2
