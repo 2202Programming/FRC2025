@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
@@ -36,6 +37,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    * 
    * 
    */
+
+
   private NetworkTable table;
   private NetworkTable positionTable;
 
@@ -48,9 +51,15 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   private NetworkTableEntry nt_pitch;
   private NetworkTableEntry nt_rotation;
 
+
+
+ 
+  
   // Sensors
   Pigeon2 m_pigeon;
   double[] m_xyz_dps = new double[3]; // rotation rates [deg/s]
+
+
 
   public static class RotationPositions {
     public double back_left;
@@ -152,6 +161,11 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI);
     m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
     m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
+    // Getting the angular velocities for m_xyz_dps
+    //TODO match array indicies to xyz
+    m_xyz_dps[0] = m_pigeon.getAngularVelocityXWorld().getValueAsDouble();
+    m_xyz_dps[1] = m_pigeon.getAngularVelocityYWorld().getValueAsDouble();
+    m_xyz_dps[2] = m_pigeon.getAngularVelocityZWorld().getValueAsDouble();
    
 
     // TODO m_xyz_dps not set
