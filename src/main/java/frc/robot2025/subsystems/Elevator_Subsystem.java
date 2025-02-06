@@ -45,91 +45,98 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   private final PIDController elevatorPidController;
   private final PIDFController elevatorMechanicalPid;
-  private NeoServo elevatorServoMain; 
-  private SparkMax elevatorServoFollow;
+  private NeoServo servo; 
+  private SparkMax followMotor;
   private SparkMaxConfig followMotorConfig;
   private double desiredVel; //in cm/s
 
   final int STALL_CURRENT = 20;
   final int FREE_CURRENT = 40;
-  final int elevatorMaxVel = 50; // [cm/s]
-  final int elevatorMaxAccel = 40; // [cm/s]
-  final int elevatorPosTol = 1;
-  final int elevatorVelTol = 1;
-  final int maxPos = 100;
-  final int minPos = -10;
+  final double elevatorMaxVel = 50.0; // [cm/s]
+  final double elevatorMaxAccel = 3.0; // [cm/s^2]  servo may not enforce yet
+  final double elevatorPosTol = 0.5;  // [cm]
+  final double elevatorVelTol = 0.5;  // [cm]
+  final double maxPos = 100.0; // [cm]
+  final double minPos = 0.0;   // [cm]
+  final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
+  final boolean motors_inverted = false;
 
-  private double gearRatio = 1.0/5.0;  //throw in constants?
-  private int chainRatio = 314159; //TODO get valid number
-  private int pullyRadius = 0; //TODO get valid number
-  private int pullyStages = 3; //TODO get valid number
-  private double conversionFactor = pullyRadius * gearRatio * Math.PI / 30.0;
+  private final double gearRatio = 1.0/5.0; // [out turns]/[mtr turns]
+  private final double chainRatio = 1.0;    // [out/in] chain in/out 
+  private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
+  private final double stagesRaito = 1.0;   // [out/in]  TODO get valid number
+  private final double positionConversionFactor = 
+      gearRatio * stagesRaito * chainRatio * pullyRadius * 2.0 * Math.PI;
 
-  
 
   public Elevator_Subsystem() {
     desiredVel = 0;
     elevatorPidController = new PIDController(0, 0, 0);
     elevatorMechanicalPid = new PIDFController(0, 0, 0, 0);
-    elevatorServoMain = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, false);
-    elevatorServoFollow = new SparkMax(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
+    servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, motors_inverted);
+    followMotor = new SparkMax(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
     //lines 51-55 config motor 2 the same as the first motor 
-    elevatorServoMain.setConversionFactor(conversionFactor) //probably wrong, double check
+    servo.setConversionFactor(positionConversionFactor) //probably wrong, double check
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
-                      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
-                      .burnFlash();
-    elevatorServoMain.setClamp(minPos, maxPos);
+                      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
+
+    servo.setClamp(minPos, maxPos);
     followMotorConfig = new SparkMaxConfig();
-        followMotorConfig.inverted(false)
+        followMotorConfig.inverted(motors_inverted)
                .idleMode(IdleMode.kBrake);
     followMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
                 .outputRange(-1.0, 1.0);
     
-    elevatorServoFollow.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    followMotor.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     followMotorConfig.follow(CAN.ELEVATOR_MAIN); //motor 2 follows the servo's behavior
+  
+    // power up config
+    servo.setPosition(initPos);
   
   }
 
   @Override
   public void periodic() {
-    elevatorServoMain.periodic();
+    servo.periodic();
   }
    
   public double getHeight() {
-    return elevatorServoMain.getPosition();
+    return servo.getPosition();
   }
 
   public void setHeight (Levels level) {
-    elevatorServoMain.setSetpoint(level.height); 
+    setHeight(level.height); 
   }
+
   public void setHeight (double height) {
-    elevatorServoMain.setSetpoint(height); 
+    servo.setSetpoint(height); 
   }
 
   public double getSetpoint() {
-    return elevatorServoMain.getSetpoint();
+    return servo.getSetpoint();
   }
 
   public double getVelocity() {
-    return elevatorServoMain.getVelocity();
+    return servo.getVelocity();
   }
 
   public void setVelocity(double vel) {
     desiredVel = vel;
-    elevatorServoMain.setVelocityCmd(vel);
+    servo.setVelocityCmd(vel);
   }
 
   public boolean atSetpoint() {
-    return elevatorServoMain.atSetpoint();
+    return servo.atSetpoint();
   }
 
   public double getDesiredVelocity() {
     return desiredVel;
   }
-public WatcherCmd getWatcher() {
-    return new ElevatorWatcherCmd();
+
+  public WatcherCmd getWatcher() {
+    return this.new ElevatorWatcherCmd();
   }
 
    class ElevatorWatcherCmd extends WatcherCmd {

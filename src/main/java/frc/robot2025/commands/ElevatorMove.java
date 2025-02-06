@@ -10,19 +10,24 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class Elevator_Extend extends Command {
+public class ElevatorMove extends Command {
   
   final Elevator_Subsystem elevator_Subsystem;
   boolean hasCoral;
   double intendedPoint;
   Levels setPoint;
 
-  public Elevator_Extend(Levels setPoint, boolean hasCoral) {
+  public ElevatorMove(Levels setPoint, boolean hasCoral) {
+
+    // TODO Mr.L wants to know how hasCoral changes anything?
+
     // Use addRequirements() here to declare subsystem dependencies.
     this.elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.hasCoral = hasCoral;
     this.setPoint = setPoint;
     intendedPoint = setPoint.height;
+    // this command require full ownership of SS, use the requirements
+    addRequirements(this.elevator_Subsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -30,10 +35,6 @@ public class Elevator_Extend extends Command {
   public void initialize() {
     elevator_Subsystem.setHeight(setPoint);
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
