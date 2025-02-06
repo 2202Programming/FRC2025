@@ -237,6 +237,9 @@ public final class Constants {
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
 
+    // Elevatos
+    public static final int Elevator = 36; // palceholder
+
     //Amp Mechanism
     public static final int AMP_MECHANISM = 10; //find out
 
