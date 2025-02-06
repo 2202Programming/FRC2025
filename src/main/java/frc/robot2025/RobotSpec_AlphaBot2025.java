@@ -37,7 +37,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "032381BF"
-  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "032381BF")
+  final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "03282B65")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -51,7 +51,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
-      .add(Sensors_Subsystem.class)
+      .add(Sensors_Subsystem.class, "sensors", () ->{
+        return new Sensors_Subsystem();
+      })
       .add(BaseLimelight.class, "limelight", () ->{
         return new Limelight();
       })
@@ -109,7 +111,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public IHeadingProvider getHeadingProvider() {
-    return RobotContainer.getSubsystem(Sensors_Subsystem.class);
+    return RobotContainer.getSubsystem("sensors");
   }
 
   @Override
