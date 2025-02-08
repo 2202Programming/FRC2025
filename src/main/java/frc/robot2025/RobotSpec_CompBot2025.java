@@ -26,8 +26,11 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.Wrist;
 
 public class RobotSpec_CompBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2024 Robot rev Alpha
@@ -43,16 +46,23 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
-      .add(Sensors_Subsystem.class)
-      .add(Limelight.class)
-     .add(SwerveDrivetrain.class, () ->{
-          return new SwerveDrivetrain(SparkFlex.class);
-      }) // must be after LL and Sensors
-      .add(VisionPoseEstimator.class)
-      // below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Command.class, "DT_Monitor", () -> {
-        return new DTMonitorCmd();
+    //   .add(Sensors_Subsystem.class)
+    //   .add(Limelight.class)
+    //  .add(SwerveDrivetrain.class, () ->{
+    //       return new SwerveDrivetrain(SparkFlex.class);
+    //   }) // must be after LL and Sensors
+    //   .add(VisionPoseEstimator.class)
+      .add(Elevator_Subsystem.class)
+      .add(Command.class, "ElevatorWatcher", () -> {
+        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       });
+      // .add(Wrist.class)
+      // .add(EndEffector_Subsystem.class)
+
+      // below are optional watchers for shuffeleboard data - disable if need too.
+      // .add(Command.class, "DT_Monitor", () -> {
+      //   return new DTMonitorCmd();
+      // });
 
   // set this true at least once after robot hw stabilizes
   boolean burnFlash = false;
