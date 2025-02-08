@@ -140,7 +140,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
-    //BindingsCompetition.ConfigureCompetition(dc);
+    BindingsCompetition.ConfigureCompetition(dc);
     BindingsOther.ConfigureOther(dc);
 
     // start anyting else
