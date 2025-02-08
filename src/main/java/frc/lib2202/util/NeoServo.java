@@ -7,16 +7,20 @@ package frc.lib2202.util;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.AlternateEncoderConfig.Type;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
@@ -61,11 +65,12 @@ public class NeoServo implements VelocityControlled {
     final ClosedLoopSlot hwVelSlot;
 
     // hardware
-    final SparkMax ctrl;
-    final SparkMaxConfig ctrlCfg;
+    final SparkFlex ctrl; 
+    final SparkFlexConfig ctrlCfg;
     final SparkClosedLoopController pid;
     final RelativeEncoder encoder;
     RelativeEncoder posEncoder = null;
+
 
     /*
      * internal constructor shared by other forms, does most of setup
@@ -76,13 +81,12 @@ public class NeoServo implements VelocityControlled {
             PIDFController hwVelPIDcfg,
             boolean inverted, ClosedLoopSlot hwVelSlot,
             Type encType, int kCPR) {
-    
         setName("NeoServo-" + canID);  //until a better name is selected
-        ctrl = new SparkMax(canID, motorType);
+        ctrl = new SparkFlex(canID, motorType);
         ctrl.setCANTimeout(50); //enter blocking mode for config
         ctrl.clearFaults();
         //not used libs2025 update  ctrl.restoreFactoryDefaults();
-        ctrlCfg = new SparkMaxConfig();
+        ctrlCfg = new SparkFlexConfig();
         ctrlCfg.inverted(inverted)
                .idleMode(IdleMode.kBrake);
        
@@ -96,7 +100,7 @@ public class NeoServo implements VelocityControlled {
                 .outputRange(-1.0, 1.0);
             
             // dpl 1/4/2025 looks like only kQuadrature is only type supported.
-            ctrlCfg.alternateEncoder
+            ctrlCfg.externalEncoder
                 .countsPerRevolution(kCPR)
                 .inverted(false);
                 /*******************  may need these 
@@ -176,7 +180,7 @@ public class NeoServo implements VelocityControlled {
      * scale_rotation - [units/rotation]
      */
     public NeoServo addAltPositionEncoder(Type encType, int CPR, double scale_rotations){
-        ctrlCfg.alternateEncoder
+        ctrlCfg.externalEncoder
             .countsPerRevolution(CPR)
             .positionConversionFactor(scale_rotations)
             .velocityConversionFactor( scale_rotations / 60.0);
@@ -186,7 +190,7 @@ public class NeoServo implements VelocityControlled {
 
     // methods to tune the servo very SmartMax Neo specific
     public NeoServo setConversionFactor(double conversionFactor) {
-        ctrlCfg.alternateEncoder            
+        ctrlCfg.externalEncoder            
             .positionConversionFactor(conversionFactor)
             .velocityConversionFactor( conversionFactor / 60.0);
         ctrl.configure(ctrlCfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
@@ -229,12 +233,12 @@ public class NeoServo implements VelocityControlled {
         return this;
     }
 
-    public SparkMax getController() {
+    public SparkBase getController() {
         return ctrl;
     }
 
     public NeoServo setBrakeMode(IdleMode mode) {        
-        SparkMaxConfig cfg = new SparkMaxConfig();
+        SparkFlexConfig cfg = new SparkFlexConfig();
         cfg.idleMode(mode);
         ctrl.configureAsync(cfg, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
         return this;

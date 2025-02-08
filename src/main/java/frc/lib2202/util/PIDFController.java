@@ -8,8 +8,10 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -136,12 +138,12 @@ public class PIDFController extends PIDController {
         System.out.println("*** ERROR *** SparkMax Flash Failed during copyTo command. Error val=" + driveError);
     }
 
-    public void copyChangesTo(SparkMax controller, SparkMaxConfig motorConfig, PIDFController updated) {
+    public void copyChangesTo(SparkFlex controller, SparkFlexConfig motorConfig, PIDFController updated) {
         copyChangesTo(controller, motorConfig, ClosedLoopSlot.kSlot0, updated);
     }
 
     // compares an updated PIDF with this one and updates it and the hardware
-    public void copyChangesTo(SparkMax motorController, SparkMaxConfig motorConfig, ClosedLoopSlot slot, PIDFController updated) {
+    public void copyChangesTo(SparkFlex motorController, SparkFlexConfig motorConfig, ClosedLoopSlot slot, PIDFController updated) {
         boolean changed = false;
         var pidCfg =  motorConfig.closedLoop;
 

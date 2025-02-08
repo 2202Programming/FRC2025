@@ -7,9 +7,11 @@ package frc.robot2025.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.lib2202.command.WatcherCmd;
 import edu.wpi.first.math.controller.PIDController;
@@ -46,8 +48,8 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final PIDController elevatorPidController;
   private final PIDFController elevatorMechanicalPid;
   private NeoServo servo; 
-  private SparkMax followMotor;
-  private SparkMaxConfig followMotorConfig;
+  private SparkFlex followMotor;
+  private SparkFlexConfig followMotorConfig;
   private double desiredVel; //in cm/s
 
   final int STALL_CURRENT = 20;
@@ -74,7 +76,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     elevatorPidController = new PIDController(0, 0, 0);
     elevatorMechanicalPid = new PIDFController(0, 0, 0, 0);
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, motors_inverted);
-    followMotor = new SparkMax(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
+    followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
     //lines 51-55 config motor 2 the same as the first motor 
     servo.setConversionFactor(positionConversionFactor) //probably wrong, double check
@@ -83,7 +85,7 @@ public class Elevator_Subsystem extends SubsystemBase {
                       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
 
     servo.setClamp(minPos, maxPos);
-    followMotorConfig = new SparkMaxConfig();
+    followMotorConfig = new SparkFlexConfig();
         followMotorConfig.inverted(motors_inverted)
                .idleMode(IdleMode.kBrake);
     followMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
