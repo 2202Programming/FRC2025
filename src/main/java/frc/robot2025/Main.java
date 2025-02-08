@@ -14,6 +14,7 @@ public final class Main {
     new RobotSpecDefault();
     new RobotSpec_AlphaBot2025();
     new RobotSpec_CompBot2025();
+    new RobotSpec_BotOnBoard();
 
   }
  
