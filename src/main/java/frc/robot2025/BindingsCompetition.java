@@ -33,15 +33,10 @@ public final class BindingsCompetition {
         if (generic_driver instanceof TMJoystickController) {
             // Joystick
             TMJoystickController joystick = (TMJoystickController)generic_driver;
-            joystick.trigger(TMJoystickController.ButtonType.TriggerButton).whileTrue(new RobotCentricDrive(drivetrain, dc));
-            joystick.trigger(TMJoystickController.ButtonType.LeftOne).onTrue(new AllianceAwareGyroReset(true));
         } 
         else if (generic_driver instanceof CommandXboxController) {
             // XBox
             CommandXboxController driver = (CommandXboxController)generic_driver;
-            driver.leftTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
-            driver.y().onTrue(new AllianceAwareGyroReset(true));
-            driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
             driver.x().whileTrue(new testElevatorVelComd(5.0));
             driver.a().whileTrue(new testElevatorVelComd(5.0));
             driver.y().whileTrue(new testElevatorVelComd(-5.0));

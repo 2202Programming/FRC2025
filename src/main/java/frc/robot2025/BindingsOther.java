@@ -26,7 +26,7 @@ public class BindingsOther {
         Competition,  DriveTest,
     }
 
-    static Bindings bindings = Bindings.DriveTest;
+    static Bindings bindings = Bindings.Competition;
 
     public static void ConfigureOther(HID_Xbox_Subsystem dc) {
         DriverBinding(dc);

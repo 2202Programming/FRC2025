@@ -188,7 +188,7 @@ public final class Constants {
     public static final int ROBORIO = 0;
     public static final int PDP = 1; // for rev
     public static final int PCM1 = 2; // for rev
-
+ 
     // lights
     public static final int CANDLE1 = 3;
     public static final int CANDLE2 = 4;
@@ -197,8 +197,8 @@ public final class Constants {
 
     //CAN IDs
     public static final int CLIMBER = 10; //placeholder
-    public static final int ELEVATOR_MAIN = 36; //placeholder
-    public static final int ELEVATOR_FOLLOW = 37; //placeholder
+    public static final int ELEVATOR_MAIN = 40; //placeholder
+    public static final int ELEVATOR_FOLLOW = 41; //placeholder
     public static final int WRIST = 38; //placeholder
     public static final int END_EFFECTOR = 39; //placeholder
 
