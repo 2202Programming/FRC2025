@@ -27,6 +27,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
@@ -52,6 +53,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(SwerveDrivetrain.class, () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
+      .add(GroundIntake.class)
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {

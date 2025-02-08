@@ -13,7 +13,7 @@ In the Powershell:
   $env:serialnum ='031b7511'          #swerveBot aka Tim
   $env:serialnum ='032D2062'          #compbot 2024
   $env:serialnum ='03238151'          #Chadbot
-  $env:serialnum ='032381BF'          #alphabot 2024
+  $env:serialnum ='032381BF'          #alphabot 2025     
 
 Pick one of these before debugging in simulation mode.
 

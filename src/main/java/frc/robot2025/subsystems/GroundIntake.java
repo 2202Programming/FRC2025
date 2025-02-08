@@ -73,6 +73,7 @@ public class GroundIntake extends SubsystemBase {
 
     
     // configure wheel motor
+    // 1:1 gear ratio
     wheelMtr_cfg = new SparkMaxConfig();
     wheelMtr_cfg.inverted(false)
             .idleMode(IdleMode.kBrake)

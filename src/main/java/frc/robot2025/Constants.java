@@ -91,6 +91,7 @@ public final class Constants {
 
   public final class DigitalIO {
     public static final int GroundIntakeLightGate = 0; // TBD 1/25/25 needs to be assigned
+    
 
   }
 
