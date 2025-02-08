@@ -15,7 +15,7 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
-import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.subsystem.BaseLimelight;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
@@ -46,7 +46,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       })
       // .add(PneumaticsControl.class)
       .add(BlinkyLights.class, "LIGHTS", () -> {
-        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
+        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE3, CAN.CANDLE4);
       })
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
@@ -79,7 +79,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
 
   // Chassis
-  double kWheelCorrectionFactor = .957;
+  double kWheelCorrectionFactor = 1.02; // WHEEL CORRECTION FACTOR >1 | WARNING! Wheel diameters might be off a little bit - BG
   double kSteeringGR = 21.428;
   double kDriveGR = 6.12;
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
@@ -173,7 +173,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   public void setDefaultCommands() {
     DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
     if (drivetrain != null) {
-      drivetrain.setDefaultCommand(new RobotCentricDrive());
+      drivetrain.setDefaultCommand(new FieldCentricDrive());
     }
   }
 
