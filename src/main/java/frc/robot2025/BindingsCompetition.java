@@ -27,7 +27,6 @@ public final class BindingsCompetition {
 
     private static void DriverBinding(HID_Xbox_Subsystem dc) {
         var generic_driver = dc.Driver();
-        var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
 
         // Driver Buttons depend on the type of controller drivers selects
         if (generic_driver instanceof TMJoystickController) {

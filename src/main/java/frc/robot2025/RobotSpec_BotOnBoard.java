@@ -45,7 +45,7 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
       .add(Elevator_Subsystem.class)
-      .add(Command.class, "IntakeWatcher", () -> {
+      .add(Command.class, "ElevatorWatcher", () -> {
         return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       });
       // below are optional watchers for shuffeleboard data - disable if need too.
@@ -129,11 +129,11 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
-    BindingsCompetition.ConfigureCompetition(dc);
+    // BindingsCompetition.ConfigureCompetition(dc);
     BindingsOther.ConfigureOther(dc);
 
     // start anyting else
-    new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
+    // new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
   }
 
   @Override
@@ -150,10 +150,6 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
 
   @Override
   public void setDefaultCommands() {
-    SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
-    if (drivetrain != null) {
-      drivetrain.setDefaultCommand(new RobotCentricDrive());
-    }
   }
 
 }

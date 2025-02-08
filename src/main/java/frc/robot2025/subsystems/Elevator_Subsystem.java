@@ -53,9 +53,9 @@ public class Elevator_Subsystem extends SubsystemBase {
   private double desiredVel; //in cm/s
 
   final int STALL_CURRENT = 20;
-  final int FREE_CURRENT = 40;
-  final double elevatorMaxVel = 50.0; // [cm/s]
-  final double elevatorMaxAccel = 3.0; // [cm/s^2]  servo may not enforce yet
+  final int FREE_CURRENT = 80;
+  final double elevatorMaxVel = 5700.0; // [cm/s] rpm
+  final double elevatorMaxAccel = 5000.0; // [cm/s^2]  servo may not enforce yet
   final double elevatorPosTol = 0.5;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
   final double maxPos = 100.0; // [cm]
@@ -63,18 +63,18 @@ public class Elevator_Subsystem extends SubsystemBase {
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
 
-  private final double gearRatio = 1.0/5.0; // [out turns]/[mtr turns]
+  private final double gearRatio = 1.0/4.67; // [out turns]/[mtr turns]
   private final double chainRatio = 1.0;    // [out/in] chain in/out 
   private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
-  private final double stagesRaito = 1.0;   // [out/in]  TODO get valid number
-  private final double positionConversionFactor = 
-      gearRatio * stagesRaito * chainRatio * pullyRadius * 2.0 * Math.PI;
+  private final double stagesRatio = 1.0;   // [out/in]  TODO get valid number
+  private final double positionConversionFactor = 1.0;
+     /*gearRatio * stagesRaito * chainRatio * pullyRadius * 2.0 * Math.PI */
 
 
   public Elevator_Subsystem() {
     desiredVel = 0;
-    elevatorPidController = new PIDController(0, 0, 0);
-    elevatorMechanicalPid = new PIDFController(0, 0, 0, 0);
+    elevatorPidController = new PIDController(0.0, 0.0, 0.0);
+    elevatorMechanicalPid = new PIDFController(0.0000, 0.0, 0.0, 1.0/5700.0);
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
@@ -91,9 +91,8 @@ public class Elevator_Subsystem extends SubsystemBase {
     followMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
                 .outputRange(-1.0, 1.0);
     
-    followMotor.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     followMotorConfig.follow(CAN.ELEVATOR_MAIN); //motor 2 follows the servo's behavior
-  
+    followMotor.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // power up config
     servo.setPosition(initPos);
   
@@ -106,6 +105,14 @@ public class Elevator_Subsystem extends SubsystemBase {
    
   public double getHeight() {
     return servo.getPosition();
+  }
+
+  public double getMainCurrent(){
+    return servo.getController().getOutputCurrent();
+  }
+
+  public double getFollowCurrent() {
+    return followMotor.getOutputCurrent();
   }
 
   public void setHeight (Levels level) {
@@ -147,6 +154,8 @@ public class Elevator_Subsystem extends SubsystemBase {
     NetworkTableEntry nt_desiredHeight;
     NetworkTableEntry nt_currentHeight;
     NetworkTableEntry nt_atHeight;
+    NetworkTableEntry nt_mainCurrent;
+    NetworkTableEntry nt_followCurrent;
 
     // add nt for pos when we add it
     @Override
@@ -161,6 +170,8 @@ public class Elevator_Subsystem extends SubsystemBase {
       nt_desiredHeight = table.getEntry("desiredHeight");
       nt_currentHeight = table.getEntry("currentHeight");
       nt_atHeight = table.getEntry("atSetpoint");
+      nt_mainCurrent = table.getEntry("mainCurrent");
+      nt_followCurrent = table.getEntry("followCurrent");
     }
 
     public void ntupdate() {
@@ -169,6 +180,8 @@ public class Elevator_Subsystem extends SubsystemBase {
       nt_desiredHeight.setDouble(getSetpoint());
       nt_currentHeight.setDouble(getHeight());
       nt_atHeight.setBoolean(atSetpoint());
+      nt_mainCurrent.setDouble(getMainCurrent());
+      nt_followCurrent.setDouble(getFollowCurrent());
     }
   }
 

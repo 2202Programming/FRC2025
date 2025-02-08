@@ -26,10 +26,17 @@ public class testElevatorVelComd extends Command {
   public void initialize() {
     vel = SmartDashboard.getNumber("Current Vel", 0.0);
     elevator_Subsystem.setVelocity(vel);
+    System.out.println(elevator_Subsystem.getDesiredVelocity() + "Desired vel");
+    System.out.println(elevator_Subsystem.getVelocity() + "Current");
+  }
+
+  @Override
+  public void execute(){
   }
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    System.out.println(elevator_Subsystem.getVelocity() + "released");
     elevator_Subsystem.setVelocity(0);
   }
 
