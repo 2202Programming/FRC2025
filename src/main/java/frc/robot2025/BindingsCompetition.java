@@ -8,6 +8,9 @@ import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.command.swerve.TargetCentricDrive;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.robot2025.Constants.Tag_Pose;
+import frc.robot2025.commands.ElevatorMove;
+import frc.robot2025.commands.testElevatorVelComd;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 
@@ -39,6 +42,11 @@ public final class BindingsCompetition {
             driver.leftTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
             driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
+            driver.x().whileTrue(new testElevatorVelComd(5.0));
+            driver.a().whileTrue(new testElevatorVelComd(5.0));
+            driver.y().whileTrue(new testElevatorVelComd(-5.0));
+            driver.b().onTrue(new ElevatorMove(Levels.Ground, true));
+            driver.rightTrigger().onTrue(new ElevatorMove(Levels.LCoral, true));
         }
     }
 
