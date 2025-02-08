@@ -63,15 +63,15 @@ public class Elevator_Subsystem extends SubsystemBase {
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
 
-  private final double gearRatio = 1.0/5.0; // [out turns]/[mtr turns]
-  private final double chainRatio = 1.0;    // [out/in] chain in/out 
+  private final double gearRatio = 1.0/4.67; // [out turns]/[mtr turns]
+  private final double sprocket_diameter = 1.76;    // [out/in] chain in/out 
   private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
   private final double stagesRaito = 1.0;   // [out/in]  TODO get valid number
   private final double positionConversionFactor = 
-      gearRatio * stagesRaito * chainRatio * pullyRadius * 2.0 * Math.PI;
+      gearRatio  /* * stagesRaito * sprocket_diameter * pullyRadius * 2.0 * Math.PI*/;
 
 
-  public Elevator_Subsystem() {
+  public Elevator_Subsystem(Class servoClass) {
     desiredVel = 0;
     elevatorPidController = new PIDController(0, 0, 0);
     elevatorMechanicalPid = new PIDFController(0, 0, 0, 0);
@@ -135,6 +135,19 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   public double getDesiredVelocity() {
     return desiredVel;
+  }
+
+  public void setP(double kP){
+    elevatorMechanicalPid.setP(kP);
+  }
+  public void setI(double kI){
+    elevatorMechanicalPid.setP(kI);
+  }
+  public void setD(double kD){
+    elevatorMechanicalPid.setP(kD);
+  }
+  public double getP(){
+    return elevatorMechanicalPid.getP();
   }
 
   public WatcherCmd getWatcher() {
