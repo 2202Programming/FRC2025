@@ -49,11 +49,12 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
       .add(Sensors_Subsystem.class)
-      .add(Limelight.class)
+     // .add(Limelight.class)
+     .add(GroundIntake.class)
       .add(SwerveDrivetrain.class, () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
-      .add(GroundIntake.class)
+      //.add(GroundIntake.class)
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
@@ -139,7 +140,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
-    BindingsCompetition.ConfigureCompetition(dc);
+    //BindingsCompetition.ConfigureCompetition(dc);
     BindingsOther.ConfigureOther(dc);
 
     // start anyting else

@@ -50,8 +50,9 @@ public class GroundIntake extends SubsystemBase {
   final int wheelFreeLimit = 5;
   final static double Kff = (1.0 / 43.2);
   final PIDFController wheelPIDF = new PIDFController(0.015, 0.0, 0.0, Kff); // TODO configure for velocity control. current vals are placeholders -er
+  final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
 
-
+// servo config
   final NeoServo topServo;
   final NeoServo btmServo;
   final SparkMax wheelMtr;
@@ -62,6 +63,8 @@ public class GroundIntake extends SubsystemBase {
   final PIDController btmPositionPID = new PIDController(7.0, 1.0, 0.0);
   PIDFController topHwAngleVelPID = new PIDFController(0.0050, 0.0, 0.0, 0.0075); // placeholder PIDs
   PIDFController btmHwAngleVelPID = new PIDFController(0.0050, 0.0, 0.0, 0.0075);
+  final double topServoGR = 1.0 /(3.0 * 360); // 3:1 gearbox reduction * 360 degrees / turn
+  final double btmServoGR = 1.0 / (45.0 * 360.0); // 45:1 gearbox reduction * 360 degrees / turn
 
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
@@ -70,17 +73,18 @@ public class GroundIntake extends SubsystemBase {
     topServo = new NeoServo(CAN.IntakeTop, topPositionPID, topHwAngleVelPID, true);
     btmServo = new NeoServo(CAN.IntakeBtm, btmPositionPID, btmHwAngleVelPID, true);
     wheelMtr = new SparkMax(CAN.IntakeWheel, MotorType.kBrushless);
+    topServo.setConversionFactor(topServoGR); // deg
+    btmServo.setConversionFactor(btmServoGR); // deg
 
-    
     // configure wheel motor
-    // 1:1 gear ratio
+    
     wheelMtr_cfg = new SparkMaxConfig();
     wheelMtr_cfg.inverted(false)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(wheelStallLimit, wheelFreeLimit)
             .encoder   
-              .positionConversionFactor(1.0) // rotations
-              .velocityConversionFactor(1.0 / 60.0); // rps
+              .positionConversionFactor(wheelMtrGearRatio) // rotations
+              .velocityConversionFactor(wheelMtrGearRatio / 60.0); // rps
 
     wheelMtr_cfg.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
@@ -105,6 +109,19 @@ public class GroundIntake extends SubsystemBase {
     btmServo.setSetpoint(cmd.btmval);
   }
 
+  public void debugSetPosition(double top, double btm){
+    topServo.setSetpoint(top);
+    btmServo.setSetpoint(btm);
+  }
+
+  public void debugBtmVelocity(double dir){
+    btmServo.setVelocityCmd(dir);
+  }
+
+  public void debugTopVelocity(double dir){
+    topServo.setVelocityCmd(dir);
+  }
+
   public boolean isTopAtSetpoint() {
     return topServo.atSetpoint();
   }
@@ -119,6 +136,14 @@ public class GroundIntake extends SubsystemBase {
 
   public void setWheelSpeed(double speed){
     wheelMtr_ctrl.setReference(speed, ControlType.kVelocity);
+  }
+
+  public double getTopPosition(){
+    return topServo.getPosition();
+  }
+
+  public double getBtmPosition(){
+    return btmServo.getPosition();
   }
 
   public boolean senseGamePiece(){
