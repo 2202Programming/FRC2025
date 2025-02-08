@@ -4,6 +4,7 @@
 
 package frc.robot2025.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem;
@@ -15,6 +16,7 @@ public class testElevatorVelComd extends Command {
   double vel;
   
   public testElevatorVelComd(double vel) {
+    SmartDashboard.putNumber("Current Vel", 0.0);
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.vel = vel;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -22,6 +24,7 @@ public class testElevatorVelComd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    vel = SmartDashboard.getNumber("Current Vel", 0.0);
     elevator_Subsystem.setVelocity(vel);
   }
   // Called once the command ends or is interrupted.
