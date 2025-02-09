@@ -27,6 +27,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
@@ -48,10 +49,12 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
       .add(Sensors_Subsystem.class)
-      .add(Limelight.class)
+     // .add(Limelight.class)
+     .add(GroundIntake.class)
       .add(SwerveDrivetrain.class, () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
+      //.add(GroundIntake.class)
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
@@ -110,22 +113,22 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   public ModuleConfig[] getModuleConfigs() {
     ModuleConfig[] modules = new ModuleConfig[4];
     modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        29, 24, 25,
+        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle,
         41.484)
         .setInversions(false, true, false);
 
     modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        30, 26, 27,
+        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,
         -66.621)
         .setInversions(true, true, false);
 
     modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        28, 22, 23,
+        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,
         24.785)
         .setInversions(false, true, false);
 
     modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        31, 20, 21,
+        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle,
         -40.781)
         .setInversions(true, true, false);
 
