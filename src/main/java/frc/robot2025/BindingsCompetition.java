@@ -1,25 +1,20 @@
 package frc.robot2025;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.command.swerve.TargetCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
-import frc.robot2025.Constants.Tag_Pose;
+import frc.robot2025.commands.ElevatorMove;
+import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.commands.GroundIntake.AlgaePickupSequence;
 import frc.robot2025.commands.GroundIntake.AlgaePlace;
 import frc.robot2025.commands.GroundIntake.CoralPickupSequence;
 import frc.robot2025.commands.GroundIntake.CoralPlace;
-import frc.robot2025.commands.ElevatorMove;
-import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
-import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
-import frc.lib2202.subsystem.hid.TMJoystickController;
 
 /*
  * Please don't edit this without leads/mentor/driveteam review
@@ -31,13 +26,14 @@ public final class BindingsCompetition {
         OperatorBindings(dc);
     }
 
-
     private static void DriverBinding(HID_Xbox_Subsystem dc) {
         var generic_driver = dc.Driver();
+        var drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
 
         // Driver Buttons depend on the type of controller drivers selects
         if (generic_driver instanceof TMJoystickController) {
             // Joystick
+            @SuppressWarnings("unused")
             TMJoystickController joystick = (TMJoystickController)generic_driver;
         } 
         else if (generic_driver instanceof CommandXboxController) {
@@ -58,7 +54,6 @@ public final class BindingsCompetition {
     static void OperatorBindings(HID_Xbox_Subsystem dc) {
         @SuppressWarnings("unused")
         var sideboard = dc.SwitchBoard();
-        @SuppressWarnings("unused")
         CommandXboxController operator = (CommandXboxController)dc.Operator();
 
         operator.a().whileTrue(new CoralPickupSequence());
@@ -68,11 +63,6 @@ public final class BindingsCompetition {
         
         
         // Switchboard buttons too
-
-
-        /***************************************************************************************/
-        // REAL COMPETITION BINDINGS.
-
         
         // Calibration commands
 

@@ -4,8 +4,6 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.MperFT;
 
-import com.revrobotics.spark.SparkFlex;
-
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,21 +14,15 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
-import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
-import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.EndEffector_Subsystem;
-import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-import frc.robot2025.subsystems.Wrist;
 
 public class RobotSpec_CompBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2024 Robot rev Alpha
@@ -115,6 +107,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
   @Override
   public ModuleConfig[] getModuleConfigs() {
     ModuleConfig[] modules = new ModuleConfig[4];
+    /*  Set these up when we have a chassis
     modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
         29, 24, 25,
         41.484)
@@ -134,17 +127,15 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
         31, 20, 21,
         -40.781)
         .setInversions(true, true, false);
-
+*/
     return modules;
   }
 
   @Override
   public void setBindings() {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
-
-    // TODO - figure better way to handle bindings
     BindingsCompetition.ConfigureCompetition(dc);
-    BindingsOther.ConfigureOther(dc);
+    //BindingsOther.ConfigureOther(dc);
 
     // start anyting else
     new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings

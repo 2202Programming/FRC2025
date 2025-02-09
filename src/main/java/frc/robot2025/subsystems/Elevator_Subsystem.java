@@ -6,18 +6,17 @@ package frc.robot2025.subsystems;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import frc.lib2202.command.WatcherCmd;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib2202.command.WatcherCmd;
 import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
@@ -67,8 +66,8 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final double chainRatio = 1.0;    // [out/in] chain in/out 
   private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
   private final double stagesRatio = 1.0;   // [out/in]  TODO get valid number
+  public  final double  pcf = gearRatio * stagesRatio * chainRatio * pullyRadius * 2.0 * Math.PI;
   private final double positionConversionFactor = 1.0;
-     /*gearRatio * stagesRaito * chainRatio * pullyRadius * 2.0 * Math.PI */
 
 
   public Elevator_Subsystem() {
@@ -107,11 +106,12 @@ public class Elevator_Subsystem extends SubsystemBase {
     return servo.getPosition();
   }
 
-  public double getMainCurrent(){
+  // current access doesn't need to be exposed, putting on NT
+  double getMainCurrent(){
     return servo.getController().getOutputCurrent();
   }
 
-  public double getFollowCurrent() {
+  double getFollowCurrent() {
     return followMotor.getOutputCurrent();
   }
 

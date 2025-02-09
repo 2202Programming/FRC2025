@@ -4,8 +4,6 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.MperFT;
 
-import com.revrobotics.spark.SparkFlex;
-
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -14,17 +12,10 @@ import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
-import frc.lib2202.command.PDPMonitorCmd;
-import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.subsystem.BlinkyLights;
-import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
-import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
-import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
-import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.Elevator_Subsystem;
@@ -100,40 +91,15 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
 
   @Override
   public ModuleConfig[] getModuleConfigs() {
-    ModuleConfig[] modules = new ModuleConfig[4];
-    modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        29, 24, 25,
-        41.484)
-        .setInversions(false, true, false);
-
-    modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        30, 26, 27,
-        -66.621)
-        .setInversions(true, true, false);
-
-    modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        28, 22, 23,
-        24.785)
-        .setInversions(false, true, false);
-
-    modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        31, 20, 21,
-        -40.781)
-        .setInversions(true, true, false);
-
+    // bot on board, no modules
+    ModuleConfig[] modules = null;
     return modules;
   }
 
   @Override
   public void setBindings() {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
-
-    // TODO - figure better way to handle bindings
-    // BindingsCompetition.ConfigureCompetition(dc);
     BindingsOther.ConfigureOther(dc);
-
-    // start anyting else
-    // new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
   }
 
   @Override

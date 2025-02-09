@@ -53,7 +53,7 @@ public final class Constants {
     // DT
     // synced as of 1/25/25 
     // https://docs.google.com/spreadsheets/d/1CyHzJscPIuvs0eFUY_qruQcuFui_w2nIXeXUyMwRKBU
-// i tried putting them in numerical order but the IO tables are sorta inconsistant with ordering so nothing I can do
+    //
     public static final int BL_Angle = 20;
     public static final int BL_Drive = 21;
     public static final int BL_CANCoder = 28;
@@ -72,22 +72,16 @@ public final class Constants {
 
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
-
   }
 
   public static final class PWM{
-
   }
 
   public static final class AnalogIn {
-    // public static final int Pressure_Sensor = 0;
-    // public static final int MAGAZINE_ANGLE = 0;
   }
 
   // pnumatics control module 1
   public static final class PCM1 {
-    //public static final int Forward = 0;
-    //public static final int Reverse = 1;
   }
 
   // pnumatics control module 2
@@ -96,9 +90,7 @@ public final class Constants {
 
   public final class DigitalIO {
     public static final int EndEffector_Lightgate = 0;
-    public static final int GroundIntakeLightGate = 0; // TBD 1/25/25 needs to be assigned
-    
-
+    public static final int GroundIntakeLightGate = 1; // TBD 1/25/25 needs to be assigned
   }
 
   // TODO fix for 2025!!!!

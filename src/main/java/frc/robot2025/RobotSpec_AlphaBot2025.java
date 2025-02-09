@@ -27,8 +27,8 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
-import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -49,8 +49,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
       .add(Sensors_Subsystem.class)
-     // .add(Limelight.class)
-     .add(GroundIntake.class)
+      //.add(Limelight.class)
+      .add(GroundIntake.class)
+      .add(Elevator_Subsystem.class)
       .add(SwerveDrivetrain.class, () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       }) // must be after LL and Sensors
@@ -69,14 +70,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
 
   // Chassis
-  double kWheelCorrectionFactor = .957;
+  double kWheelCorrectionFactor = 1.0;
   double kSteeringGR = 21.428;
   double kDriveGR = 6.12;
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
   final ChassisConfig chassisConfig = new ChassisConfig(
-      MperFT * (25.0 / 12.0) / 2.0, // x
-      MperFT * (20.75 / 12.0) / 2.0, // y
+      0.57785 / 2.0, // x, based on direct measurements
+      0.57785 / 2.0, // y, based on direct measurements
       kWheelCorrectionFactor, // scale [] <= 1.0
       kWheelDiameter,
       kSteeringGR,
@@ -114,22 +115,22 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     ModuleConfig[] modules = new ModuleConfig[4];
     modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
         CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle,
-        41.484)
+        43.41759375)
         .setInversions(false, true, false);
 
     modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
         CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,
-        -66.621)
+        -66.2694375)
         .setInversions(true, true, false);
 
     modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
         CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,
-        24.785)
+        49.482265625)
         .setInversions(false, true, false);
 
     modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
         CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle,
-        -40.781)
+        -66.005609375)
         .setInversions(true, true, false);
 
     return modules;
