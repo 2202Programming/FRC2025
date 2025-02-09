@@ -32,7 +32,7 @@ public final class Constants {
     public static final int ROBORIO = 0;
     public static final int PDP = 1; // for rev
     public static final int PCM1 = 2; // for rev
-
+ 
     // lights
     public static final int CANDLE1 = 3;
     public static final int CANDLE2 = 4;
@@ -43,6 +43,12 @@ public final class Constants {
     public static final int IntakeTop = 12; //TBD
     public static final int IntakeBtm = 13; //TBD
     public static final int IntakeWheel = 14; //TBD
+    //CAN IDs
+    public static final int CLIMBER = 10; //placeholder
+    public static final int ELEVATOR_MAIN = 40; //placeholder
+    public static final int ELEVATOR_FOLLOW = 41; //placeholder
+    public static final int WRIST = 38; //placeholder
+    public static final int END_EFFECTOR = 39; //placeholder
 
     // DT
     // synced as of 1/25/25 
@@ -70,19 +76,18 @@ public final class Constants {
   }
 
   public static final class PWM{
-    //public static final int LEFT_AMP_MECHANISM = 1;
-    //public static final int RIGHT_AMP_MECHANISM = 0;
+
   }
 
   public static final class AnalogIn {
-    public static final int Pressure_Sensor = 0;
+    // public static final int Pressure_Sensor = 0;
     // public static final int MAGAZINE_ANGLE = 0;
   }
 
   // pnumatics control module 1
   public static final class PCM1 {
-    public static final int Forward = 0;
-    public static final int Reverse = 1;
+    //public static final int Forward = 0;
+    //public static final int Reverse = 1;
   }
 
   // pnumatics control module 2
@@ -90,6 +95,7 @@ public final class Constants {
   }
 
   public final class DigitalIO {
+    public static final int EndEffector_Lightgate = 0;
     public static final int GroundIntakeLightGate = 0; // TBD 1/25/25 needs to be assigned
     
 

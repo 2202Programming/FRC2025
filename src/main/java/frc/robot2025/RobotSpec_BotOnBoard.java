@@ -16,6 +16,7 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
@@ -27,42 +28,27 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.EndEffector_Subsystem;
-import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-import frc.robot2025.subsystems.Wrist;
 
-public class RobotSpec_CompBot2025 implements IRobotSpec {
-  // Subsystems and other hardware on 2024 Robot rev Alpha
-  final SubsystemConfig ssconfig = new SubsystemConfig("CompBot2025", "11111111") //TODO FIX serialnum
+public class RobotSpec_BotOnBoard implements IRobotSpec {
+  // Subsystems and other hardware on 2025 Robot rev Alpha
+  // $env:serialnum = "032381BF"
+  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
         pdp.clearStickyFaults();
         return pdp;
       })
-      // .add(PneumaticsControl.class)
-      // .add(BlinkyLights.class, "LIGHTS")
+
       .add(HID_Xbox_Subsystem.class, "DC", () -> {
         return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
       })
-    //   .add(Sensors_Subsystem.class)
-    //   .add(Limelight.class)
-    //  .add(SwerveDrivetrain.class, () ->{
-    //       return new SwerveDrivetrain(SparkFlex.class);
-    //   }) // must be after LL and Sensors
-    //   .add(VisionPoseEstimator.class)
       .add(Elevator_Subsystem.class)
       .add(Command.class, "ElevatorWatcher", () -> {
         return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       });
-      // .add(Wrist.class)
-      // .add(EndEffector_Subsystem.class)
-
       // below are optional watchers for shuffeleboard data - disable if need too.
-      // .add(Command.class, "DT_Monitor", () -> {
-      //   return new DTMonitorCmd();
-      // });
 
   // set this true at least once after robot hw stabilizes
   boolean burnFlash = false;
@@ -73,13 +59,13 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
 
   // Chassis
   double kWheelCorrectionFactor = .957;
-  double kSteeringGR = 21.42857; //Mk4i 
-  double kDriveGR = 6.12; //Mk4i L3
+  double kSteeringGR = 21.428;
+  double kDriveGR = 6.12;
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
   final ChassisConfig chassisConfig = new ChassisConfig(
-      MperFT * (23.287 / 12.0) / 2.0, // x, based off onshape measurements
-      MperFT * (23.386 / 12.0) / 2.0, // y, based off onshape measurements
+      MperFT * (25.0 / 12.0) / 2.0, // x
+      MperFT * (20.75 / 12.0) / 2.0, // y
       kWheelCorrectionFactor, // scale [] <= 1.0
       kWheelDiameter,
       kSteeringGR,
@@ -88,7 +74,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
       new PIDFController(0.01, 0.0, 0.0, 0.0) // angle
   );
 
-  public RobotSpec_CompBot2025() {
+  public RobotSpec_BotOnBoard() {
     // finish BetaBot's drivePIDF
     chassisConfig.drivePIDF.setIZone(0.2);
     // add the specs to the ssconfig
@@ -143,11 +129,11 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
     HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
-    BindingsCompetition.ConfigureCompetition(dc);
+    // BindingsCompetition.ConfigureCompetition(dc);
     BindingsOther.ConfigureOther(dc);
 
     // start anyting else
-    new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
+    // new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
   }
 
   @Override
@@ -164,10 +150,6 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
 
   @Override
   public void setDefaultCommands() {
-    SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
-    if (drivetrain != null) {
-      drivetrain.setDefaultCommand(new RobotCentricDrive());
-    }
   }
 
 }
