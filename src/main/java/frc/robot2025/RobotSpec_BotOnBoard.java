@@ -12,6 +12,7 @@ import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
+import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
@@ -98,7 +99,11 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
 
   @Override
   public void setBindings() {
-    HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
+    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
+
+    // FOR BOT ON BOARD you can configure bindings directly here
+    // and avoid messing with BindingsOther or Comp.
+
     BindingsOther.ConfigureOther(dc);
   }
 

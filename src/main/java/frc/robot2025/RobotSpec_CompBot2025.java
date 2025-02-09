@@ -14,7 +14,7 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
+import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
@@ -25,7 +25,7 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_CompBot2025 implements IRobotSpec {
-  // Subsystems and other hardware on 2024 Robot rev Alpha
+  // Subsystems and other hardware on 2025 Robot rev Competition
   final SubsystemConfig ssconfig = new SubsystemConfig("CompBot2025", "11111111") //TODO FIX serialnum
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
@@ -35,8 +35,8 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
       })
       // .add(PneumaticsControl.class)
       // .add(BlinkyLights.class, "LIGHTS")
-      .add(HID_Xbox_Subsystem.class, "DC", () -> {
-        return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
+      .add(HID_Subsystem.class, "DC", () -> {
+        return new HID_Subsystem(0.3, 0.9, 0.05);
       })
     //   .add(Sensors_Subsystem.class)
     //   .add(Limelight.class)
@@ -133,7 +133,7 @@ public class RobotSpec_CompBot2025 implements IRobotSpec {
 
   @Override
   public void setBindings() {
-    HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
+    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
     BindingsCompetition.ConfigureCompetition(dc);
     //BindingsOther.ConfigureOther(dc);
 

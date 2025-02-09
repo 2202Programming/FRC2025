@@ -15,11 +15,13 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
-import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.VisionPoseEstimator;
+import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
@@ -54,8 +56,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Elevator_Subsystem.class)
       .add(SwerveDrivetrain.class, () ->{
           return new SwerveDrivetrain(SparkFlex.class);
-      }) // must be after LL and Sensors
-      //.add(GroundIntake.class)
+      })
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
@@ -70,7 +71,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
 
   // Chassis
-  double kWheelCorrectionFactor = 1.0;
+  double kWheelCorrectionFactor = 1.02;
   double kSteeringGR = 21.428;
   double kDriveGR = 6.12;
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
@@ -138,7 +139,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public void setBindings() {
-    HID_Xbox_Subsystem dc = RobotContainer.getSubsystem("DC");
+    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
     BindingsCompetition.ConfigureCompetition(dc);
@@ -162,9 +163,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public void setDefaultCommands() {
-    SwerveDrivetrain drivetrain = RobotContainer.getSubsystem(SwerveDrivetrain.class);
+    DriveTrainInterface drivetrain = RobotContainer.getSubsystemOrNull("drivetrain");
     if (drivetrain != null) {
-      drivetrain.setDefaultCommand(new RobotCentricDrive());
+      drivetrain.setDefaultCommand(new FieldCentricDrive());
     }
   }
 
