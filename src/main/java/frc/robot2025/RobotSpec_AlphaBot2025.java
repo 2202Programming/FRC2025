@@ -17,9 +17,10 @@ import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
+import frc.lib2202.subsystem.Odometry;
+import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
-import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
@@ -48,24 +49,30 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(BlinkyLights.class, "LIGHTS", () -> {
         return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
       })
-      .add(HID_Xbox_Subsystem.class, "DC", () -> {
-        return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
+      .add(HID_Subsystem.class, "DC", () -> {
+        return new HID_Subsystem(0.3, 0.9, 0.05);
       })
-      .add(Sensors_Subsystem.class, "sensors")
-      .add(Limelight.class, "limelight")
       .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
-      .add(SwerveDrivetrain.class, () ->{
+      // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
+      // match what is given here.
+      .add(Sensors_Subsystem.class, "sensors")
+      .add(Limelight.class, "limelight")
+      .add(SwerveDrivetrain.class, "drivetrain", () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       })
+      .add(OdometryInterface.class, "odometry", () ->{
+        var obj = new Odometry();
+        obj.new OdometryWatcher();
+        return obj;
+      })
+      // VisonPoseEstimator needs LL and Odometry
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
       });
 
-  // set this true at least once after robot hw stabilizes
-  boolean burnFlash = false;
   boolean swerve = true;
 
   // Robot Speed Limits
@@ -104,7 +111,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public IHeadingProvider getHeadingProvider() {
-    return RobotContainer.getSubsystem(Sensors_Subsystem.class);
+    return RobotContainer.getSubsystem("sensors");
   }
 
   @Override
@@ -143,8 +150,10 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
 
     // TODO - figure better way to handle bindings
+    
+    // Select either comp or other for testing
     BindingsCompetition.ConfigureCompetition(dc);
-    BindingsOther.ConfigureOther(dc);
+    //BindingsOther.ConfigureOther(dc);
 
     // start anyting else
     new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
@@ -152,7 +161,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public boolean burnFlash() {
-    return burnFlash;
+    return true;
   }
 
   @Override

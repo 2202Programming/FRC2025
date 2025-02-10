@@ -44,9 +44,8 @@ public class BindingsOther {
         }
     }
 
-
-
-    static void DriverBinding(HID_Subsystem dc) {
+    // Warning, these will fail if XBOX controllers are not connected
+    static void DriverBinding(HID_Subsystem dc) {        
         var generic_driver = dc.Driver();
         DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
         CommandXboxController driver = (CommandXboxController)generic_driver;
@@ -61,7 +60,8 @@ public class BindingsOther {
                 break;
         }
     }
-
+    
+    // Warning, these will fail if XBOX controllers are not connected
     static void OperatorBindings(HID_Subsystem dc) {
         CommandXboxController operator = (CommandXboxController)dc.Operator();
 

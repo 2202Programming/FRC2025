@@ -1,5 +1,6 @@
 package frc.robot2025;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
@@ -35,6 +36,9 @@ public final class BindingsCompetition {
             // Joystick
             @SuppressWarnings("unused")
             TMJoystickController joystick = (TMJoystickController)generic_driver;
+
+            // put Driver's joystick bindings here
+
         } 
         else if (generic_driver instanceof CommandXboxController) {
             // XBox
@@ -48,19 +52,28 @@ public final class BindingsCompetition {
             driver.b().onTrue(new ElevatorMove(Levels.Ground, true));
             driver.rightTrigger().onTrue(new ElevatorMove(Levels.LCoral, true));
         }
+        else {
+            DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
+        }
     }
 
 
     static void OperatorBindings(HID_Subsystem dc) {
         @SuppressWarnings("unused")
         var sideboard = dc.SwitchBoard();
-        CommandXboxController operator = (CommandXboxController)dc.Operator();
+        var generic_opr = dc.Operator();
 
-        operator.a().whileTrue(new CoralPickupSequence());
-        operator.b().whileTrue(new CoralPlace());
-        operator.x().whileTrue(new AlgaePickupSequence());
-        operator.y().whileTrue(new AlgaePlace());
-        
+        //buttons depend on what controller is plugged in
+        if (generic_opr instanceof CommandXboxController) {
+            CommandXboxController operator = (CommandXboxController)generic_opr;
+            operator.a().whileTrue(new CoralPickupSequence());
+            operator.b().whileTrue(new CoralPlace());
+            operator.x().whileTrue(new AlgaePickupSequence());
+            operator.y().whileTrue(new AlgaePlace());
+        }
+        else {
+            DriverStation.reportWarning("Bindings: No operator bindings set, check controllers.", false);
+        }
         
         // Switchboard buttons too
         
