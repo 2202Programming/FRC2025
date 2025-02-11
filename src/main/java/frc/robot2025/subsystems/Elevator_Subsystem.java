@@ -62,7 +62,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
 
-  private final double gearRatio = 1.0/4.67; // [out turns]/[mtr turns]
+  private final double gearRatio = 1/4.67; // [out turns]/[mtr turns]
   private final double chainRatio = 1.0;    // [out/in] chain in/out 
   private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
   private final double stagesRatio = 1.0;   // [out/in]  TODO get valid number
@@ -73,7 +73,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   public Elevator_Subsystem() {
     desiredVel = 0;
     elevatorPidController = new PIDController(0.0, 0.0, 0.0);
-    elevatorMechanicalPid = new PIDFController(0.0000, 0.0, 0.0, 1.0/5700.0);
+    elevatorMechanicalPid = new PIDFController(0.000, 0.0, 0.0, 1.0/2700.0);
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
