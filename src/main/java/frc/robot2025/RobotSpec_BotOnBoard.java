@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
@@ -19,6 +22,7 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
@@ -33,8 +37,8 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
         return pdp;
       })
 
-      .add(HID_Xbox_Subsystem.class, "DC", () -> {
-        return new HID_Xbox_Subsystem(0.3, 0.9, 0.05);
+      .add(HID_Subsystem.class, "DC", () -> {
+        return new HID_Subsystem(0.3, 0.9, 0.05);
       })
       .add(Elevator_Subsystem.class)
       .add(Command.class, "ElevatorWatcher", () -> {
@@ -100,11 +104,28 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
   @Override
   public void setBindings() {
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
+    if (dc.Driver() instanceof CommandPS4Controller) {
+      CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
+
+      opp.square().whileTrue(new testElevatorVelComd(140));
+      opp.triangle().whileTrue(new testElevatorVelComd(0));
+      opp.cross().whileTrue(new testElevatorVelComd(-140));
+      opp.circle().whileTrue(new testElevatorVelComd(300));
+    } else {
+      CommandXboxController opp = (CommandXboxController)dc.Driver();
+
+      opp.a().whileTrue(new testElevatorVelComd(140));
+      opp.b().whileTrue(new testElevatorVelComd(0));
+      opp.x().whileTrue(new testElevatorVelComd(-140));
+      opp.y().whileTrue(new testElevatorVelComd(300));
+    }
+
+    
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // and avoid messing with BindingsOther or Comp.
 
-    BindingsOther.ConfigureOther(dc);
+    //BindingsOther.ConfigureOther(dc);
   }
 
   @Override
