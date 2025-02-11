@@ -15,6 +15,7 @@ import frc.robot2025.commands.GroundIntake.AlgaePickupSequence;
 import frc.robot2025.commands.GroundIntake.AlgaePlace;
 import frc.robot2025.commands.GroundIntake.CoralPickupSequence;
 import frc.robot2025.commands.GroundIntake.CoralPlace;
+import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /*
@@ -66,10 +67,13 @@ public final class BindingsCompetition {
         //buttons depend on what controller is plugged in
         if (generic_opr instanceof CommandXboxController) {
             CommandXboxController operator = (CommandXboxController)generic_opr;
-            operator.a().whileTrue(new CoralPickupSequence());
-            operator.b().whileTrue(new CoralPlace());
-            operator.x().whileTrue(new AlgaePickupSequence());
-            operator.y().whileTrue(new AlgaePlace());
+
+            if(RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
+                operator.a().whileTrue(new CoralPickupSequence());
+                operator.b().whileTrue(new CoralPlace());
+                operator.x().whileTrue(new AlgaePickupSequence());
+                operator.y().whileTrue(new AlgaePlace());
+            }
         }
         else {
             DriverStation.reportWarning("Bindings: No operator bindings set, check controllers.", false);
