@@ -21,6 +21,7 @@ import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
+import frc.lib2202.subsystem.swerve.AutoPPConfigure;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
@@ -153,6 +154,13 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // Select either comp or other for testing
     BindingsCompetition.ConfigureCompetition(dc);
     //BindingsOther.ConfigureOther(dc);
+
+    // Initialize PathPlanner
+    OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
+    DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
+    if (odo != null && sdt != null) {
+      AutoPPConfigure.configureAutoBuilder(sdt, odo);
+    }
 
     // start anyting else
     new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
