@@ -45,7 +45,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   }; 
 
   private final PIDController elevatorPidController;
-  private final PIDFController elevatorMechanicalPid;
+  private final PIDFController velocityPid;
   private NeoServo servo; 
   private SparkFlex followMotor;
   private SparkFlexConfig followMotorConfig;
@@ -62,7 +62,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
 
-  private final double gearRatio = 1/4.67; // [out turns]/[mtr turns]
+  private final double gearRatio = 1.0/4.67; // [out turns]/[mtr turns]
   private final double chainRatio = 1.0;    // [out/in] chain in/out 
   private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
   private final double stagesRatio = 1.0;   // [out/in]  TODO get valid number
@@ -73,12 +73,11 @@ public class Elevator_Subsystem extends SubsystemBase {
   public Elevator_Subsystem() {
     desiredVel = 0;
     elevatorPidController = new PIDController(0.0, 0.0, 0.0);
-    elevatorMechanicalPid = new PIDFController(0.000, 0.0, 0.0, 1.0/2700.0);
-    servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, elevatorMechanicalPid, motors_inverted);
+    velocityPid = new PIDFController(0.00025, 0.0, 0.01, 0.75/4960.0);
+    servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
-    //lines 51-55 config motor 2 the same as the first motor 
-    servo.setConversionFactor(positionConversionFactor) //probably wrong, double check
+    servo.setConversionFactor(positionConversionFactor) //update with new values after testing
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
                       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
@@ -94,7 +93,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     followMotor.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // power up config
     servo.setPosition(initPos);
-  
+    servo.getWatcher();
   }
 
   @Override
