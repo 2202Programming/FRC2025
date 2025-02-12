@@ -14,12 +14,6 @@ import frc.lib2202.util.AprilTag2d;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-
-    // shared networktables that can be used for accessing shared globals 
-    public final static class NTStrings {
-      // defined in sensors
-      public final static String NT_Name_Position = "EulerAngles";
-    }
   
   /*-------------------------Ports/CAN-------------------------------- */
   /**

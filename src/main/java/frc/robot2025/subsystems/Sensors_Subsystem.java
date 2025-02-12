@@ -22,13 +22,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.util.ModMath;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.Constants.NTStrings;
 
 public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider {
-  public enum YawSensor {
-    kNavX, kPigeon
-  };
-
   /**
    * Creates a new Sensors_Subsystem.
    * 
@@ -38,103 +33,73 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    * 
    */
 
+  final int NT_UPDATE_FRAME = 10; 
+  int log_counter = 0;
 
   private NetworkTable table;
-  private NetworkTable positionTable;
-
+  //CAN
   private NetworkTableEntry nt_canUtilization;
   private NetworkTableEntry nt_canTxError;
   private NetworkTableEntry nt_canRxError;
-
+  // angles
   private NetworkTableEntry nt_yaw;
+  private NetworkTableEntry nt_yaw_dot;
   private NetworkTableEntry nt_roll;
+  private NetworkTableEntry nt_roll_dot;
   private NetworkTableEntry nt_pitch;
+  private NetworkTableEntry nt_pitch_dot;
   private NetworkTableEntry nt_rotation;
 
-
-
- 
-  
-  // Sensors
+  // Sensors & CAN monitoring
   Pigeon2 m_pigeon;
-  double[] m_xyz_dps = new double[3]; // rotation rates [deg/s]
-
-
-
-  public static class RotationPositions {
-    public double back_left;
-    public double back_right;
-    public double front_left;
-    public double front_right;
-  }
-
-  public enum GyroStatus {
-    UsingPigeon("Pigeon");
-
-    private String name;
-
-    private GyroStatus(String name) {
-      this.name = name;
-    }
-
-    public String toString() {
-      return name;
-    }
-  }
-
-
-  // CAN monitoring
   CANStatus m_canStatus;
 
-  // Simulation
-  /// AHRS_GyroSim m_gyroSim;
-
-  // measured values
+  // Simulation TBD
+  
+  // measured angles and rates
   double m_roll;
+  double m_roll_d;
   double m_pitch;
+  double m_pitch_d;
   double m_yaw;
-
+  double m_yaw_d;
+  
+  //accelerations
   double m_Xaccel;
   double m_Yaccel;
   double m_Zaccel;
 
-  // offsets measured at power up
+  //bias offsets measured at power up
   final int BIAS_SAMPLES = 5; // [count]
   final double BIAS_DELAY = 0.2; // [s]
   double m_roll_bias; // [deg]
   double m_pitch_bias; // [deg]
   double m_yaw_bias; // [deg] measured, but not corrected for
 
-  double m_yaw_d;
- 
-  // configurion setting
-  YawSensor c_yaw_type = YawSensor.kPigeon;
-  GyroStatus c_gryo_status = GyroStatus.UsingPigeon;
-
-  final int NT_UPDATE_FRAME = 20;
-  int log_counter = 0;
-
   // set this to true to default to pigeon
   public Pose2d autoStartPose;
   public Pose2d autoEndPose;
 
   public Sensors_Subsystem() {
-
     // alocate sensors
     m_canStatus = new CANStatus();
     m_pigeon = new Pigeon2(CAN.PIGEON_IMU_CAN);
+    m_pigeon.reset();  
+    m_pigeon.clearStickyFaults();
+
     // setup network table
     table = NetworkTableInstance.getDefault().getTable("Sensors");
-    positionTable = NetworkTableInstance.getDefault().getTable(NTStrings.NT_Name_Position);
-
-    nt_canUtilization = table.getEntry("CanUtilization/value");
+    nt_canUtilization = table.getEntry("CanUtilization");
     nt_canRxError = table.getEntry("CanRxError");
     nt_canTxError = table.getEntry("CanTxError");
 
-    nt_yaw = table.getEntry("Active Yaw");
     nt_rotation = table.getEntry("Rotation");
-    nt_pitch = positionTable.getEntry("Pitch");
-    nt_roll = positionTable.getEntry("Roll");
+    nt_pitch = table.getEntry("Pitch");
+    nt_roll = table.getEntry("Roll");
+    nt_yaw = table.getEntry("Yaw");
+    nt_yaw_dot = table.getEntry("Yaw_d");
+    nt_pitch_dot = table.getEntry("Pitch_d");
+    nt_roll_dot = table.getEntry("Roll_d");
 
     calibrate();
     log();
@@ -144,39 +109,51 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   public void calibrate() {
     double roll_bias = 0.0, pitch_bias = 0.0, yaw_bias = 0.0;
     for (int i = 0; i < BIAS_SAMPLES; i++) {
-      roll_bias += m_pigeon.getRotation3d().getX() * 180.0 / Math.PI;// Roll
-      pitch_bias += m_pigeon.getRotation3d().getY() * 180.0 / Math.PI;// Pitch
-      yaw_bias += m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI;// Yaw
+
+      // dpl - not sure how much these differ
+      // roll_bias += m_pigeon.getRotation3d().getX() * 180.0 / Math.PI;// Roll
+      // pitch_bias += m_pigeon.getRotation3d().getY() * 180.0 / Math.PI;// Pitch
+      // yaw_bias += m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI;// Yaw
+
+      // use pigeon's direct r/p/y
+      roll_bias += m_pigeon.getRoll().getValueAsDouble();
+      pitch_bias += m_pigeon.getPitch().getValueAsDouble();
+      yaw_bias += m_pigeon.getYaw().getValueAsDouble();
       Timer.delay(BIAS_DELAY);
     }
     // save bias value to subtract from live measurements
     m_roll_bias = roll_bias / (double) BIAS_SAMPLES;
     m_pitch_bias = pitch_bias / (double) BIAS_SAMPLES;
     m_yaw_bias = yaw_bias / (double) BIAS_SAMPLES;
+
+    System.out.println("\t\tSensors measured yaw_bias= " + m_yaw_bias );
+    System.out.println("\t\tSensors measured pitch_bias= " + m_pitch_bias );
+    System.out.println("\t\tSensors measured roll_bias= " + m_roll_bias );
   }
 
   @Override
   public void periodic() {
     // CCW positive, inverting here to match all the NavX code previously written.
-    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI);
-    m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
-    m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
-    // Getting the angular velocities for m_xyz_dps
-    //TODO match array indicies to xyz
-    m_xyz_dps[0] = m_pigeon.getAngularVelocityXWorld().getValueAsDouble();
-    m_xyz_dps[1] = m_pigeon.getAngularVelocityYWorld().getValueAsDouble();
-    m_xyz_dps[2] = m_pigeon.getAngularVelocityZWorld().getValueAsDouble();
+    // m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI);
+    // m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
+    // m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
+
+    // pigeon gets done with (false) so as not to wait, using cached value
+
+    // Use the direct r/p/y from pigeon instead of above unpack from 3d ... not sure of difference 
+    m_roll = m_pigeon.getRoll(false).getValueAsDouble() - m_roll_bias;
+    m_pitch = m_pigeon.getPitch(false).getValueAsDouble() - m_pitch_bias;
+    m_yaw = ModMath.fmod360_2(-m_pigeon.getYaw(false).getValueAsDouble() );
+    
+    // Getting the angular velocities
+    m_roll_d = m_pigeon.getAngularVelocityXWorld(false).getValueAsDouble();
+    m_pitch_d = m_pigeon.getAngularVelocityYWorld(false).getValueAsDouble();
+    m_yaw_d = m_pigeon.getAngularVelocityZWorld(false).getValueAsDouble();
    
-
-    // TODO m_xyz_dps not set
-    m_yaw_d = m_xyz_dps[2];
-
     // read accelerations
-    m_Xaccel = m_pigeon.getAccelerationX().getValueAsDouble();
-    m_Yaccel = m_pigeon.getAccelerationY().getValueAsDouble();
-    m_Zaccel = m_pigeon.getAccelerationZ().getValueAsDouble();
-
-    log_counter++;
+    m_Xaccel = m_pigeon.getAccelerationX(false).getValueAsDouble();
+    m_Yaccel = m_pigeon.getAccelerationY(false).getValueAsDouble();
+    m_Zaccel = m_pigeon.getAccelerationZ(false).getValueAsDouble();
     log();
   }
 
@@ -191,7 +168,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   }
 
   public void log() {
-    if ((log_counter % NT_UPDATE_FRAME) == 0) {
+    if ((log_counter++ % NT_UPDATE_FRAME) == 0) {
 
       CANJNI.getCANStatus(m_canStatus);
       nt_canUtilization.setDouble(m_canStatus.percentBusUtilization);
@@ -202,6 +179,10 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
       nt_rotation.setDouble(getRotation2d().getDegrees());
       nt_roll.setDouble(getRoll());
       nt_pitch.setDouble(getPitch());
+
+      nt_yaw_dot.setDouble(getYawRate());
+      nt_roll_dot.setDouble(getRollRate());
+      nt_pitch_dot.setDouble(getPitchRate());
     }
   }
 
@@ -215,15 +196,28 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   }
 
   public double getPitchRate() {
-    return m_xyz_dps[1];
+    return m_pitch_d;
   }
 
   public double getRollRate() {
-    return m_xyz_dps[0];
+    return m_roll_d;
   }
 
+   /**
+   * Return the rate of rotation of the yaw gyro.
+   *
+   * <p>
+   * The rate is based on the most recent reading of the gyro analog value
+   *
+   * <p>
+   * The rate is expected to be positive as the gyro turns clockwise when looked
+   * at from the top. It needs to follow the NED axis convention.
+   *
+   * @return the current yaw rate in degrees per second
+   */
+  // @Override
   public double getYawRate() {
-    return m_xyz_dps[2];
+    return m_yaw_d;
   }
 
   public double getXAccel() {
@@ -305,30 +299,18 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     return Rotation2d.fromDegrees(-m_yaw); // note sign
   }
 
-  /**
-   * Return the rate of rotation of the gyro.
-   *
-   * <p>
-   * The rate is based on the most recent reading of the gyro analog value
-   *
-   * <p>
-   * The rate is expected to be positive as the gyro turns clockwise when looked
-   * at from the top. It needs to follow the NED axis convention.
-   *
-   * @return the current rate in degrees per second
-   */
-  // @Override
-  public double getRate() {
-    return m_yaw_d;
-  }
 
-
+  // 2/12/2025 We shouldn't have to mess with pose and setYaw. Odometry seems to handle
+  // tracking yaw offsets now.
+  // deprcate and see where we still might use these.
+  @Deprecated
   public void setAutoStartPose(Pose2d pose) {
     autoStartPose = new Pose2d(pose.getTranslation(), pose.getRotation());
     setYaw(pose.getRotation()); // set gyro to starting heading so it's in field coordinates.
     System.out.println("***Auto Start Pose set: " + pose);
   }
 
+  @Deprecated
   public void setAutoEndPose(Pose2d pose) {
     autoEndPose = new Pose2d(pose.getTranslation(), pose.getRotation());
 
