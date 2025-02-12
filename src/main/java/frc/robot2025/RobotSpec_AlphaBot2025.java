@@ -174,8 +174,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public SendableChooser<Command> getRegisteredCommands() {
     // no robot parts to support thse now
-    // return RegisteredCommands.RegisterCommands();
-    return null;
+    return RegisteredCommands.RegisterCommands();
   }
 
   @Override
