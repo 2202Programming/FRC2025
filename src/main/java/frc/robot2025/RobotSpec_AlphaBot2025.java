@@ -37,7 +37,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
-  // $env:serialnum = "032381BF"
+  // $env:serialnum = "03282B65"
   final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "03282B65")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {

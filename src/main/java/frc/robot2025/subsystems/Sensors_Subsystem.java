@@ -97,9 +97,9 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     nt_pitch = table.getEntry("Pitch");
     nt_roll = table.getEntry("Roll");
     nt_yaw = table.getEntry("Yaw");
-    nt_yaw_dot = table.getEntry("Yaw_d");
-    nt_pitch_dot = table.getEntry("Pitch_d");
-    nt_roll_dot = table.getEntry("Roll_d");
+    nt_yaw_dot = table.getEntry("YawDot");
+    nt_pitch_dot = table.getEntry("PitchDot");
+    nt_roll_dot = table.getEntry("RollDot");
 
     calibrate();
     log();
