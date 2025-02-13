@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 7.573,
+        "y": 7.278
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.954125943713999,
-        "y": 6.710536497907895
+        "x": 6.476338072469974,
+        "y": 7.297438342907609
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.0,
-        "y": 6.0
+        "x": 6.220633561643836,
+        "y": 7.278
       },
       "prevControl": {
-        "x": 4.104552712902451,
-        "y": 6.264141873849388
+        "x": 7.29004604986705,
+        "y": 7.237440225421257
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 0.0,
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "No Potato Paths",
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }

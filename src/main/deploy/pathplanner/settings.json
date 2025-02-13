@@ -3,9 +3,11 @@
   "robotLength": 0.9,
   "holonomicMode": true,
   "pathFolders": [
-    "A_Paths"
+    "No Potato Paths"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "No Potato Auto"
+  ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,

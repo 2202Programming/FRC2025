@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos1 to D1"
+            "pathName": "Pos3 get out of the way"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "No Potato Auto",
   "choreoAuto": false
 }

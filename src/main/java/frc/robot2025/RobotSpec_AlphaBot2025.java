@@ -47,7 +47,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       })
       // .add(PneumaticsControl.class)
       .add(BlinkyLights.class, "LIGHTS", () -> {
-        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
+        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE3, CAN.CANDLE4);
       })
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
