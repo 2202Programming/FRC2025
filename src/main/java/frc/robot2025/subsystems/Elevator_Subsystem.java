@@ -73,7 +73,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   public Elevator_Subsystem() {
     desiredVel = 0;
     elevatorPidController = new PIDController(0.0, 0.0, 0.0);
-    velocityPid = new PIDFController(0.00025, 0.0, 0.01, 0.75/4960.0);
+    velocityPid = new PIDFController(0.00025, 0.0, 0.01, 1.0/6613.0);
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
