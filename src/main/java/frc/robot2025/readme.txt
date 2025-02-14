@@ -14,7 +14,7 @@ In the Powershell:
   $env:serialnum ='032D2062'          #compbot 2024
   $env:serialnum ='03238151'          #Chadbot
   $env:serialnum ='032381BF'          #alphabot 2025     
-
+  $env:serialnum ='03061025'          #botOnBoard2
 Pick one of these before debugging in simulation mode.
 
 You can show env with:

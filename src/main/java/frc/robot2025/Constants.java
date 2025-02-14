@@ -34,9 +34,9 @@ public final class Constants {
     public static final int CANDLE4 = 6;
 
     // Ground Intake
-    public static final int IntakeTop = 12; //TBD
-    public static final int IntakeBtm = 13; //TBD
-    public static final int IntakeWheel = 14; //TBD
+    public static final int IntakeTop = 51; //51
+    public static final int IntakeBtm = 52; //52
+    public static final int IntakeWheel = 50; //TBD
     //CAN IDs
     public static final int CLIMBER = 10; //placeholder
     public static final int ELEVATOR_MAIN = 40; //placeholder

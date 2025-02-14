@@ -59,12 +59,13 @@ public class GroundIntake extends SubsystemBase {
   DigitalInput lightgate = new DigitalInput(DigitalIO.GroundIntakeLightGate);
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
-  final PIDController topPositionPID = new PIDController(7.0, 1.0, 0.0); // placeholder PIDs
-  final PIDController btmPositionPID = new PIDController(7.0, 1.0, 0.0);
-  PIDFController topHwAngleVelPID = new PIDFController(0.0050, 0.0, 0.0, 0.0075); // placeholder PIDs
-  PIDFController btmHwAngleVelPID = new PIDFController(0.0050, 0.0, 0.0, 0.0075);
-  final double topServoGR = 1.0 /(3.0 * 360); // 3:1 gearbox reduction * 360 degrees / turn
-  final double btmServoGR = 1.0 / (45.0 * 360.0); // 45:1 gearbox reduction * 360 degrees / turn
+  final PIDController topPositionPID = new PIDController(0.75, 0.0, 0.0);
+  final PIDController btmPositionPID = new PIDController(0.0, 0.0, 0.0);
+  PIDFController topHwAngleVelPID = new PIDFController(0.0000, 0.0, 0.0, 0.00017); // placeholder PIDs
+  PIDFController btmHwAngleVelPID = new PIDFController(0.0000, 0.0, 0.0, 0.0017);
+  //TODO fix this its being devided by 60 in neoservo
+  final double topServoGR = (1.0 /45.0) * 360.0 * 60; // 45:1 gearbox reduction * 360 degrees / turn 
+  final double btmServoGR = (1.0 / 45.0) * 360.0 *60; // 45:1 gearbox reduction * 360 degrees / turn
 
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
