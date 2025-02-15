@@ -31,7 +31,6 @@ public class EndEffector_Subsystem extends SubsystemBase {
   private double cmdRPM;
   private double measRPM;
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
-  PIDFController pidConsts_freeSpin = new PIDFController(0.0, 0.0, 0.0, 0.0);
   final double velocityConversionFactor = 1.0;
   DigitalInput farLightGate = new DigitalInput(DigitalIO.EndEffector_nearLightgate);
   DigitalInput nearLightGate = new DigitalInput(DigitalIO.EndEffector_farLightgate);
@@ -54,10 +53,6 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public void setRPM(double RPM) {
-    if (RPM == 0.0) {
-      controller.setIAccum(0.0);
-      controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-    }
     controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     cmdRPM = RPM;
   }
@@ -78,7 +73,6 @@ public class EndEffector_Subsystem extends SubsystemBase {
     var mtrpid = mtr.getClosedLoopController();
     pid.copyTo(mtr, config);
     config.closedLoop.iZone(150.0); // placeholder
-    pidConsts_freeSpin.copyTo(mtr, config);
     config.closedLoop.iMaxAccum(150.0);
     // mtr.setInverted(inverted); //deprecated
     config.idleMode(IdleMode.kBrake);
