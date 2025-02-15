@@ -76,7 +76,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     desiredVel = 0;
     elevatorPidController = new PIDController(0.001, 0.0, 0.0);
     velocityPid = new PIDFController(0.00025, 0.0, 0.01, 1.0/6613.0);
-    servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted);
+    servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     System.out.println(1/cf + " INITIAL CF");
     servo.setConversionFactor(1/cf) //update with new values after testing
