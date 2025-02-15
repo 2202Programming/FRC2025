@@ -121,8 +121,8 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       opp.b().whileTrue(new testElevatorVelComd(0));
       opp.x().whileTrue(new testElevatorVelComd(-140));
       opp.y().whileTrue(new testElevatorVelComd(300));
-      opp.rightBumper().onTrue(new ElevatorCalibrate(-140.0));
-      opp.leftBumper().onTrue(new ElevatorCalibrate(140.0));
+      opp.rightBumper().onTrue(new ElevatorCalibrate(-10.0));
+      opp.leftBumper().onTrue(new ElevatorCalibrate(-5.0));
     }
 
     

@@ -8,7 +8,9 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.EncoderConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -66,16 +68,18 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   private final double gearRatio = 1.0/4.67; // [out turns]/[mtr turns]
   private final double chainRatio = 1.0;    // [out/in] chain in/out 
-  private final double pitchDiameter = 1.76;   // [cm]   TODO get valid number
+  private final double pitchDiameter = 1.76;   // [cm]   
   private final double sprocket_circumference = 5.529;
-  private final double stagesRatio = 1.0;   // [out/in]  TODO get valid number
-  public  final double cf = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI;
-
-
+  private final double stagesRatio = 1.0;   // [out/in] 
+  //public  final double cf = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI;
+  public  final double cf = 0.07919;
+  public SparkFlex driveMotor;
+  public EncoderConfigAccessor d_enc;
+  
   public Elevator_Subsystem() {
     desiredVel = 0;
     elevatorPidController = new PIDController(0.001, 0.0, 0.0);
-    velocityPid = new PIDFController(0.00025, 0.0, 0.01, 1.0/6613.0);
+    velocityPid = new PIDFController(0.002, 0.00001, 0.0, 1.0/300.0); //prior p 0.00025, Kd 0.01, KF 1.0/6613
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     System.out.println(1/cf + " INITIAL CF");
@@ -83,6 +87,12 @@ public class Elevator_Subsystem extends SubsystemBase {
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
                       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
+
+    driveMotor = (SparkFlex)servo.getController();
+
+    d_enc = driveMotor.configAccessor.encoder;
+
+    
 
     servo.setClamp(minPos, maxPos);
     followMotorConfig = new SparkFlexConfig();
@@ -132,11 +142,16 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
 
   public double getVelocity() {
-    System.out.println(servo.getController().getEncoder().getVelocity());
     return servo.getVelocity();
   }
 
   public void setVelocity(double vel) {
+    if (vel > 0) {
+      servo.setArbFeedforward(0.5);
+    }
+    else {
+      servo.setArbFeedforward(0.0);
+    }
     desiredVel = vel;
     servo.setVelocityCmd(vel);
   }
