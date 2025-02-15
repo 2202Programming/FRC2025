@@ -23,11 +23,15 @@ import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.ElevatorMove;
+import frc.robot2025.commands.EndEffectorRPM;
 import frc.robot2025.commands.WristToPos;
+import frc.robot2025.commands.backupEE_Move;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.backupEE;
 
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
@@ -46,9 +50,9 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       })
       
       // .add(Wrist.class);
-      .add(Elevator_Subsystem.class)
-      .add(Command.class, "ElevatorWatcher", () -> {
-       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
+      .add(EndEffector_Subsystem.class)
+      .add(Command.class, "EndEffectorWatcher", () -> {
+       return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
       });
       // below are optional watchers for shuffeleboard data - disable if need too.
 
@@ -119,17 +123,9 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
     } else {
       CommandXboxController opp = (CommandXboxController)dc.Driver();
       final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-      opp.a().whileTrue(new testElevatorVelComd(140));
-      opp.y().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(90.0);
-      }));
-      opp.b().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(50.0);
-      }));
-      opp.x().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(0.0);
-      }));
-      opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
+      opp.b().whileTrue(new EndEffectorRPM(500.0));
+      opp.a().whileTrue(new EndEffectorRPM(1000.0));
+      opp.y().whileTrue(new EndEffectorRPM(2000.0));
     }
 
     
