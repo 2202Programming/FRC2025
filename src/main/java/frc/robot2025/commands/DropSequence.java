@@ -10,7 +10,6 @@ import frc.robot2025.subsystems.Wrist;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
-import frc.robot2025.subsystems.Wrist.WristLevels;;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DropSequence extends Command {
@@ -21,18 +20,16 @@ public class DropSequence extends Command {
   int count;
   final EndEffector_Subsystem endEffector;
   Levels level;
-  WristLevels wristLevel;
   public enum Phase{
     ElevatorUp, Drop, Finish
   }
 
   Phase phase;
-  public DropSequence(Levels level, WristLevels wristLevel) {
+  public DropSequence(Levels level) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     wrist = RobotContainer.getSubsystem(Wrist.class);
     endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     this.level = level;
-    this.wristLevel = wristLevel;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -49,10 +46,9 @@ public class DropSequence extends Command {
     switch(phase){
       case ElevatorUp:
         elevator.setHeight(level);
-        wrist.setWristSetpoint(wristLevel);
+        wrist.setPos(wrist.drop);
         //next state conditions
-        if(elevator.atSetpoint() && wrist.atSetPoint()){
-          wrist.setWristVelocity(0);
+        if(elevator.atSetpoint() && wrist.atSetpoint()){
           elevator.setVelocity(0);
           phase = Phase.Drop;
         }
@@ -80,7 +76,7 @@ public class DropSequence extends Command {
     // Mr.L - do we want to start the elevator/wrist moving down right away???
     // Does the drivetrain have to backup any?
     elevator.setHeight(0); //pickup level
-    wrist.setWristSetpoint(0); //default pos
+    wrist.setPos(wrist.pickup); //default pos
   }
 
   // Returns true when the command should end.
