@@ -79,7 +79,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
-    servo.setConversionFactor(cf) //update with new values after testing
+    servo.setConversionFactor(1/cf) //update with new values after testing
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
                       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
