@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
@@ -21,6 +22,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.ElevatorCalibrate;
+import frc.robot2025.commands.ElevatorMove;
 import frc.robot2025.commands.WristToPos;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
@@ -116,13 +118,18 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       // opp.cross().onTrue(new WristToPos(0.5));
     } else {
       CommandXboxController opp = (CommandXboxController)dc.Driver();
-
+      final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
       opp.a().whileTrue(new testElevatorVelComd(140));
-      opp.b().whileTrue(new testElevatorVelComd(0));
-      opp.x().whileTrue(new testElevatorVelComd(-140));
-      opp.y().whileTrue(new testElevatorVelComd(300));
-      opp.rightBumper().onTrue(new ElevatorCalibrate(-10.0));
-      opp.leftBumper().onTrue(new ElevatorCalibrate(-5.0));
+      opp.y().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(90.0);
+      }));
+      opp.b().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(50.0);
+      }));
+      opp.x().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(0.0);
+      }));
+      opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
     }
 
     

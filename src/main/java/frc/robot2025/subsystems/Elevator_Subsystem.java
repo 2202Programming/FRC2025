@@ -56,14 +56,14 @@ public class Elevator_Subsystem extends SubsystemBase {
   private SparkClosedLoopController cl_ctrl; 
   private double desiredVel; //in cm/s
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
-  final int STALL_CURRENT = 40;
-  final int FREE_CURRENT = 80;
-  final double elevatorMaxVel = 5700.0; // [cm/s] rpm
-  final double elevatorMaxAccel = 5000.0; // [cm/s^2]  servo may not enforce yet
+  final int STALL_CURRENT = 60;
+  final int FREE_CURRENT = 5;
+  final double elevatorMaxVel = 50.0; // [cm/s] rpm
+  final double elevatorMaxAccel = 50.0; // [cm/s^2]  servo may not enforce yet
   final double elevatorPosTol = 0.5;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
-  final double maxPos = 100.0; // [cm]
-  final double minPos = 0.0;   // [cm]
+  final double maxPos = 122.0; // [cm]
+  final double minPos = -1.0;   // [cm]
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
 
@@ -79,22 +79,24 @@ public class Elevator_Subsystem extends SubsystemBase {
   
   public Elevator_Subsystem() {
     desiredVel = 0;
-    elevatorPidController = new PIDController(0.001, 0.0, 0.0);
-    velocityPid = new PIDFController(0.002, 0.00001, 0.0, 1.0/300.0); //prior p 0.00025, Kd 0.01, KF 1.0/6613
+    elevatorPidController = new PIDController(9.0, 0.1, 0.0);
+    velocityPid = new PIDFController(0.001, 0.0, 0.000, 1.0/565.0); //1.0/800 before
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
     cl_ctrl = servo.getController().getClosedLoopController();
     cl_ctrl.setIAccum(0.0);
+    elevatorPidController.setIZone(500.0);
     velocityPid.setIZone(0.0); //TODO: set this once value has been found
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     System.out.println(1/cf + " INITIAL CF");
     servo.setConversionFactor(1/cf) //update with new values after testing
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
-                      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
+                      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
+                      .setMaxVelocity(50.0);
 
-    driveMotor = (SparkFlex)servo.getController();
+    // driveMotor = (SparkFlex)servo.getController();
 
-    d_enc = driveMotor.configAccessor.encoder;
+    // d_enc = driveMotor.configAccessor.encoder;
 
     
 
@@ -155,10 +157,10 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   public void setVelocity(double vel) {
     if (vel > 0) {
-      servo.setArbFeedforward(0.5);
+      servo.setArbFeedforward(0.04);
     }
     else {
-      servo.setArbFeedforward(0.0);
+      servo.setArbFeedforward(0.004);
     }
     desiredVel = vel;
     servo.setVelocityCmd(vel);
