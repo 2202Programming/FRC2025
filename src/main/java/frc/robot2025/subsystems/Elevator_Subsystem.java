@@ -15,11 +15,13 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.command.WatcherCmd;
 import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.Constants.DigitalIO;
 
 
 public class Elevator_Subsystem extends SubsystemBase {
@@ -50,7 +52,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private SparkFlex followMotor;
   private SparkFlexConfig followMotorConfig;
   private double desiredVel; //in cm/s
-
+  final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
   final int STALL_CURRENT = 20;
   final int FREE_CURRENT = 80;
   final double elevatorMaxVel = 5700.0; // [cm/s] rpm
@@ -101,7 +103,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     servo.periodic();
   }
    
-  public double getHeight() {
+  public double getPosition() {
     return servo.getPosition();
   }
 
@@ -122,6 +124,9 @@ public class Elevator_Subsystem extends SubsystemBase {
     servo.setSetpoint(height); 
   }
 
+  public void setPosition(double pos){
+    servo.setPosition(pos);
+  }
   public double getSetpoint() {
     return servo.getSetpoint();
   }
@@ -147,6 +152,10 @@ public class Elevator_Subsystem extends SubsystemBase {
     return this.new ElevatorWatcherCmd();
   }
 
+  public boolean atZeroLimit(){
+    return zeroLimitSwitch.get();
+  }
+
    class ElevatorWatcherCmd extends WatcherCmd {
     NetworkTableEntry nt_cmdVel;
     NetworkTableEntry nt_measVel;
@@ -155,6 +164,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     NetworkTableEntry nt_atHeight;
     NetworkTableEntry nt_mainCurrent;
     NetworkTableEntry nt_followCurrent;
+    NetworkTableEntry nt_zeroLimitSwitch;
 
     // add nt for pos when we add it
     @Override
@@ -171,16 +181,18 @@ public class Elevator_Subsystem extends SubsystemBase {
       nt_atHeight = table.getEntry("atSetpoint");
       nt_mainCurrent = table.getEntry("mainCurrent");
       nt_followCurrent = table.getEntry("followCurrent");
+      nt_zeroLimitSwitch = table.getEntry("zeroLimitSwitch");
     }
 
     public void ntupdate() {
       nt_cmdVel.setDouble(getDesiredVelocity());
       nt_measVel.setDouble(getVelocity());
       nt_desiredHeight.setDouble(getSetpoint());
-      nt_currentHeight.setDouble(getHeight());
+      nt_currentHeight.setDouble(getPosition());
       nt_atHeight.setBoolean(atSetpoint());
       nt_mainCurrent.setDouble(getMainCurrent());
       nt_followCurrent.setDouble(getFollowCurrent());
+      nt_zeroLimitSwitch.setBoolean(atZeroLimit());
     }
   }
 

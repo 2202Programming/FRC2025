@@ -33,7 +33,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
   PIDFController pidConsts_freeSpin = new PIDFController(0.0, 0.0, 0.0, 0.0);
   final double velocityConversionFactor = 1.0;
-  DigitalInput lightGate = new DigitalInput(DigitalIO.EndEffector_Lightgate);
+  DigitalInput farLightGate = new DigitalInput(DigitalIO.EndEffector_nearLightgate);
+  DigitalInput nearLightGate = new DigitalInput(DigitalIO.EndEffector_farLightgate);
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
@@ -62,7 +63,11 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public boolean hasPiece() {
-    return lightGate.get();
+    return farLightGate.get();
+  }
+
+  public boolean pieceReady(){
+    return nearLightGate.get();
   }
 
   // configure our motor controller and retun it
@@ -90,6 +95,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
     NetworkTableEntry nt_kP;
     NetworkTableEntry nt_kF;
     NetworkTableEntry nt_hasPiece;
+    NetworkTableEntry nt_pieceReady;
 
     // add nt for pos when we add it
     @Override
@@ -104,6 +110,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
       nt_kP = table.getEntry("kP");
       nt_kF = table.getEntry("kF");
       nt_hasPiece = table.getEntry("hasPiece");
+      nt_pieceReady = table.getEntry("pieceReady");
     }
 
     public void ntupdate() {
@@ -112,6 +119,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
       nt_kP.setDouble(pid.getP());
       nt_kF.setDouble(pid.getF());
       nt_hasPiece.setBoolean(hasPiece());
+      nt_pieceReady.setBoolean(pieceReady());
     }
   }
 
