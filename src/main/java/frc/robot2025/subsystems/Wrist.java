@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LinearServo extends SubsystemBase {
+public class Wrist extends SubsystemBase {
   /** Creates a new linearServo. */
   PWM servo;
 
@@ -16,8 +16,10 @@ public class LinearServo extends SubsystemBase {
   double prevPos;
   double lastCommandTime;
   double timeToFinish;
+  public final double pickup = 0.0;
+  public final double drop = 0.5;
 
-  public LinearServo(double initPos) {
+  public Wrist(double initPos) {
     //works on a scale of 0-1, and autoclamps 
     servo = new PWM(0);
     prevPos = initPos;
@@ -34,7 +36,7 @@ public class LinearServo extends SubsystemBase {
     return timeToFinish;
   }
 
-  public boolean isAtSetpoint() {
+  public boolean atSetpoint() {
     return Timer.getFPGATimestamp() >= timeToFinish;
   }
 }

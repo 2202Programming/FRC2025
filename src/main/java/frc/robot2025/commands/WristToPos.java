@@ -6,16 +6,16 @@ package frc.robot2025.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib2202.builder.RobotContainer;
-import frc.robot2025.subsystems.LinearServo;
+import frc.robot2025.subsystems.Wrist;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class linearActuatorToPos extends InstantCommand {
-  LinearServo servo = RobotContainer.getSubsystem(LinearServo.class);
+public class WristToPos extends InstantCommand {
+  Wrist servo = RobotContainer.getSubsystem(Wrist.class);
   double pos;
 
-  public linearActuatorToPos(double pos) {
+  public WristToPos(double pos) {
     this.pos = pos;
     // Use addRequirements() here to declare subsystem dependencies.
   }
