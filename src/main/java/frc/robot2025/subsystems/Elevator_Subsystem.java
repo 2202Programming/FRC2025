@@ -78,7 +78,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     velocityPid = new PIDFController(0.00025, 0.0, 0.01, 1.0/6613.0);
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
-    
+    System.out.println(1/cf + " INITIAL CF");
     servo.setConversionFactor(1/cf) //update with new values after testing
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
@@ -132,6 +132,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
 
   public double getVelocity() {
+    System.out.println(servo.getController().getEncoder().getVelocity());
     return servo.getVelocity();
   }
 
