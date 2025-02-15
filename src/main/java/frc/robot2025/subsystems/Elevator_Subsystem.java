@@ -6,9 +6,9 @@ package frc.robot2025.subsystems;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.EncoderConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -53,6 +53,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private NeoServo servo; 
   private SparkFlex followMotor;
   private SparkFlexConfig followMotorConfig;
+  private SparkClosedLoopController cl_ctrl; 
   private double desiredVel; //in cm/s
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
   final int STALL_CURRENT = 40;
@@ -81,6 +82,9 @@ public class Elevator_Subsystem extends SubsystemBase {
     elevatorPidController = new PIDController(0.001, 0.0, 0.0);
     velocityPid = new PIDFController(0.002, 0.00001, 0.0, 1.0/300.0); //prior p 0.00025, Kd 0.01, KF 1.0/6613
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
+    cl_ctrl = servo.getController().getClosedLoopController();
+    cl_ctrl.setIAccum(0.0);
+    velocityPid.setIZone(0.0); //TODO: set this once value has been found
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     System.out.println(1/cf + " INITIAL CF");
     servo.setConversionFactor(1/cf) //update with new values after testing
@@ -120,6 +124,10 @@ public class Elevator_Subsystem extends SubsystemBase {
   // current access doesn't need to be exposed, putting on NT
   double getMainCurrent(){
     return servo.getController().getOutputCurrent();
+  }
+
+  public double getAccumI(){
+    return cl_ctrl.getIAccum();
   }
 
   double getFollowCurrent() {
@@ -181,6 +189,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     NetworkTableEntry nt_mainCurrent;
     NetworkTableEntry nt_followCurrent;
     NetworkTableEntry nt_zeroLimitSwitch;
+    NetworkTableEntry nt_iAccum;
 
     // add nt for pos when we add it
     @Override
@@ -198,6 +207,7 @@ public class Elevator_Subsystem extends SubsystemBase {
       nt_mainCurrent = table.getEntry("mainCurrent");
       nt_followCurrent = table.getEntry("followCurrent");
       nt_zeroLimitSwitch = table.getEntry("zeroLimitSwitch");
+      nt_iAccum = table.getEntry("iAccum");
     }
 
     public void ntupdate() {
@@ -209,6 +219,7 @@ public class Elevator_Subsystem extends SubsystemBase {
       nt_mainCurrent.setDouble(getMainCurrent());
       nt_followCurrent.setDouble(getFollowCurrent());
       nt_zeroLimitSwitch.setBoolean(atZeroLimit());
+      nt_iAccum.setDouble(getAccumI());
     }
   }
 
