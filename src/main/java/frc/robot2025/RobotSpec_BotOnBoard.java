@@ -20,11 +20,12 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.linearActuatorToPos;
+import frc.robot2025.commands.ElevatorCalibrate;
+import frc.robot2025.commands.WristToPos;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-import frc.robot2025.subsystems.LinearServo;
+import frc.robot2025.subsystems.Wrist;
 
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
@@ -42,11 +43,11 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
 
       })
       
-      .add(LinearServo.class);
-      //.add(Elevator_Subsystem.class)
-      //.add(Command.class, "ElevatorWatcher", () -> {
-      //  return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
-      //});
+      // .add(Wrist.class);
+      .add(Elevator_Subsystem.class)
+      .add(Command.class, "ElevatorWatcher", () -> {
+       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
+      });
       // below are optional watchers for shuffeleboard data - disable if need too.
 
   // set this true at least once after robot hw stabilizes
@@ -110,16 +111,18 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
     if (dc.Driver() instanceof CommandPS4Controller) {
       CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
 
-      opp.square().onTrue(new linearActuatorToPos(1.0));
-      opp.triangle().onTrue(new linearActuatorToPos(0.0));
-      opp.cross().onTrue(new linearActuatorToPos(0.5));
+      // opp.square().onTrue(new WristToPos(1.0));
+      // opp.triangle().onTrue(new WristToPos(0.0));
+      // opp.cross().onTrue(new WristToPos(0.5));
     } else {
       CommandXboxController opp = (CommandXboxController)dc.Driver();
 
-      //opp.a().whileTrue(new testElevatorVelComd(140));
-      //opp.b().whileTrue(new testElevatorVelComd(0));
-      //opp.x().whileTrue(new testElevatorVelComd(-140));
-      //opp.y().whileTrue(new testElevatorVelComd(300));
+      opp.a().whileTrue(new testElevatorVelComd(140));
+      opp.b().whileTrue(new testElevatorVelComd(0));
+      opp.x().whileTrue(new testElevatorVelComd(-140));
+      opp.y().whileTrue(new testElevatorVelComd(300));
+      opp.rightBumper().onTrue(new ElevatorCalibrate(-140.0));
+      opp.leftBumper().onTrue(new ElevatorCalibrate(140.0));
     }
 
     
