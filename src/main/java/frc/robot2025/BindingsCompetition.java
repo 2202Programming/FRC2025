@@ -44,14 +44,9 @@ public final class BindingsCompetition {
         else if (generic_driver instanceof CommandXboxController) {
             // XBox
             CommandXboxController driver = (CommandXboxController)generic_driver;
-            driver.leftTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
+            driver.rightTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
            // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
-            driver.x().whileTrue(new testElevatorVelComd(5.0));
-            driver.a().whileTrue(new testElevatorVelComd(5.0));
-            driver.y().whileTrue(new testElevatorVelComd(-5.0));
-            driver.b().onTrue(new ElevatorMove(Levels.Ground, true));
-            driver.rightTrigger().onTrue(new ElevatorMove(Levels.LCoral, true));
         }
         else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
