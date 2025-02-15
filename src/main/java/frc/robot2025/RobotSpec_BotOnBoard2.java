@@ -115,8 +115,8 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
 
         operator.rightBumper().whileTrue(new BtmArmFwd(50.0));
         operator.leftBumper().whileTrue(new BtmArmFwd(-50.0));
-        operator.povRight().whileTrue(new TopArmFwd(250.0));
-        operator.povLeft().whileTrue(new TopArmFwd(-250.0));
+        operator.povRight().whileTrue(new TopArmFwd(10.0));
+        operator.povLeft().whileTrue(new TopArmFwd(-10.0));
         operator.x().onTrue(new TopArmRelPos(25.0));
         operator.y().onTrue(new BtmArmRelPos(10.0));
         operator.a().whileTrue(new RollersDebug(5.0));
