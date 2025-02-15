@@ -35,8 +35,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
   private double measRPM;
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
   final double velocityConversionFactor = (1.0 / 30.0) / 60.0; // GearRatio / sec -- RPS
-  DigitalInput farLightGate = new DigitalInput(DigitalIO.EndEffector_nearLightgate);
-  DigitalInput nearLightGate = new DigitalInput(DigitalIO.EndEffector_farLightgate);
+  DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_LIGHTGATE);
+  DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LIGHTGATE);
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
@@ -62,11 +62,11 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public boolean hasPiece() {
-    return farLightGate.get();
+    return loadLightGate.get();
   }
 
   public boolean pieceReady(){
-    return nearLightGate.get();
+    return wheelLightGate.get();
   }
 
   // configure our motor controller and retun it
