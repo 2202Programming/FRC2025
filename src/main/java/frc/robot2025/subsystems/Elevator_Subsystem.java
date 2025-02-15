@@ -53,7 +53,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private SparkFlexConfig followMotorConfig;
   private double desiredVel; //in cm/s
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
-  final int STALL_CURRENT = 20;
+  final int STALL_CURRENT = 40;
   final int FREE_CURRENT = 80;
   final double elevatorMaxVel = 5700.0; // [cm/s] rpm
   final double elevatorMaxAccel = 5000.0; // [cm/s^2]  servo may not enforce yet
@@ -66,20 +66,20 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   private final double gearRatio = 1.0/4.67; // [out turns]/[mtr turns]
   private final double chainRatio = 1.0;    // [out/in] chain in/out 
-  private final double pullyRadius = 2.5;   // [cm]   TODO get valid number
+  private final double pitchDiameter = 1.76;   // [cm]   TODO get valid number
+  private final double sprocket_circumference = 5.529;
   private final double stagesRatio = 1.0;   // [out/in]  TODO get valid number
-  public  final double  pcf = gearRatio * stagesRatio * chainRatio * pullyRadius * 2.0 * Math.PI;
-  private final double positionConversionFactor = 1.0;
+  public  final double cf = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI;
 
 
   public Elevator_Subsystem() {
     desiredVel = 0;
-    elevatorPidController = new PIDController(0.0, 0.0, 0.0);
+    elevatorPidController = new PIDController(0.001, 0.0, 0.0);
     velocityPid = new PIDFController(0.00025, 0.0, 0.01, 1.0/6613.0);
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
     
-    servo.setConversionFactor(positionConversionFactor) //update with new values after testing
+    servo.setConversionFactor(cf) //update with new values after testing
                       .setTolerance(elevatorPosTol, elevatorPosTol)
                       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
                       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
@@ -153,7 +153,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
 
   public boolean atZeroLimit(){
-    return zeroLimitSwitch.get();
+    return !zeroLimitSwitch.get();
   }
 
    class ElevatorWatcherCmd extends WatcherCmd {
