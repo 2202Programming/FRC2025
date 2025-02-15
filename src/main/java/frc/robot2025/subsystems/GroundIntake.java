@@ -52,7 +52,7 @@ public class GroundIntake extends SubsystemBase {
 
   // motor config constants
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
-  final int wheelStallLimit = 5;
+  final int wheelStallLimit = 40;
   final int wheelFreeLimit = 5;
   final static double Kff = (1.0 / 43.2);
   final PIDFController wheelPIDF = new PIDFController(0.015, 0.0, 0.0, Kff); // TODO configure for velocity control.
@@ -67,24 +67,29 @@ public class GroundIntake extends SubsystemBase {
   DigitalInput limitswitch = new DigitalInput(DigitalIO.GroundIntakeHasCoral);
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
-  final PIDController topPositionPID = new PIDController(0.75, 0.0, 0.0);
-  final PIDController btmPositionPID = new PIDController(0.0, 0.0, 0.0);
-  PIDFController topHwAngleVelPID = new PIDFController(0.0005, 0.0, 0.0, 0.00136); // placeholder PIDs
-  PIDFController btmHwAngleVelPID = new PIDFController(0.0000, 0.0, 0.0, 0.0017);
-  // TODO fix this its being devided by 60 in neoservo
+  final PIDController topPositionPID = new PIDController(2.0, 0.000, 0.0);
+  final PIDController btmPositionPID = new PIDController(2.0, 0.0, 0.0);
+  PIDFController topHwAngleVelPID = new PIDFController(0.0005, 0.000005, 0.0, 0.00136); // placeholder PIDs
+  PIDFController btmHwAngleVelPID = new PIDFController(0.0005, 0.000005, 0.0, 0.0017);
   final double topServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
 
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
 
-  public GroundIntake() {
+  public GroundIntake() { 
+    topHwAngleVelPID.setIZone(50.0);
     topServo = new NeoServo(CAN.IntakeTop, topPositionPID, topHwAngleVelPID, true);
     btmServo = new NeoServo(CAN.IntakeBtm, btmPositionPID, btmHwAngleVelPID, true);
     wheelMtr = new SparkMax(CAN.IntakeWheel, MotorType.kBrushless);
-    topServo.setConversionFactor(topServoGR); // deg
-    btmServo.setConversionFactor(btmServoGR); // deg
-
+    topServo.setConversionFactor(topServoGR)
+      .setMaxVelocity(60.0)
+      .setTolerance(3.0, 1.0);
+    btmServo.setConversionFactor(btmServoGR)
+      .setMaxVelocity(60.0)
+      .setTolerance(3.0, 1.0);
+  
+   
     // configure wheel motor
 
     wheelMtr_cfg = new SparkMaxConfig();
@@ -114,6 +119,7 @@ public class GroundIntake extends SubsystemBase {
     this.new GroundIntakeWatcher();
   }
 
+  //TODO rename to goToPosition
   public void setPosition(Position cmd) {
     currentPos = cmd;
     topServo.setSetpoint(cmd.topval);
@@ -130,6 +136,11 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void debugTopVelocity(double dir) {
+    double aff = 0.0;
+    if(Math.abs(dir) > 0.5){
+      aff = (dir > 0.0) ? 0.008 : -0.018;
+    }
+    topServo.setArbFeedforward(aff);
     topServo.setVelocityCmd(dir);
   }
 
@@ -161,6 +172,11 @@ public class GroundIntake extends SubsystemBase {
     return !limitswitch.get();
   }
 
+  public void setZero(){
+    topServo.setPosition(0.0);
+    btmServo.setPosition(0.0);
+  }
+
   @Override
   public void periodic() {
     topServo.periodic();
@@ -179,6 +195,8 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_btmCmdVel;
     NetworkTableEntry NT_topCmdPos;
     NetworkTableEntry NT_btmCmdPos;
+    NetworkTableEntry NT_topAtSetpoint;
+    NetworkTableEntry NT_topGetIAccum;
 
     public GroundIntakeWatcher() {
     }
@@ -201,6 +219,9 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdVel = MonitorTable.getEntry("bottom cmd velocity");
       NT_topCmdPos = MonitorTable.getEntry("top cmd position");
       NT_btmCmdPos = MonitorTable.getEntry("bottom cmd position");
+      NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
+      NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
+
 
     }
 
@@ -214,8 +235,10 @@ public class GroundIntake extends SubsystemBase {
       NT_btmPos.setDouble(btmServo.getPosition());
       NT_topCmdVel.setDouble(topServo.getVelocityCmd());
       NT_btmCmdVel.setDouble(btmServo.getVelocityCmd());
-      NT_topCmdPos.setDouble(currentPos.topval);
-      NT_btmCmdPos.setDouble(currentPos.btmval);
+      NT_topCmdPos.setDouble(topServo.getSetpoint());
+      NT_btmCmdPos.setDouble(btmServo.getSetpoint());
+      NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
+      NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
     }
   } 
 

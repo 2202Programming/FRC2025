@@ -15,26 +15,20 @@ public class BtmArmRelPos extends Command {
   public BtmArmRelPos(double pos) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
+    this.pos = pos;
 
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+  public void initialize() {
     groundIntake.debugSetPosition(groundIntake.getTopPosition(), groundIntake.getBtmPosition() + pos);
   }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return groundIntake.isBottomAtSetpoint();
   }
 }

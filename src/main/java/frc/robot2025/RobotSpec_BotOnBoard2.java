@@ -21,6 +21,7 @@ import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
 import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
 import frc.robot2025.commands.GroundIntake.Debug.RollersDebug;
+import frc.robot2025.commands.GroundIntake.Debug.SetZero;
 import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
 import frc.robot2025.commands.GroundIntake.Debug.TopArmRelPos;
 import frc.robot2025.subsystems.GroundIntake;
@@ -113,13 +114,14 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
         CommandXboxController operator = (CommandXboxController) dc.Operator();
 
-        operator.rightBumper().whileTrue(new BtmArmFwd(50.0));
-        operator.leftBumper().whileTrue(new BtmArmFwd(-50.0));
-        operator.povRight().whileTrue(new TopArmFwd(10.0));
-        operator.povLeft().whileTrue(new TopArmFwd(-10.0));
-        operator.x().onTrue(new TopArmRelPos(25.0));
-        operator.y().onTrue(new BtmArmRelPos(10.0));
-        operator.a().whileTrue(new RollersDebug(5.0));
+        operator.rightBumper().whileTrue(new BtmArmFwd(10.0));
+        operator.leftBumper().whileTrue(new BtmArmFwd(-10.0));
+        operator.povRight().whileTrue(new TopArmFwd(2.0));
+        operator.povLeft().whileTrue(new TopArmFwd(-2.0));
+        operator.x().onTrue(new BtmArmRelPos(25.0));
+        operator.y().onTrue(new BtmArmRelPos(-25.0));
+        operator.a().whileTrue(new RollersDebug(10.0));
+        operator.b().onTrue(new SetZero());
     }
 
     @Override
