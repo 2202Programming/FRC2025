@@ -144,8 +144,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   @Override
   public void periodic() {
     // CCW positive, inverting here to match all the NavX code previously written.
-    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI)
-            + m_yaw_offset; // quaternian-based works in field centric
+    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
+            + m_yaw_offset); // quaternian-based works in field centric
     // m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
     // m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
     m_yaw_quatZ = -m_pigeon.getQuatZ().getValueAsDouble() * 180.0/Math.PI;
@@ -156,8 +156,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_pitch = m_pigeon.getPitch(false).getValueAsDouble() - m_pitch_bias;
 
     // this wasn't working in FieldCentric, had -m_pigeon.getYaw(), could be sign...?
-    m_yaw_simple = ModMath.fmod360_2(m_pigeon.getYaw(false).getValueAsDouble() )
-      + m_yaw_offset; 
+    m_yaw_simple = ModMath.fmod360_2(m_pigeon.getYaw(false).getValueAsDouble() 
+      + m_yaw_offset); 
     
     // Getting the angular velocities
     m_roll_d = m_pigeon.getAngularVelocityXWorld(false).getValueAsDouble();
@@ -329,8 +329,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    * gyro is not changed. This avoids expensive CAN set call. (100ms worst case)
    */
   public void setRotation2d(Rotation2d newrot) {
-    double rawYaw = (m_yaw - m_yaw_offset); // take out current offset for raw gyro's yaw
-    m_yaw = newrot.getDegrees();
+    double rawYaw = ModMath.fmod360_2(m_yaw - m_yaw_offset); // take out current offset for raw gyro's yaw
+    m_yaw = ModMath.fmod360_2(newrot.getDegrees());
     m_yaw_offset = m_yaw - rawYaw;  
   }
 
