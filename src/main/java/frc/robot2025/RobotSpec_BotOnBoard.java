@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
@@ -21,21 +20,14 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.ElevatorCalibrate;
-import frc.robot2025.commands.ElevatorMove;
 import frc.robot2025.commands.EndEffectorRPM;
-import frc.robot2025.commands.WristToPos;
-import frc.robot2025.commands.backupEE_Move;
-import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-import frc.robot2025.subsystems.Wrist;
-import frc.robot2025.subsystems.backupEE;
 
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
-  // $env:serialnum = "032381BF"
+  // $env:serialnum = "0312db1a"
   final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
@@ -48,7 +40,7 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
         return new HID_Subsystem(0.3, 0.9, 0.05);
 
       })
-      
+      .add(Elevator_Subsystem.class)
       // .add(Wrist.class);
       .add(EndEffector_Subsystem.class)
       .add(Command.class, "EndEffectorWatcher", () -> {
@@ -115,6 +107,7 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
   public void setBindings() {
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
     if (dc.Driver() instanceof CommandPS4Controller) {
+      @SuppressWarnings("unused")
       CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
 
       // opp.square().onTrue(new WristToPos(1.0));
@@ -122,7 +115,10 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       // opp.cross().onTrue(new WristToPos(0.5));
     } else {
       CommandXboxController opp = (CommandXboxController)dc.Driver();
+      @SuppressWarnings("unused")  //TODO add the elevator test cmds here
       final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+      
+      //endEffector rpm testing
       opp.b().whileTrue(new EndEffectorRPM(500.0));
       opp.a().whileTrue(new EndEffectorRPM(1000.0));
       opp.y().whileTrue(new EndEffectorRPM(2000.0));

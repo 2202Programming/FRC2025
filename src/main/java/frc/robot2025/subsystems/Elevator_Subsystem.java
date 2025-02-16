@@ -10,7 +10,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.EncoderConfigAccessor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -35,11 +34,12 @@ public class Elevator_Subsystem extends SubsystemBase {
    */
   public enum Levels {
     LCoral(75.5), 
-    LOne(30), 
+    LOne(30.0), 
     LTwo(75.5), 
-    LThree(116), 
-    LFour(176),
-    Ground(0); //change to accurate heights (in CM) THESE ARE NOT ACCURATE
+    LThree(116.0), 
+    LFour(176.0),
+    Ground(0.0),
+    PowerUp(0.0); //change to accurate heights (in CM) THESE ARE NOT ACCURATE
 
     public double height;
 
@@ -54,7 +54,8 @@ public class Elevator_Subsystem extends SubsystemBase {
   private SparkFlex followMotor;
   private SparkFlexConfig followMotorConfig;
   private SparkClosedLoopController cl_ctrl; 
-  private double desiredVel; //in cm/s
+  private double desiredVel = 0; //in cm/s
+
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
   final int STALL_CURRENT = 60;
   final int FREE_CURRENT = 5;
@@ -63,7 +64,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   final double elevatorPosTol = 0.5;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
   final double maxPos = 122.0; // [cm]
-  final double minPos = -1.0;   // [cm]
+  final double minPos = -1.0;  // [cm]
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
 
@@ -72,45 +73,55 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final double pitchDiameter = 1.76;   // [cm]   
   private final double sprocket_circumference = 5.529;
   private final double stagesRatio = 1.0;   // [out/in] 
-  //public  final double cf = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI;
-  public  final double cf = 0.07919;
-  public SparkFlex driveMotor;
-  public EncoderConfigAccessor d_enc;
+  // cf_spec - TODO not used yet, should workout to what was measured/corrected
+  public final double cf_spec = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI * sprocket_circumference ;
+  public final double cf = 12.627857;  //[cm/mtr-rot]  // ad-hoc measured 2/15/25 - needs tuning/correction
+ 
   
   public Elevator_Subsystem() {
-    desiredVel = 0;
+    //init pid constant holders
+    //software position pid - run in servo's periodic to control elevator position
     elevatorPidController = new PIDController(9.0, 0.1, 0.0);
-    velocityPid = new PIDFController(0.001, 0.0, 0.000, 1.0/565.0); //1.0/800 before
+    elevatorPidController.setIZone(500.0);
+    //hardware velocity pidf - holds values to send to hw, not actually run
+    velocityPid = new PIDFController(0.001, 0.0, 0.000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
+    velocityPid.setIZone(0.0); //TODO: set this once value has been found, if KI is used
+    
+    //devices 
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
+    followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
+
+    //get closed-loop controller so we can monitor iAccum
     cl_ctrl = servo.getController().getClosedLoopController();
     cl_ctrl.setIAccum(0.0);
-    elevatorPidController.setIZone(500.0);
-    velocityPid.setIZone(0.0); //TODO: set this once value has been found
-    followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
-    System.out.println(1/cf + " INITIAL CF");
-    servo.setConversionFactor(1/cf) //update with new values after testing
-                      .setTolerance(elevatorPosTol, elevatorPosTol)
-                      .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
-                      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
-                      .setMaxVelocity(50.0);
-
-    // driveMotor = (SparkFlex)servo.getController();
-
-    // d_enc = driveMotor.configAccessor.encoder;
-
+   
+    // TODO - calibrate the cf so positions are accurate by using cf_spec 
+    System.out.println("\tINITIAL CF=]" + cf);
+    System.out.println("\tCF_spec=]" + cf_spec +" spec should come from gearRatio... fix it."); 
     
-
-    servo.setClamp(minPos, maxPos);
+    //finish off the server setup
+    servo
+      .setConversionFactor(1/cf) //update with new values after testing
+      .setTolerance(elevatorPosTol, elevatorPosTol)
+      .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
+      .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
+      .setMaxVelocity(50.0)
+      .setClamp(minPos, maxPos);
+    
+    //setup follower motor
     followMotorConfig = new SparkFlexConfig();
-        followMotorConfig.inverted(motors_inverted)
-               .idleMode(IdleMode.kBrake);
-    followMotorConfig.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
-                .outputRange(-1.0, 1.0);
-    
-    followMotorConfig.follow(CAN.ELEVATOR_MAIN); //motor 2 follows the servo's behavior
+    followMotorConfig
+      .inverted(motors_inverted)
+      .idleMode(IdleMode.kBrake)
+      .follow(CAN.ELEVATOR_MAIN) //motor 2 follows the servo's behavior
+      .closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
+          .outputRange(-1.0, 1.0);          
+    //write the followMotor's config to hardware
     followMotor.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    // power up config
-    servo.setPosition(initPos);
+    
+    // power up starting position of servo
+    servo.setPosition(Levels.PowerUp.height);
     servo.getWatcher();
   }
 

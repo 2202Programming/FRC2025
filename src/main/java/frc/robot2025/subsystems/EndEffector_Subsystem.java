@@ -6,13 +6,12 @@ package frc.robot2025.subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -27,12 +26,14 @@ import frc.robot2025.Constants.DigitalIO;
 public class EndEffector_Subsystem extends SubsystemBase {
   final SparkMax mtr;
   final SparkClosedLoopController controller;
-  final RelativeEncoder encoder;
+  final RelativeEncoder mtrEncoder;
   final SparkBaseConfig config;
   final double kF = 1.0 / 5500.0; // placeholder
   public final double adjustment = 0.0;
   private double cmdRPM;
   private double measRPM;
+
+  //roller's pid values, will be copied to the hardware.
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
   final double velocityConversionFactor = (1.0 / 30.0) / 60.0; // GearRatio / sec -- RPS
   DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_LIGHTGATE);
@@ -40,16 +41,36 @@ public class EndEffector_Subsystem extends SubsystemBase {
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
-    mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless);
-    encoder = mtr.getEncoder();
-    controller = motor_config(mtr, pid, false);
+    mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless);    
     config = new SparkMaxConfig();
 
+    // setup the mtr's config
+    config.idleMode(IdleMode.kBrake)
+      .inverted(false)   //note: motor may be inverted, but not encoder
+      .encoder
+        .positionConversionFactor(velocityConversionFactor * 60.0)  // [shaft-rot]
+        .velocityConversionFactor(velocityConversionFactor);  // [shaft-rot/sec]
+       
+    //setup the config -- if closed loop is needed, use internal, primary encoder
+    config.closedLoop
+      .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      .outputRange(-1.0, 1.0)
+      //.iZone(150.0)  // placeholder
+      //.iMaxAccum(150.0) // placeholder
+      ;
+    // writes pid's values and the above config setting to the hardware.
+    // copyTo() will persist to hardware
+    pid.copyTo(mtr, config);
+
+    // get our controller and clear any faults
+    controller = mtr.getClosedLoopController();
+    mtrEncoder = mtr.getEncoder();
+    mtr.clearFaults();
   }
 
   @Override
   public void periodic() {
-    measRPM = encoder.getVelocity();
+    measRPM = mtrEncoder.getVelocity();
   }
 
   public boolean isAtRPM(double tolerance) {
@@ -68,22 +89,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
   public boolean pieceReady(){
     return wheelLightGate.get();
   }
-
-  // configure our motor controller and retun it
-  SparkClosedLoopController motor_config(SparkMax mtr, PIDFController hwPidConsts, boolean inverted) {
-    mtr.clearFaults();
-    config.encoder.velocityConversionFactor(velocityConversionFactor); // idk if this is the best way to do it?
-    // mtr.restoreFactoryDefaults(); //removed from API, shouldn't need
-    var mtrpid = mtr.getClosedLoopController();
-    config.closedLoop.iZone(150.0); // placeholder
-    config.closedLoop.iMaxAccum(150.0);
-    // mtr.setInverted(inverted); //deprecated
-    config.idleMode(IdleMode.kBrake);
-    mtr.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
-    pid.copyTo(mtr, config);
-    return mtrpid;
-  }
-
+  
   public WatcherCmd getWatcher() {
     return this.new EndEffectorWatcherCmd();
   }
