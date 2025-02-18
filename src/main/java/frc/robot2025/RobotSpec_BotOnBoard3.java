@@ -59,7 +59,7 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
 
     // SubsystemConfig gets registered in static array to match serial number at
     // Construct call
-    SubsystemConfig subsystemConfig = new SubsystemConfig("bot-On-Board-2", "3061025")
+    SubsystemConfig subsystemConfig = new SubsystemConfig("bot-On-Board-3", "0326F275")
     // deferred construction via Supplier<Object> lambda
         .add(PowerDistribution.class, "PDP", () -> {
             var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -67,13 +67,13 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
             return pdp;
         })
         // .add(PneumaticsControl.class)
-        .add(BlinkyLights.class, "LIGHTS", () -> {
-            return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
-        })
+        //.add(BlinkyLights.class, "LIGHTS", () -> {
+        //    return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
+        //})
         .add(HID_Subsystem.class, "DC", () -> {
             return new HID_Subsystem(0.3, 0.9, 0.05);
         })
-        .add(Sensors_Subsystem.class)
+        //.add(Sensors_Subsystem.class)
         // .add(Limelight.class)
         .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
         //.add(GroundIntake.class)
@@ -124,10 +124,11 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
             //operator.a().whileTrue(new RollersDebug(10.0));
 
         } else if(dc.Operator() instanceof CommandPS4Controller operator) {
-            EndEffector_Subsystem endEffectorSubsystem = RobotContainer.getSubsystem("endEffectorSubsystem");
-            operator.circle().whileTrue(new EndEffectorRPM(200));
-            operator.cross().whileTrue(new EndEffectorRPM(500));
-            operator.square().whileTrue(new EndEffectorRPM(1000));
+            //EndEffector_Subsystem endEffectorSubsystem = RobotContainer.getSubsystem("endEffectorSubsystem");
+            operator.circle().whileTrue(new EndEffectorRPM(-.3));
+            operator.cross().whileTrue(new EndEffectorRPM(.2));
+            operator.square().whileTrue(new EndEffectorRPM(.5));
+            operator.triangle().whileTrue(new EndEffectorRPM(1));
         }
 
         //BindingsCompetition.ConfigureCompetition(dc);

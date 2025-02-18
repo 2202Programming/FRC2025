@@ -14,15 +14,18 @@ public class EndEffectorRPM extends Command {
   final EndEffector_Subsystem endEffector;
   double RPM;
   public EndEffectorRPM(double RPM) {
-    endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
+    endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
     this.RPM = RPM;
+    System.out.println("EndEffectorRPM " + RPM);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    endEffector.setRPM(RPM);
+    if(endEffector.pieceReady()) {
+      endEffector.setRPM(RPM);
+    }
   }
 
   // Called once the command ends or is interrupted.

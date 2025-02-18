@@ -25,9 +25,9 @@ import frc.robot2025.Constants.DigitalIO;
 
 public class EndEffector_Subsystem extends SubsystemBase {
   final SparkMax mtr;
-  final SparkClosedLoopController controller;
-  final RelativeEncoder mtrEncoder;
-  final SparkBaseConfig config;
+  //final SparkClosedLoopController controller;
+  //final RelativeEncoder mtrEncoder;
+  //final SparkBaseConfig config;
   final double kF = 1.0 / 5500.0; // placeholder
   public final double adjustment = 0.0;
   private double cmdRPM;
@@ -36,12 +36,13 @@ public class EndEffector_Subsystem extends SubsystemBase {
   //roller's pid values, will be copied to the hardware.
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
   final double velocityConversionFactor = (21.0 / 30.0) / 60.0; // GearRatio / sec -- RPS
-  DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_LIGHTGATE);
+  DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_LIGHTGATE);  // false is broken(coral loaded), true is not broken(no coral)
   DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LIGHTGATE);
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
-    mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless);    
+    mtr = new SparkMax(26, SparkMax.MotorType.kBrushless);    
+    /*
     config = new SparkMaxConfig();
 
     // setup the mtr's config
@@ -65,12 +66,13 @@ public class EndEffector_Subsystem extends SubsystemBase {
     // get our controller and clear any faults
     controller = mtr.getClosedLoopController();
     mtrEncoder = mtr.getEncoder();
+    */
     mtr.clearFaults();
   }
 
   @Override
   public void periodic() {
-    measRPM = mtrEncoder.getVelocity();
+    measRPM = mtr.getEncoder().getVelocity();
   }
 
   public boolean isAtRPM(double tolerance) {
@@ -78,16 +80,19 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public void setRPM(double RPM) {
-    controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    System.out.println("Load Light Gate: " +  loadLightGate.get());
+    System.out.println("Wheel Light Gate: " +  wheelLightGate.get());
+    mtr.set(RPM);
+    //controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     cmdRPM = RPM;
   }
 
   public boolean hasPiece() {
-    return loadLightGate.get();
+    return !loadLightGate.get();
   }
 
   public boolean pieceReady(){
-    return wheelLightGate.get();
+    return !wheelLightGate.get();
   }
   
   public WatcherCmd getWatcher() {

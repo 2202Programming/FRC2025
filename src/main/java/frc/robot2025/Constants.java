@@ -84,10 +84,10 @@ public final class Constants {
   }
 
   public final class DigitalIO {
-    public static final int END_EFFECTOR_WHEEL_LIGHTGATE = 0;
-    public static final int END_EFFECTOR_LOAD_LIGHTGATE = 1;
-    public static final int GroundIntakeLightGate = 2; // TBD 1/25/25 needs to be assigned
-    public static final int ElevatorZeroLS = 3;
+    public static final int END_EFFECTOR_WHEEL_LIGHTGATE = 2;
+    public static final int END_EFFECTOR_LOAD_LIGHTGATE = 3;
+    public static final int GroundIntakeLightGate = 6;//2; // TBD 1/25/25 needs to be assigned
+    public static final int ElevatorZeroLS = 7;//3;
   }
 
   // TODO fix for 2025!!!!
