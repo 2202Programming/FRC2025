@@ -35,7 +35,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
 
   //roller's pid values, will be copied to the hardware.
   PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
-  final double velocityConversionFactor = (1.0 / 30.0) / 60.0; // GearRatio / sec -- RPS
+  final double velocityConversionFactor = (21.0 / 30.0) / 60.0; // GearRatio / sec -- RPS
   DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_LIGHTGATE);
   DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LIGHTGATE);
 
@@ -46,7 +46,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
 
     // setup the mtr's config
     config.idleMode(IdleMode.kBrake)
-      .inverted(false)   //note: motor may be inverted, but not encoder
+      .inverted(true)   //note: motor may be inverted, but not encoder
       .encoder
         .positionConversionFactor(velocityConversionFactor * 60.0)  // [shaft-rot]
         .velocityConversionFactor(velocityConversionFactor);  // [shaft-rot/sec]
