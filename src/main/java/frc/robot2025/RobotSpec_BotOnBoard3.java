@@ -122,13 +122,16 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
         if(dc.Operator() instanceof CommandXboxController operator) {
             //operator.a().whileTrue(new RollersDebug(10.0));
-
+            operator.a().whileTrue(new EndEffectorRPM(-.3)); //reverse
+            operator.b().whileTrue(new EndEffectorRPM(.2)); //very slow
+            operator.x().whileTrue(new EndEffectorRPM(.5)); //ok
+            operator.y().whileTrue(new EndEffectorRPM(1)); //fast
         } else if(dc.Operator() instanceof CommandPS4Controller operator) {
             //EndEffector_Subsystem endEffectorSubsystem = RobotContainer.getSubsystem("endEffectorSubsystem");
-            operator.circle().whileTrue(new EndEffectorRPM(-.3));
-            operator.cross().whileTrue(new EndEffectorRPM(.2));
-            operator.square().whileTrue(new EndEffectorRPM(.5));
-            operator.triangle().whileTrue(new EndEffectorRPM(1));
+            operator.circle().whileTrue(new EndEffectorRPM(-.3)); //reverse
+            operator.cross().whileTrue(new EndEffectorRPM(.2)); //very slow
+            operator.square().whileTrue(new EndEffectorRPM(.5)); //ok
+            operator.triangle().whileTrue(new EndEffectorRPM(1)); //fast
         }
 
         //BindingsCompetition.ConfigureCompetition(dc);

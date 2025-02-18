@@ -299,6 +299,11 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     return Rotation2d.fromDegrees(-m_yaw); // note sign
   }
 
+  @Override
+  public void setRotation2d(Rotation2d heading) {
+
+  }
+
 
   // 2/12/2025 We shouldn't have to mess with pose and setYaw. Odometry seems to handle
   // tracking yaw offsets now.

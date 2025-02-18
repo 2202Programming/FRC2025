@@ -16,7 +16,6 @@ public class EndEffectorRPM extends Command {
   public EndEffectorRPM(double RPM) {
     endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
     this.RPM = RPM;
-    System.out.println("EndEffectorRPM " + RPM);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
