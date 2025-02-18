@@ -59,6 +59,9 @@ public class GroundIntake extends SubsystemBase {
                                                                              // current vals are placeholders -er
   final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
 
+  final int StallCurrent = 40;
+  final int FreeCurrent = 5;
+
   // servo config
   final NeoServo topServo;
   final NeoServo btmServo;
@@ -67,10 +70,13 @@ public class GroundIntake extends SubsystemBase {
   DigitalInput limitswitch = new DigitalInput(DigitalIO.GroundIntakeHasCoral);
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
-  final PIDController topPositionPID = new PIDController(2.0, 0.000, 0.0);
-  final PIDController btmPositionPID = new PIDController(2.0, 0.0, 0.0);
-  PIDFController topHwAngleVelPID = new PIDFController(0.0005, 0.000005, 0.0, 0.00136); // placeholder PIDs
-  PIDFController btmHwAngleVelPID = new PIDFController(0.0005, 0.000005, 0.0, 0.0017);
+
+  PIDFController topHwAngleVelPID = new PIDFController(0.00075, 0.0, 0.0, 0.0013); // placeholder PIDs
+  final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);
+
+  PIDFController btmHwAngleVelPID = new PIDFController(0.0000005, 0.000005, 0.0, 0.0017);
+  final PIDController btmPositionPID = new PIDController(0.0, 0.0, 0.0);
+
   final double topServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
 
@@ -78,16 +84,18 @@ public class GroundIntake extends SubsystemBase {
   Position currentPos = Position.POWERUP;
 
   public GroundIntake() { 
-    topHwAngleVelPID.setIZone(50.0);
+    topHwAngleVelPID.setIZone(250.0);
     topServo = new NeoServo(CAN.IntakeTop, topPositionPID, topHwAngleVelPID, true);
     btmServo = new NeoServo(CAN.IntakeBtm, btmPositionPID, btmHwAngleVelPID, true);
     wheelMtr = new SparkMax(CAN.IntakeWheel, MotorType.kBrushless);
     topServo.setConversionFactor(topServoGR)
-      .setMaxVelocity(60.0)
-      .setTolerance(3.0, 1.0);
+      .setMaxVelocity(90.0) // [deg/s]
+      .setTolerance(3.0, 1.0)
+      .setSmartCurrentLimit(StallCurrent, FreeCurrent);
     btmServo.setConversionFactor(btmServoGR)
       .setMaxVelocity(60.0)
-      .setTolerance(3.0, 1.0);
+      .setTolerance(3.0, 1.0)
+      .setSmartCurrentLimit(StallCurrent, FreeCurrent);
   
    
     // configure wheel motor
@@ -122,11 +130,10 @@ public class GroundIntake extends SubsystemBase {
   //TODO rename to goToPosition
   public void setPosition(Position cmd) {
     currentPos = cmd;
-    topServo.setSetpoint(cmd.topval);
-    btmServo.setSetpoint(cmd.btmval);
+    setPosition(cmd.topval, cmd.btmval);
   }
 
-  public void debugSetPosition(double top, double btm) {
+  public void setPosition(double top, double btm) {
     topServo.setSetpoint(top);
     btmServo.setSetpoint(btm);
   }
@@ -138,7 +145,7 @@ public class GroundIntake extends SubsystemBase {
   public void debugTopVelocity(double dir) {
     double aff = 0.0;
     if(Math.abs(dir) > 0.5){
-      aff = (dir > 0.0) ? 0.008 : -0.018;
+      aff = (dir > 0.0) ? 0.003 : -0.02;
     }
     topServo.setArbFeedforward(aff);
     topServo.setVelocityCmd(dir);
