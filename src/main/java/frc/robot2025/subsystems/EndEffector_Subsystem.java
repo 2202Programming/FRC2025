@@ -47,8 +47,6 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public void setRPM(double RPM) {
-    System.out.println("Load Light Gate: " +  loadLightGate.get());
-    System.out.println("Wheel Light Gate: " +  wheelLightGate.get());
     mtr.set(RPM);
     cmdRPM = RPM;
   }
