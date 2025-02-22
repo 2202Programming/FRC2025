@@ -63,7 +63,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   final double elevatorMaxAccel = 50.0; // [cm/s^2]  servo may not enforce yet
   final double elevatorPosTol = 0.5;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
-  final double maxPos = 122.0; // [cm]
+  final double maxPos = 149.0; // [cm]
   final double minPos = -1.0;  // [cm]
   final double initPos = 0.0;  // [cm]  initial power up position for relative encoders
   final boolean motors_inverted = false;
@@ -75,7 +75,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final double stagesRatio = 1.0;   // [out/in] 
   // cf_spec - TODO not used yet, should workout to what was measured/corrected
   public final double cf_spec = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI * sprocket_circumference ;
-  public final double cf = 12.627857;  //[cm/mtr-rot]  // ad-hoc measured 2/15/25 - needs tuning/correction
+  public final double cf = 8.9026;  //[cm/mtr-rot]  // ad-hoc measured 2/17/25, 12.627857 bfre
  
   
   public Elevator_Subsystem() {
@@ -83,9 +83,9 @@ public class Elevator_Subsystem extends SubsystemBase {
     //software position pid - run in servo's periodic to control elevator position
     elevatorPidController = new PIDController(9.0, 0.1, 0.0);
     elevatorPidController.setIZone(500.0);
-    //hardware velocity pidf - holds values to send to hw, not actually run
-    velocityPid = new PIDFController(0.001, 0.0, 0.000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
-    velocityPid.setIZone(0.0); //TODO: set this once value has been found, if KI is used
+    //hardware velocity pidf - holds values to send to hw, not actually run825
+    velocityPid = new PIDFController(0.001, 0.000001, 0.0000, 1.0/1000.0); //1.0/800 before, 565 is vortex Kv
+    velocityPid.setIZone(500.0); //TODO: set this once value has been found, if KI is used
     
     //devices 
     servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
@@ -101,11 +101,11 @@ public class Elevator_Subsystem extends SubsystemBase {
     
     //finish off the server setup
     servo
-      .setConversionFactor(1/cf) //update with new values after testing
+      .setConversionFactor(cf) //update with new values after testing
       .setTolerance(elevatorPosTol, elevatorPosTol)
       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
-      .setMaxVelocity(50.0)
+      .setMaxVelocity(125.0)
       .setClamp(minPos, maxPos);
     
     //setup follower motor
@@ -128,7 +128,10 @@ public class Elevator_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     servo.periodic();
+    elevatorPidController.calculate(FREE_CURRENT);
   }
+
+  
    
   public double getPosition() {
     return servo.getPosition();
@@ -168,10 +171,10 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   public void setVelocity(double vel) {
     if (vel > 0) {
-      servo.setArbFeedforward(0.04);
+      servo.setArbFeedforward(0.02);
     }
     else {
-      servo.setArbFeedforward(0.004);
+      servo.setArbFeedforward(0.005);
     }
     desiredVel = vel;
     servo.setVelocityCmd(vel);
@@ -182,7 +185,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
 
   public double getDesiredVelocity() {
-    return desiredVel;
+    return servo.getVelocityCmd();
   }
 
   public WatcherCmd getWatcher() {
