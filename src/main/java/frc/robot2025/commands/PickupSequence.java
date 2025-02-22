@@ -17,6 +17,7 @@ public class PickupSequence extends Command {
   Wrist wrist;
   EndEffector_Subsystem endEffector;
   Levels level;
+  boolean station;
   final int DELAY_COUNT = 25;
   int count;
 
@@ -26,11 +27,17 @@ public class PickupSequence extends Command {
   }
 
   Phase phase;
+  /**
+   * 
+   * @param level what level you want to go after pickup
+   * @param station whether pickup is from the station or no
+   */
 
-  public PickupSequence(Levels level) {
+  public PickupSequence(Levels level, boolean station) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     wrist = RobotContainer.getSubsystem(Wrist.class);
     endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
+    this.station = station;
     this.level = level;
     // Use addRequirements() here to declare subsystem dependencies.
     //systwem.out.println("sup, from Avdhut");
@@ -48,7 +55,11 @@ public class PickupSequence extends Command {
   public void execute() {
     switch(phase){
       case ElevatorInPos:
-        elevator.setHeight(level);
+      if(station){
+        elevator.setHeight(Levels.LTwo);
+      } else{
+        elevator.setHeight(Levels.Ground);
+      }
         wrist.setPos(wrist.drop);
         if(elevator.atSetpoint() && wrist.atSetpoint()){
           elevator.setVelocity(0);
@@ -56,10 +67,17 @@ public class PickupSequence extends Command {
         }
         break;
       case WaitingForCoral:
+      if(station){
+        endEffector.setRPM(500); //placeholder
+        if(endEffector.pieceReady()){
+          count++;
+        }
+      } else {
         endEffector.setRPM(-500); //placeholder
         if(endEffector.hasPiece()){
           count++;
         }
+      }
         if(count >= DELAY_COUNT){
           phase = Phase.Finished;
         }

@@ -54,7 +54,6 @@ public class Elevator_Subsystem extends SubsystemBase {
   private SparkFlex followMotor;
   private SparkFlexConfig followMotorConfig;
   private SparkClosedLoopController cl_ctrl; 
-  private double desiredVel = 0; //in cm/s
 
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
   final int STALL_CURRENT = 60;
@@ -173,10 +172,9 @@ public class Elevator_Subsystem extends SubsystemBase {
     if (vel > 0) {
       servo.setArbFeedforward(0.02);
     }
-    else {
+    else {  
       servo.setArbFeedforward(0.005);
     }
-    desiredVel = vel;
     servo.setVelocityCmd(vel);
   }
 
