@@ -22,7 +22,7 @@ public class EndEffectorRPM extends Command {
     endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
     this.label=label;
     this.RPM=RPM;
-    SmartDashboard.putNumber("End Effector Motor Percent "+ label, RPM);
+    SmartDashboard.putNumber("End Effector RPM "+ label, RPM);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -30,7 +30,7 @@ public class EndEffectorRPM extends Command {
   @Override
   public void initialize() {
     if(endEffector.pieceReady()) {
-      endEffector.setRPM(SmartDashboard.getNumber("End Effector Motor Percent "+ label, RPM));
+      endEffector.setRPM(SmartDashboard.getNumber("End Effector RPM "+ label, RPM));
     }
   }
 

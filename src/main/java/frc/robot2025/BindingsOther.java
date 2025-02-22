@@ -91,8 +91,8 @@ public class BindingsOther {
                 ((CommandXboxController) operator).x().whileTrue(new testElevatorVelComd(2430.0));
                 ((CommandXboxController) operator).a().whileTrue(new testElevatorVelComd(100.0));
                 ((CommandXboxController) operator).y().whileTrue(new testElevatorVelComd(-2430.0));
-                ((CommandXboxController) operator).b().onTrue(new ElevatorMove(Levels.Ground, true));
-                ((CommandXboxController) operator).rightTrigger().onTrue(new ElevatorMove(Levels.LCoral, true));
+                ((CommandXboxController) operator).b().onTrue(new ElevatorMove(Levels.Ground));
+                ((CommandXboxController) operator).rightTrigger().onTrue(new ElevatorMove(Levels.LCoral));
             default:
                 break;
         }
