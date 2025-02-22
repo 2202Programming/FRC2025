@@ -27,6 +27,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
   final SparkMax mtr;
   private double cmdRPM;
   private double measRPM;
+  private double commandPercent;
+  private double measuredPercent;
 
   DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_HIGH_LIGHTGATE);  // false is broken(coral loaded), true is not broken(no coral)
   DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LOW_LIGHTGATE);
@@ -40,6 +42,7 @@ public class EndEffector_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     measRPM = mtr.getEncoder().getVelocity();
+    measuredPercent = mtr.get();
   }
 
   public boolean isAtRPM(double tolerance) {
@@ -47,8 +50,14 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public void setRPM(double RPM) {
-    mtr.set(RPM);
+    //mtr.set(RPM);
+    System.out.println("RPM MODE IS NOT IMPLEMENTED, use setPercent");
     cmdRPM = RPM;
+  }
+
+  public void setPercent(double percent) {
+    mtr.set(percent);
+    commandPercent = percent;
   }
 
   public boolean hasPiece() {
@@ -66,6 +75,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
   class EndEffectorWatcherCmd extends WatcherCmd {
     NetworkTableEntry nt_cmdRPM;
     NetworkTableEntry nt_measRPM;
+    NetworkTableEntry nt_cmdPercent;
+    NetworkTableEntry nt_measPercent;
     NetworkTableEntry nt_hasPiece;
     NetworkTableEntry nt_pieceReady;
 
@@ -79,6 +90,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
       NetworkTable table = getTable();
       nt_cmdRPM = table.getEntry("cmdRPM");
       nt_measRPM = table.getEntry("measRPM");
+      nt_cmdPercent = table.getEntry("cmdPCT");
+      nt_measPercent = table.getEntry("measPCT");
       nt_hasPiece = table.getEntry("hasPiece");
       nt_pieceReady = table.getEntry("pieceReady");
     }
@@ -86,6 +99,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
     public void ntupdate() {
       nt_cmdRPM.setDouble(cmdRPM);
       nt_measRPM.setDouble(measRPM);
+      nt_cmdPercent.setDouble(commandPercent);
+      nt_measPercent.setDouble(measuredPercent);
       nt_hasPiece.setBoolean(hasPiece());
       nt_pieceReady.setBoolean(pieceReady());
     }
