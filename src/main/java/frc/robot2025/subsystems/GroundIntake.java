@@ -74,8 +74,8 @@ public class GroundIntake extends SubsystemBase {
   PIDFController topHwAngleVelPID = new PIDFController(0.00075, 0.0, 0.0, 0.0013); // placeholder PIDs
   final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);
 
-  PIDFController btmHwAngleVelPID = new PIDFController(0.0000005, 0.000005, 0.0, 0.0017);
-  final PIDController btmPositionPID = new PIDController(0.0, 0.0, 0.0);
+  PIDFController btmHwAngleVelPID = new PIDFController(0.0007, 0.000001, 0.0, 0.0017);
+  final PIDController btmPositionPID = new PIDController(2.5, 0.0001, 0.0);
 
   final double topServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
@@ -84,17 +84,18 @@ public class GroundIntake extends SubsystemBase {
   Position currentPos = Position.POWERUP;
 
   public GroundIntake() { 
-    topHwAngleVelPID.setIZone(250.0);
+    topHwAngleVelPID.setIZone(25.0);
+    btmHwAngleVelPID.setIZone(25.0);
     topServo = new NeoServo(CAN.IntakeTop, topPositionPID, topHwAngleVelPID, true);
     btmServo = new NeoServo(CAN.IntakeBtm, btmPositionPID, btmHwAngleVelPID, true);
     wheelMtr = new SparkMax(CAN.IntakeWheel, MotorType.kBrushless);
     topServo.setConversionFactor(topServoGR)
       .setMaxVelocity(90.0) // [deg/s]
-      .setTolerance(3.0, 1.0)
+      .setTolerance(2.0, 0.5)
       .setSmartCurrentLimit(StallCurrent, FreeCurrent);
     btmServo.setConversionFactor(btmServoGR)
-      .setMaxVelocity(60.0)
-      .setTolerance(3.0, 1.0)
+      .setMaxVelocity(120.0)
+      .setTolerance(2.0, 0.5)
       .setSmartCurrentLimit(StallCurrent, FreeCurrent);
   
    
@@ -122,23 +123,30 @@ public class GroundIntake extends SubsystemBase {
     btmServo.setPosition(currentPos.btmval);
 
     // set our requested setpoint with our public api POWERUP
-    setPosition(currentPos); // changes setpoints
+    setSetpoint(currentPos); // changes setpoints
 
     this.new GroundIntakeWatcher();
   }
 
-  //TODO rename to goToPosition
-  public void setPosition(Position cmd) {
+  public void setSetpoint(Position cmd) {
     currentPos = cmd;
-    setPosition(cmd.topval, cmd.btmval);
+    setSetpoint(cmd.topval, cmd.btmval);
   }
 
-  public void setPosition(double top, double btm) {
+  public void setSetpoint(double top, double btm) {
     topServo.setSetpoint(top);
     btmServo.setSetpoint(btm);
   }
 
-  public void debugBtmVelocity(double dir) {
+  public void debugBtmVelocity(double dir) {    
+    double aff = 0.0;
+    if(Math.abs(dir) > 0.5){
+      aff = (dir > 0.0) ? 0.003 : -0.02;
+    }
+    if (dir== 0.0){
+      aff = -0.02; // seemed to hold at 0 velocity
+    }
+    btmServo.setArbFeedforward(aff); 
     btmServo.setVelocityCmd(dir);
   }
 
@@ -146,6 +154,9 @@ public class GroundIntake extends SubsystemBase {
     double aff = 0.0;
     if(Math.abs(dir) > 0.5){
       aff = (dir > 0.0) ? 0.003 : -0.02;
+    }
+    if (dir== 0.0){
+      aff = -0.02;
     }
     topServo.setArbFeedforward(aff);
     topServo.setVelocityCmd(dir);
@@ -186,6 +197,7 @@ public class GroundIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // protect against bad motion
     topServo.periodic();
     btmServo.periodic();
   }

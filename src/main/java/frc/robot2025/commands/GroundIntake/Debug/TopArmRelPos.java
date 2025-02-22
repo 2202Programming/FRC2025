@@ -24,7 +24,7 @@ public class TopArmRelPos extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    groundIntake.setPosition(pos, groundIntake.getBtmPosition());
+    groundIntake.setSetpoint(pos, groundIntake.getBtmPosition());
   }
 
   // Returns true when the command should end.

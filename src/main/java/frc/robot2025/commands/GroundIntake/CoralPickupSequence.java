@@ -28,7 +28,7 @@ public class CoralPickupSequence extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    groundIntake.setPosition(Position.CORAL_PICKUP);
+    groundIntake.setSetpoint(Position.CORAL_PICKUP);
     groundIntake.setWheelSpeed(1.0); //placeholder
     state = State.WaitForCoral;
 
@@ -45,7 +45,7 @@ public class CoralPickupSequence extends Command {
         break;
       
       case CoralRest:
-        groundIntake.setPosition(Position.CORAL_REST);
+        groundIntake.setSetpoint(Position.CORAL_REST);
         groundIntake.setWheelSpeed(0.0);
         state = State.Finished;
         break;
@@ -58,7 +58,7 @@ public class CoralPickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    groundIntake.setPosition(groundIntake.senseGamePiece() ? Position.CORAL_REST : Position.ZERO);
+    groundIntake.setSetpoint(groundIntake.senseGamePiece() ? Position.CORAL_REST : Position.ZERO);
     groundIntake.setWheelSpeed(0.0);
   }
 

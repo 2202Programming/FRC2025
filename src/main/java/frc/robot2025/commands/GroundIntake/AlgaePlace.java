@@ -30,7 +30,7 @@ public class AlgaePlace extends Command {
   @Override
   public void initialize() {
     if (hasAlgae == true) {
-      groundIntake.setPosition(Position.ALGAE_PLACE);
+      groundIntake.setSetpoint(Position.ALGAE_PLACE);
       groundIntake.setWheelSpeed(0.0);
       state = State.WaitForAlgaePlacePos;
     } else {
@@ -58,7 +58,7 @@ public class AlgaePlace extends Command {
         break;
 
       case DefaultPos:
-        groundIntake.setPosition(Position.ZERO);
+        groundIntake.setSetpoint(Position.ZERO);
         groundIntake.setWheelSpeed(0.0);
         state = State.Finished;
         break;

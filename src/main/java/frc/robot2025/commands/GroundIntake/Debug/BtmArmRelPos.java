@@ -22,7 +22,7 @@ public class BtmArmRelPos extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    groundIntake.setPosition(groundIntake.getTopPosition(), groundIntake.getBtmPosition());
+    groundIntake.setSetpoint(groundIntake.getTopPosition(), pos);
   }
 
 

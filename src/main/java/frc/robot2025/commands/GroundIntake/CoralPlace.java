@@ -32,7 +32,7 @@ public class CoralPlace extends Command {
   public void initialize() {
     hasCoral = groundIntake.senseGamePiece();  
     if (hasCoral == true) {  // goes to position without ejecting
-      groundIntake.setPosition(Position.CORAL_PLACE);
+      groundIntake.setSetpoint(Position.CORAL_PLACE);
       groundIntake.setWheelSpeed(0.0);
       state = State.WaitForCoralPlacePos;
     } else {
@@ -59,7 +59,7 @@ public class CoralPlace extends Command {
         break;
 
       case DefaultPos:
-        groundIntake.setPosition(Position.ZERO);
+        groundIntake.setSetpoint(Position.ZERO);
         groundIntake.setWheelSpeed(0.0);
         state = State.Finished;
         break;
@@ -73,10 +73,10 @@ public class CoralPlace extends Command {
   @Override
   public void end(boolean interrupted) {
     if (hasCoral == true) {
-      groundIntake.setPosition(Position.CORAL_REST);
+      groundIntake.setSetpoint(Position.CORAL_REST);
       groundIntake.setWheelSpeed(0.0);
     } else {
-      groundIntake.setPosition(Position.ZERO);
+      groundIntake.setSetpoint(Position.ZERO);
       groundIntake.setWheelSpeed(0.0);
     }
   }
