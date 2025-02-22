@@ -160,6 +160,7 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void debugTopVelocity(double dir) {
+    topControlModeAbsolute = false;
     double aff = 0.0;
     if(Math.abs(dir) > 0.5){
       aff = (dir > 0.0) ? 0.003 : -0.02;
@@ -218,6 +219,9 @@ public class GroundIntake extends SubsystemBase {
     if (barrierCrossed()){    // Checking if the top arm has cross the vertical plane
       setTopAbsolutePosition(0);  //Changes to absolute mode
     }
+    else {
+      topControlModeAbsolute = false;
+    }
     if (topControlModeAbsolute) {
       topServo.setSetpoint(getBtmPosition() - topAbsolutePositionTarget); //Converts relative to absolute
     }
@@ -241,6 +245,10 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_btmCmdPos;
     NetworkTableEntry NT_topAtSetpoint;
     NetworkTableEntry NT_topGetIAccum;
+    NetworkTableEntry NT_topAbsoluteTarget;
+    NetworkTableEntry NT_topControlMode;
+    NetworkTableEntry NT_topPlaneViolated;
+    NetworkTableEntry NT_topAbsolutePosition;
 
     public GroundIntakeWatcher() {
     }
@@ -265,7 +273,10 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos = MonitorTable.getEntry("bottom cmd position");
       NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
-
+      NT_topAbsoluteTarget = MonitorTable.getEntry("top Absolute Target");
+      NT_topControlMode = MonitorTable.getEntry("Top Control Mode (true=absolute)");
+      NT_topPlaneViolated = MonitorTable.getEntry("Top Plane Violated");
+      NT_topAbsolutePosition = MonitorTable.getEntry("Top absolute position");
 
     }
 
@@ -283,6 +294,10 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
+      NT_topAbsoluteTarget.setDouble(topAbsolutePositionTarget);
+      NT_topControlMode.setBoolean(topControlModeAbsolute);
+      NT_topPlaneViolated.setBoolean(barrierCrossed());
+      NT_topAbsolutePosition.setDouble(getAbsoluteTopPosition());
     }
   } 
 
