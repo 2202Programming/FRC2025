@@ -6,12 +6,12 @@ package frc.robot2025.subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -83,6 +83,9 @@ public class GroundIntake extends SubsystemBase {
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
 
+  boolean topControlModeAbsolute = false;
+  double topAbsolutePositionTarget = 0.0;
+
   public GroundIntake() { 
     topHwAngleVelPID.setIZone(25.0);
     btmHwAngleVelPID.setIZone(25.0);
@@ -129,8 +132,14 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setSetpoint(Position cmd) {
+    topControlModeAbsolute = false; //Sets back to relative mode
     currentPos = cmd;
     setSetpoint(cmd.topval, cmd.btmval);
+  }
+
+  public void setTopAbsolutePosition (double cmd) { //Switches top arm to absolute position mode
+    topControlModeAbsolute = true;
+    topAbsolutePositionTarget = cmd;
   }
 
   public void setSetpoint(double top, double btm) {
@@ -186,6 +195,15 @@ public class GroundIntake extends SubsystemBase {
     return btmServo.getPosition();
   }
 
+  public double getAbsoluteTopPosition() { //returns the position of the top arm relative to the robot in degrees
+    return getBtmPosition() - getTopPosition();
+  }
+
+  public boolean barrierCrossed() { //barrier is the vertical plane
+    return getAbsoluteTopPosition() < 0;
+  }
+
+
   public boolean senseGamePiece() {
     return !limitswitch.get();
   }
@@ -197,6 +215,13 @@ public class GroundIntake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (barrierCrossed()){    // Checking if the top arm has cross the vertical plane
+      setTopAbsolutePosition(0);  //Changes to absolute mode
+    }
+    if (topControlModeAbsolute) {
+      topServo.setSetpoint(getBtmPosition() - topAbsolutePositionTarget); //Converts relative to absolute
+    }
+
     // protect against bad motion
     topServo.periodic();
     btmServo.periodic();
