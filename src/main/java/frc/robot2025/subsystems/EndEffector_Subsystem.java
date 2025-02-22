@@ -28,8 +28,8 @@ public class EndEffector_Subsystem extends SubsystemBase {
   private double cmdRPM;
   private double measRPM;
 
-  DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_LIGHTGATE);  // false is broken(coral loaded), true is not broken(no coral)
-  DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LIGHTGATE);
+  DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_HIGH_LIGHTGATE);  // false is broken(coral loaded), true is not broken(no coral)
+  DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LOW_LIGHTGATE);
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
