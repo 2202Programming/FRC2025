@@ -9,28 +9,37 @@ import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.GroundIntake.Position;
 
-public class CoralPickupSequence extends Command {
-
+public class PickupSequence extends Command {
+  // used to pick gamepiece up from the floor and then move to traveling position (rest) if gamepiece is obtained. if not, keep going
+  // until driver lets go of button -er
   public enum State{
-    WaitForCoral, // wait until coral trips lightgate
-    CoralRest, // sets position to transport coral
+    WaitForGamepiece, // wait until coral trips limitswitch
+    Rest, // sets position to transport coral
+    WaitForMove,
     Finished // sequence is finished, either no coral was picked up or its ready for transport
   }
   State state;
   final GroundIntake groundIntake;
-  boolean hasCoral;
+  final Position pickup;
+  final Position rest;
 
-  public CoralPickupSequence() {
+  public PickupSequence(String gp) {
   this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
-  this.hasCoral = false;
+    if(gp.startsWith("a")){
+      pickup = Position.ALGAE_PICKUP;
+      rest = Position.ALGAE_REST;
+    } else {
+      pickup = Position.CORAL_PICKUP;
+      rest = Position.CORAL_REST;
+    }
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    groundIntake.setSetpoint(Position.CORAL_PICKUP);
-    groundIntake.setWheelSpeed(1.0); //placeholder
-    state = State.WaitForCoral;
+    groundIntake.setSetpoint(pickup);
+    groundIntake.setWheelSpeed(5.0); 
+    state = State.WaitForGamepiece;
 
   }
 
@@ -39,15 +48,18 @@ public class CoralPickupSequence extends Command {
   public void execute() {
     switch(state){
 
-      case WaitForCoral:
-        hasCoral = groundIntake.senseGamePiece();
-        state = hasCoral ? State.CoralRest : State.WaitForCoral;
+      case WaitForGamepiece:
+        state = groundIntake.senseGamePiece() ? State.Rest : State.WaitForGamepiece;
         break;
       
-      case CoralRest:
-        groundIntake.setSetpoint(Position.CORAL_REST);
+      case Rest:
+        groundIntake.setSetpoint(rest);
         groundIntake.setWheelSpeed(0.0);
-        state = State.Finished;
+        state = State.WaitForMove;
+        break;
+      
+      case WaitForMove:
+        state = groundIntake.isBottomAtSetpoint() ? State.Finished : State.WaitForMove;
         break;
 
       case Finished:
@@ -58,8 +70,11 @@ public class CoralPickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    groundIntake.setSetpoint(groundIntake.senseGamePiece() ? Position.CORAL_REST : Position.ZERO);
-    groundIntake.setWheelSpeed(0.0);
+    if(interrupted){
+      groundIntake.setSetpoint(groundIntake.senseGamePiece() ? rest : Position.ZERO);
+      groundIntake.setWheelSpeed(0.0);
+      System.out.println("pickup sequence interrupted");
+    }
   }
 
   // Returns true when the command should end.

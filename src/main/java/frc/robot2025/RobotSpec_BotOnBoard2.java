@@ -18,12 +18,14 @@ import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
 import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
 import frc.robot2025.commands.GroundIntake.Debug.RollersDebug;
 import frc.robot2025.commands.GroundIntake.Debug.SetZero;
 import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
 import frc.robot2025.commands.GroundIntake.Debug.TopArmRelPos;
+import frc.robot2025.commands.GroundIntake.Debug.TopHold;
 import frc.robot2025.subsystems.GroundIntake;
 
 //copy or extend this code for your robot - remember to override:
@@ -113,15 +115,18 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
     public void setBindings() {
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
         CommandXboxController operator = (CommandXboxController) dc.Operator();
-
+        // keep for testing purposes -er
         operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
         operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
         operator.povRight().whileTrue(new TopArmFwd(30.0));
         operator.povLeft().whileTrue(new TopArmFwd(-30.0));
         operator.a().onTrue(new BtmArmRelPos(0.0));
-        operator.x().onTrue(new BtmArmRelPos(60.0));
-        operator.y().onTrue(new BtmArmRelPos(120.0));
         operator.b().onTrue(new SetZero());
+        operator.rightTrigger().whileTrue(new TopHold(5.0));
+        // testing real commands -er
+        operator.x().whileTrue(new PickupSequence("c"));
+        operator.y().whileTrue(new PickupSequence("a"));
+
     }
 
     @Override

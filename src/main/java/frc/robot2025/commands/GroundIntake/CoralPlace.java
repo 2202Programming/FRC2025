@@ -9,7 +9,6 @@ import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.GroundIntake.Position;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class CoralPlace extends Command {
   public enum State {
     WaitForCoralPlacePos, // wait for subsystem to get to commanded position

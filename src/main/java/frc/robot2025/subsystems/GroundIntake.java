@@ -33,13 +33,13 @@ public class GroundIntake extends SubsystemBase {
   public enum Position {
     POWERUP(0.0, 0.0), // pwr up could be different from ZERO
     ZERO(0.0, 0.0),
-    ALGAE_PICKUP(45.0, 135.0),
-    ALGAE_PLACE(20.0, 10.0), // algae place
-    CORAL_PICKUP(100.0, 135.0),
-    CORAL_PLACE(35.0, 45.0), // coral place
-    ALGAE_REST(35.0, 100.0),
-    CORAL_REST(15.0, 45.0),
-    FLOOR(135.0, 135.0);
+    ALGAE_PICKUP(-45.0, 120.0),
+    ALGAE_PLACE(-45.0, 60), // algae place
+    ALGAE_REST(-45.0, 100.0),
+    CORAL_PICKUP(-20.0, 120.0),
+    CORAL_PLACE(-20.0, 45.0), // coral place
+    CORAL_REST(-20.0, 45.0),
+    FLOOR(0.0, 120.0);
 
     public double topval;
     public double btmval;
@@ -80,18 +80,23 @@ public class GroundIntake extends SubsystemBase {
   final double topServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
 
+  final double topIRange = 1.0; // degrees, default is infinity
+
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
+  double holdOffset;
+  
 
   public GroundIntake() { 
     topHwAngleVelPID.setIZone(25.0);
+    topPositionPID.setIntegratorRange(-topIRange, topIRange);
     btmHwAngleVelPID.setIZone(25.0);
     topServo = new NeoServo(CAN.IntakeTop, topPositionPID, topHwAngleVelPID, true);
     btmServo = new NeoServo(CAN.IntakeBtm, btmPositionPID, btmHwAngleVelPID, true);
     wheelMtr = new SparkMax(CAN.IntakeWheel, MotorType.kBrushless);
     topServo.setConversionFactor(topServoGR)
       .setMaxVelocity(90.0) // [deg/s]
-      .setTolerance(2.0, 0.5)
+      .setTolerance(4.0, 0.5)
       .setSmartCurrentLimit(StallCurrent, FreeCurrent);
     btmServo.setConversionFactor(btmServoGR)
       .setMaxVelocity(120.0)
@@ -134,7 +139,7 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setSetpoint(double top, double btm) {
-    topServo.setSetpoint(top);
+    topServo.setSetpoint(top + holdOffset);
     btmServo.setSetpoint(btm);
   }
 
@@ -160,6 +165,10 @@ public class GroundIntake extends SubsystemBase {
     }
     topServo.setArbFeedforward(aff);
     topServo.setVelocityCmd(dir);
+  }
+
+  public void hold(double deg){
+    this.holdOffset = deg;
   }
 
   public boolean isTopAtSetpoint() {
