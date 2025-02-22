@@ -51,7 +51,7 @@ public class AlgaePlace extends Command {
 
       case Eject:
         groundIntake.setWheelSpeed(-1.0);
-        hasAlgae = groundIntake.senseGamePiece();
+        hasAlgae = groundIntake.senseAlgae();
         if (!hasAlgae) {
           state = State.DefaultPos;
         }

@@ -4,6 +4,8 @@
 
 package frc.robot2025.commands.GroundIntake;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.GroundIntake;
@@ -22,15 +24,18 @@ public class PickupSequence extends Command {
   final GroundIntake groundIntake;
   final Position pickup;
   final Position rest;
+  final BooleanSupplier  hasPiece;
 
   public PickupSequence(String gp) {
   this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
     if(gp.startsWith("a")){
       pickup = Position.ALGAE_PICKUP;
       rest = Position.ALGAE_REST;
+      hasPiece = groundIntake::senseAlgae;
     } else {
       pickup = Position.CORAL_PICKUP;
       rest = Position.CORAL_REST;
+      hasPiece = groundIntake::senseCoral;
     }
   }
 
@@ -49,7 +54,7 @@ public class PickupSequence extends Command {
     switch(state){
 
       case WaitForGamepiece:
-        state = groundIntake.senseGamePiece() ? State.Rest : State.WaitForGamepiece;
+        state = hasPiece.getAsBoolean() ? State.Rest : State.WaitForGamepiece;
         break;
       
       case Rest:
@@ -71,7 +76,7 @@ public class PickupSequence extends Command {
   @Override
   public void end(boolean interrupted) {
     if(interrupted){
-      groundIntake.setSetpoint(groundIntake.senseGamePiece() ? rest : Position.ZERO);
+      groundIntake.setSetpoint(hasPiece.getAsBoolean() ? rest : Position.ZERO);
       groundIntake.setWheelSpeed(0.0);
       System.out.println("pickup sequence interrupted");
     }

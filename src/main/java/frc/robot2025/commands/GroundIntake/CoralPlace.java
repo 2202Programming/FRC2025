@@ -29,7 +29,7 @@ public class CoralPlace extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    hasCoral = groundIntake.senseGamePiece();  
+    hasCoral = groundIntake.senseCoral();  
     if (hasCoral == true) {  // goes to position without ejecting
       groundIntake.setSetpoint(Position.CORAL_PLACE);
       groundIntake.setWheelSpeed(0.0);
@@ -51,7 +51,7 @@ public class CoralPlace extends Command {
 
       case Eject:
         groundIntake.setWheelSpeed(-1.0);
-        hasCoral = groundIntake.senseGamePiece();
+        hasCoral = groundIntake.senseCoral();
         if (!hasCoral) {
           state = State.DefaultPos;
         }

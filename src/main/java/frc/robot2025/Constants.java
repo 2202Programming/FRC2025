@@ -85,6 +85,7 @@ public final class Constants {
   public final class DigitalIO {
     public static final int EndEffector_Lightgate = 0;
     public static final int GroundIntakeHasCoral = 4; // TBD 1/25/25 needs to be assigned
+    public static final int GroundIntakeHasAlgae = 4;
   }
 
   // TODO fix for 2025!!!!

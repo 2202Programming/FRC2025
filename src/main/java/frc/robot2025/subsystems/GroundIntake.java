@@ -67,7 +67,11 @@ public class GroundIntake extends SubsystemBase {
   final NeoServo btmServo;
   final SparkMax wheelMtr;
   final RelativeEncoder wheelMtr_encoder;
-  DigitalInput limitswitch = new DigitalInput(DigitalIO.GroundIntakeHasCoral);
+  
+  // gates for piece detection
+  DigitalInput coralSwitch = new DigitalInput(DigitalIO.GroundIntakeHasCoral);
+  DigitalInput algeSwitch = new DigitalInput(DigitalIO.GroundIntakeHasAlgae);
+
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
 
@@ -195,9 +199,14 @@ public class GroundIntake extends SubsystemBase {
     return btmServo.getPosition();
   }
 
-  public boolean senseGamePiece() {
-    return !limitswitch.get();
+  public boolean senseCoral() {
+    return !coralSwitch.get();
   }
+
+  public boolean senseAlgae() {
+    return !algeSwitch.get();
+  }
+
 
   public void setZero(){
     topServo.setPosition(0.0);
@@ -217,6 +226,7 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_btmVelocity;
     NetworkTableEntry NT_wheelVelocity;
     NetworkTableEntry NT_hasCoral;
+    NetworkTableEntry NT_hasAlgae;
     NetworkTableEntry NT_topPos;
     NetworkTableEntry NT_btmPos;
     NetworkTableEntry NT_topCmdVel;
@@ -241,6 +251,7 @@ public class GroundIntake extends SubsystemBase {
       NT_btmVelocity = MonitorTable.getEntry("bottom velocity");
       NT_wheelVelocity = MonitorTable.getEntry("roller velocity");
       NT_hasCoral = MonitorTable.getEntry("hasCoral");
+      NT_hasAlgae = MonitorTable.getEntry("hasAlgae");
       NT_topPos = MonitorTable.getEntry("top position");
       NT_btmPos = MonitorTable.getEntry("bottom position");
       NT_topCmdVel = MonitorTable.getEntry("top cmd velocity");
@@ -258,7 +269,8 @@ public class GroundIntake extends SubsystemBase {
       NT_topVelocity.setDouble(topServo.getVelocity());
       NT_btmVelocity.setDouble(btmServo.getVelocity());
       NT_wheelVelocity.setDouble(wheelMtr_encoder.getVelocity());
-      NT_hasCoral.setBoolean(senseGamePiece());
+      NT_hasCoral.setBoolean(senseCoral());
+      NT_hasAlgae.setBoolean(senseAlgae());
       NT_topPos.setDouble(topServo.getPosition());
       NT_btmPos.setDouble(btmServo.getPosition());
       NT_topCmdVel.setDouble(topServo.getVelocityCmd());
