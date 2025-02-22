@@ -17,7 +17,22 @@ import frc.robot2025.commands.GroundIntake.Debug.TopArmBack;
 import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
+/**
+ * NOAH COMMENTS ON TESTING ELEVATOR AND END EFFECTOR FOR 2/22
+ * For tuning velocity PID (make sure to re-tune), run: TestElevatorVelCmd -- it uses SmartDashboard (Current vel)
+ * For moving to various positions on elevator: Use instant command, copy paste below and change position
+ * ElevatorCalibrate to calibrate Elevator
+ * op.b().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(50.0);
+      }));
+ * Use WristToPos to test wrist (Linear servo or actuator or wtv it's being called, the thing that moves EE between 2 pos)
+ * Use EndEffectorRPM to test RPM of EndEffector
+ * Test various sequences: PickupSequence & DropSequence
+ * PickupSequence: Look at the documentation for params. For either picking up a piece from ground
+ *  (if possible, if not then just remove boolean), or getting it from station
+ * DropSequence: To drop the piece onto whatever level you're aiming for
 /*
+
  * Bindings here for testing, 
  */
 public class BindingsOther {
