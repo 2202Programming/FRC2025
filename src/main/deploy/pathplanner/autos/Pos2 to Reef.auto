@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos1 get out of the way"
+            "pathName": "Pos2 go to Reef"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "No Potato Auto",
+  "folder": "Placing Autos",
   "choreoAuto": false
 }

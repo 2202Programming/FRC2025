@@ -43,6 +43,9 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   private NetworkTableEntry nt_canRxError;
   // angles
   private NetworkTableEntry nt_yaw;
+  private NetworkTableEntry nt_yaw_offset;
+  private NetworkTableEntry nt_yaw_simple;
+  private NetworkTableEntry nt_yaw_quatZ;
   private NetworkTableEntry nt_yaw_dot;
   private NetworkTableEntry nt_roll;
   private NetworkTableEntry nt_roll_dot;
@@ -56,12 +59,15 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
 
   // Simulation TBD
   
-  // measured angles and rates
+  // measured angles and rates, in degrees
   double m_roll;
   double m_roll_d;
   double m_pitch;
   double m_pitch_d;
-  double m_yaw;
+  double m_yaw;         //includes offset
+  double m_yaw_offset;  //avoid CAN io, so track offset on resetting gyro
+  double m_yaw_simple;  //uses pigeon.getYaw, debugging
+  double m_yaw_quatZ;   //debug - might be faster than whole 
   double m_yaw_d;
   
   //accelerations
@@ -84,7 +90,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     // alocate sensors
     m_canStatus = new CANStatus();
     m_pigeon = new Pigeon2(CAN.PIGEON_IMU_CAN);
-    m_pigeon.reset();  
+    m_pigeon.reset();
+    m_yaw_offset = 0.0;
     m_pigeon.clearStickyFaults();
 
     // setup network table
@@ -97,6 +104,9 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     nt_pitch = table.getEntry("Pitch");
     nt_roll = table.getEntry("Roll");
     nt_yaw = table.getEntry("Yaw");
+    nt_yaw_offset = table.getEntry("yawOffset");
+    nt_yaw_simple = table.getEntry("yawSimpleDBG");
+    nt_yaw_quatZ = table.getEntry("yawZquatDBG");
     nt_yaw_dot = table.getEntry("YawDot");
     nt_pitch_dot = table.getEntry("PitchDot");
     nt_roll_dot = table.getEntry("RollDot");
@@ -134,16 +144,20 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   @Override
   public void periodic() {
     // CCW positive, inverting here to match all the NavX code previously written.
-    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI); // quaternian-based works in field centric
+    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
+            + m_yaw_offset); // quaternian-based works in field centric
     // m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
     // m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
-
+    m_yaw_quatZ = -m_pigeon.getQuatZ().getValueAsDouble() * 180.0/Math.PI;
     // pigeon gets done with (false) so as not to wait, using cached value
 
     // Use the direct r/p/y from pigeon instead of above unpack from 3d ... not sure of difference 
     m_roll = m_pigeon.getRoll(false).getValueAsDouble() - m_roll_bias;
     m_pitch = m_pigeon.getPitch(false).getValueAsDouble() - m_pitch_bias;
-    // m_yaw = ModMath.fmod360_2(-m_pigeon.getYaw(false).getValueAsDouble() ); //no work in field centric
+
+    // this wasn't working in FieldCentric, had -m_pigeon.getYaw(), could be sign...?
+    m_yaw_simple = ModMath.fmod360_2(m_pigeon.getYaw(false).getValueAsDouble() 
+      + m_yaw_offset); 
     
     // Getting the angular velocities
     m_roll_d = m_pigeon.getAngularVelocityXWorld(false).getValueAsDouble();
@@ -176,6 +190,10 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
       nt_canTxError.setNumber(m_canStatus.transmitErrorCount);
 
       nt_yaw.setDouble(getYaw());
+      nt_yaw_offset.setDouble(m_yaw_offset);
+      nt_yaw_simple.setDouble(m_yaw_simple);
+      nt_yaw_quatZ.setDouble(m_yaw_quatZ);
+      //
       nt_rotation.setDouble(getRotation2d().getDegrees());
       nt_roll.setDouble(getRoll());
       nt_pitch.setDouble(getPitch());
@@ -264,10 +282,17 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     return m_yaw;
   }
 
+  /*
+   * setYaw() - will do a CAN IO call
+   * use setRotation2d() which tracks offset and doesn't use CAN blocking call.
+   * 
+   */
+  @Deprecated
   public void setYaw(double yawDegrees) {
     m_pigeon.setYaw(yawDegrees);
+    m_yaw_offset = 0.0;  //no offset needed, gyro state set
   }
-
+  @Deprecated
   public void setYaw(Rotation2d rotation) {
     setYaw(rotation.getDegrees());
   }
@@ -291,14 +316,23 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    * <p>
    * This heading is based on integration of the returned rate from the gyro.
    *
-   * @return the current heading of the robot as a {@link
-   *         edu.wpi.first.math.geometry.Rotation2d}.
+   * @return the current heading of the robot as a 
+   *   {@link edu.wpi.first.math.geometry.Rotation2d}.
    */
   // @Override
   public Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(-m_yaw); // note sign
   }
 
+  /*
+   * set the gyro to the new value by adjusting the offset, the actual
+   * gyro is not changed. This avoids expensive CAN set call. (100ms worst case)
+   */
+  public void setRotation2d(Rotation2d newrot) {
+    double rawYaw = ModMath.fmod360_2(m_yaw - m_yaw_offset); // take out current offset for raw gyro's yaw
+    m_yaw = ModMath.fmod360_2(newrot.getDegrees());
+    m_yaw_offset = m_yaw - rawYaw;  
+  }
 
   // 2/12/2025 We shouldn't have to mess with pose and setYaw. Odometry seems to handle
   // tracking yaw offsets now.
