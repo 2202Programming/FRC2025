@@ -24,7 +24,6 @@ import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_BotOnBoard implements IRobotSpec {
