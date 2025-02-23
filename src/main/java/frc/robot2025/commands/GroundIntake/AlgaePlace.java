@@ -12,16 +12,25 @@ import frc.robot2025.subsystems.GroundIntake.Position;
 public class AlgaePlace extends Command {
   public enum State {
     WaitForAlgaePlacePos, // wait for subsystem to get to commanded position
-    Eject, // eject algae after arm gets to setpoint
+    Ejecting, // eject algae after arm gets to setpoint
     DefaultPos, // go to zero
     Finished // command is done
   }
 
+  final int ejectingFrameCount = 5; //tbd
+
   State state;
+  int count;   //framecountdown
   final GroundIntake groundIntake;
+  final double wheelSpeed;
   boolean hasAlgae;
 
   public AlgaePlace() {
+    this(-1.0);
+  }
+
+  public AlgaePlace(double ws) {
+    this.wheelSpeed = ws;
     this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
     hasAlgae = false;
   }
@@ -29,6 +38,7 @@ public class AlgaePlace extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    count = ejectingFrameCount;
     if (hasAlgae == true) {
       groundIntake.setSetpoint(Position.ALGAE_PLACE);
       groundIntake.setWheelSpeed(0.0);
@@ -45,22 +55,23 @@ public class AlgaePlace extends Command {
 
       case WaitForAlgaePlacePos:
         if (groundIntake.isAtSetpoint()) {
-          state = State.Eject;
+          state = State.Ejecting;
+          groundIntake.setWheelSpeed(wheelSpeed);
         }
         break;
 
-      case Eject:
-        groundIntake.setWheelSpeed(-1.0);
+      case Ejecting:
         hasAlgae = groundIntake.senseAlgae();
-        if (!hasAlgae) {
+        if (--count <= 0 && !hasAlgae ) {
           state = State.DefaultPos;
+          groundIntake.setSetpoint(Position.ZERO);
+          groundIntake.setWheelSpeed(0.0);
         }
         break;
 
       case DefaultPos:
-        groundIntake.setSetpoint(Position.ZERO);
-        groundIntake.setWheelSpeed(0.0);
-        state = State.Finished;
+        if (groundIntake.isAtSetpoint() ) {
+          state = State.Finished; }
         break;
 
       case Finished:
@@ -76,6 +87,6 @@ public class AlgaePlace extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return state == State.Finished;
   }
 }
