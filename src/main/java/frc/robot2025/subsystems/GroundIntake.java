@@ -56,7 +56,7 @@ public class GroundIntake extends SubsystemBase {
   final NeoServo topServo;
   final NeoServo btmServo;
   final SparkMax wheelMtr;
-  DigitalInput lightgate = new DigitalInput(DigitalIO.GroundIntakeLightGate);
+  DigitalInput lightgate = new DigitalInput(DigitalIO.GroundIntakeLightGateDown);
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
   final PIDController topPositionPID = new PIDController(7.0, 1.0, 0.0); // placeholder PIDs
