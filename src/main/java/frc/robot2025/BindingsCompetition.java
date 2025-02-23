@@ -11,9 +11,8 @@ import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorMove;
 import frc.robot2025.commands.testElevatorVelComd;
-import frc.robot2025.commands.GroundIntake.AlgaePlace;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
-import frc.robot2025.commands.GroundIntake.CoralPlace;
+import frc.robot2025.commands.GroundIntake.PlaceSequence;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
@@ -68,10 +67,10 @@ public final class BindingsCompetition {
             CommandXboxController operator = (CommandXboxController)generic_opr;
 
             if(RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
-                operator.a().whileTrue(new PickupSequence("c"));
-                operator.b().whileTrue(new CoralPlace());
-                operator.x().whileTrue(new PickupSequence("a"));
-                operator.y().whileTrue(new AlgaePlace());
+                operator.a().whileTrue(new PickupSequence("coral"));
+                operator.b().whileTrue(new PlaceSequence("coral"));
+                operator.x().whileTrue(new PickupSequence("algea"));
+                operator.y().whileTrue(new PlaceSequence("algea"));
             }
         }
         else {

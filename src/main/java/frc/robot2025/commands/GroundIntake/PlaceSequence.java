@@ -4,37 +4,60 @@
 
 package frc.robot2025.commands.GroundIntake;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.GroundIntake.Position;
 
-public class CoralPlace extends Command {
+public class PlaceSequence extends Command {
   public enum State {
-    WaitForCoralPlacePos, // wait for subsystem to get to commanded position
+    WaitForPlacePos, // wait for subsystem to get to commanded position
     Eject, // eject coral after arm gets to setpoint
     DefaultPos, // go to zero 
     Finished // command is done
   }
 
-  State state;
-  final GroundIntake groundIntake;
-  boolean hasCoral;
+  final int ejectingFrameCount = 5; //tbd
 
-  public CoralPlace() {
+  State state;
+  int count;
+  final GroundIntake groundIntake;
+  final Position place;
+  final Position rest;
+  final BooleanSupplier  hasPiece;
+  final double WheelSpeed;
+  
+  
+  public PlaceSequence(String gp) {
+    this(gp, -1.0);
+  }
+
+  public PlaceSequence(String gp, double WheelSpeed) {
     this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
-    hasCoral = false;
+    this.WheelSpeed = WheelSpeed;
+    if (gp.startsWith("a")){
+      place = Position.ALGAE_PLACE;
+      rest = Position.ALGAE_REST;
+      hasPiece = groundIntake::senseAlgae;
+    } else {
+      place = Position.CORAL_PLACE;
+      rest = Position.CORAL_REST;
+      hasPiece = groundIntake::senseCoral;
+    }
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    hasCoral = groundIntake.senseCoral();  
-    if (hasCoral == true) {  // goes to position without ejecting
-      groundIntake.setSetpoint(Position.CORAL_PLACE);
-      groundIntake.setWheelSpeed(0.0);
-      state = State.WaitForCoralPlacePos;
+     count = ejectingFrameCount;
+    if (hasPiece.getAsBoolean() ) {  // goes to position without ejecting
+      groundIntake.setSetpoint(place);
+      //groundIntake.setWheelSpeed(0.0);  should alrady be 0 or a hold cmd
+      state = State.WaitForPlacePos;
     } else {
+      groundIntake.setSetpoint(Position.ZERO);
       state = State.DefaultPos;
     }
   }
@@ -43,24 +66,26 @@ public class CoralPlace extends Command {
   public void execute() {
     switch (state) {
 
-      case WaitForCoralPlacePos:
+      case WaitForPlacePos:
         if (groundIntake.isAtSetpoint()) {
-          state = State.Eject;
+          state = State.Eject; 
+          groundIntake.setWheelSpeed(WheelSpeed);      
         }
         break;
 
       case Eject:
-        groundIntake.setWheelSpeed(-1.0);
-        hasCoral = groundIntake.senseCoral();
-        if (!hasCoral) {
+         
+        if (count <= 0 && !hasPiece.getAsBoolean()) { 
+          groundIntake.setSetpoint(Position.ZERO);
+          groundIntake.setWheelSpeed(0.0);
           state = State.DefaultPos;
         }
         break;
 
       case DefaultPos:
-        groundIntake.setSetpoint(Position.ZERO);
-        groundIntake.setWheelSpeed(0.0);
-        state = State.Finished;
+        if (groundIntake.isAtSetpoint() ) {
+          state = State.Finished; 
+        }
         break;
 
       case Finished:
@@ -71,8 +96,8 @@ public class CoralPlace extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (hasCoral == true) {
-      groundIntake.setSetpoint(Position.CORAL_REST);
+    if (hasPiece.getAsBoolean()) {
+      groundIntake.setSetpoint(rest);
       groundIntake.setWheelSpeed(0.0);
     } else {
       groundIntake.setSetpoint(Position.ZERO);
