@@ -48,8 +48,8 @@ public class Elevator_Subsystem extends SubsystemBase {
     }
   }; 
 
-  private final PIDController elevatorPidController;
-  private final PIDFController velocityPid;
+  private final PIDController positionPid;   //software on rio
+  private final PIDFController velocityPid;  //values copied to spark, done on hw controller
   private NeoServo servo; 
   private SparkFlex followMotor;
   private SparkFlexConfig followMotorConfig;
@@ -80,14 +80,14 @@ public class Elevator_Subsystem extends SubsystemBase {
   public Elevator_Subsystem() {
     //init pid constant holders
     //software position pid - run in servo's periodic to control elevator position
-    elevatorPidController = new PIDController(9.0, 0.1, 0.0);
-    elevatorPidController.setIZone(500.0);
+    positionPid = new PIDController(9.0, 0.1, 0.0);
+    positionPid.setIZone(500.0);
     //hardware velocity pidf - holds values to send to hw, not actually run825
     velocityPid = new PIDFController(0.001, 0.000001, 0.0000, 1.0/1000.0); //1.0/800 before, 565 is vortex Kv
     velocityPid.setIZone(500.0); //TODO: set this once value has been found, if KI is used
     
     //devices 
-    servo = new NeoServo(CAN.ELEVATOR_MAIN, elevatorPidController, velocityPid, motors_inverted, SparkFlex.class);
+    servo = new NeoServo(CAN.ELEVATOR_MAIN, positionPid, velocityPid, motors_inverted, SparkFlex.class);
     followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
 
     //get closed-loop controller so we can monitor iAccum
@@ -127,7 +127,9 @@ public class Elevator_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     servo.periodic();
-    elevatorPidController.calculate(FREE_CURRENT);
+    //positionPid.calculate(FREE_CURRENT);   //this amounts to a position change
+    //-- DPL what are you trying to do here? This class is used internal to servo
+    // either way, this is wrong - see me.
   }
 
   
