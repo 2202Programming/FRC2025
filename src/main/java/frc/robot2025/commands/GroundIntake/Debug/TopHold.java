@@ -9,23 +9,24 @@ import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.GroundIntake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class BtmArmBack extends Command {
-  
-  final GroundIntake groundIntake;
+public class TopHold extends Command {
 
-  public BtmArmBack() {
-    this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
+  double deg;
+  final GroundIntake groundIntake;
+  public TopHold(double deg) {
+    groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
+    this.deg = deg;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    groundIntake.hold(deg);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    groundIntake.debugBtmVelocity(-0.1);
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

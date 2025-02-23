@@ -34,9 +34,9 @@ public final class Constants {
     public static final int CANDLE4 = 6;
 
     // Ground Intake
-    public static final int IntakeTop = 12; //TBD
-    public static final int IntakeBtm = 13; //TBD
-    public static final int IntakeWheel = 14; //TBD
+    public static final int IntakeTop = 51;
+    public static final int IntakeBtm = 52; 
+    public static final int IntakeWheel = 50; 
     //CAN IDs
     public static final int CLIMBER = 10; //placeholder
     public static final int ELEVATOR_MAIN = 40; //placeholder
@@ -84,7 +84,8 @@ public final class Constants {
 
   public final class DigitalIO {
     public static final int EndEffector_Lightgate = 0;
-    public static final int GroundIntakeLightGate = 1; // TBD 1/25/25 needs to be assigned
+    public static final int GroundIntakeHasCoral = 4; // TBD 1/25/25 needs to be assigned
+    public static final int GroundIntakeHasAlgae = 4;
   }
 
   // TODO fix for 2025!!!!

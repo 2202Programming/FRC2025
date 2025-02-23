@@ -11,10 +11,6 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorMove;
 import frc.robot2025.commands.testElevatorVelComd;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmBack;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.TopArmBack;
-import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /*
@@ -23,10 +19,10 @@ import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 public class BindingsOther {
     // enum for bindings add when needed
     public enum Bindings {
-        DriveTest, ElevatorTesting, GroundIntakeTesting,
+        DriveTest, ElevatorTesting
     }
 
-    static Bindings bindings = Bindings.ElevatorTesting;
+    static Bindings bindings = Bindings.DriveTest;
 
     public static void ConfigureOther(HID_Subsystem dc) {
         DriverBinding(dc);
@@ -66,12 +62,6 @@ public class BindingsOther {
         CommandXboxController operator = (CommandXboxController)dc.Operator();
 
         switch (bindings) {
-            case GroundIntakeTesting:
-                operator.rightBumper().whileTrue(new BtmArmFwd());
-                operator.leftBumper().whileTrue(new BtmArmBack());
-                operator.povRight().whileTrue(new TopArmFwd());
-                operator.povLeft().whileTrue(new TopArmBack());
-                break;
             case ElevatorTesting:
                 ((CommandXboxController) operator).x().whileTrue(new testElevatorVelComd(2430.0));
                 ((CommandXboxController) operator).a().whileTrue(new testElevatorVelComd(100.0));
