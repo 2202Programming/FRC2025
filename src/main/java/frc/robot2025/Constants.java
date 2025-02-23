@@ -84,14 +84,12 @@ public final class Constants {
   }
 
   public final class DigitalIO {
-    public static final int EndEffector_Lightgate = 0;
-    public static final int GroundIntakeHasCoral = 4; // TBD 1/25/25 needs to be assigned
-    public static final int GroundIntakeHasAlgae = 4;
-    public static final int END_EFFECTOR_WHEEL_LOW_LIGHTGATE = 2; //2 on bot on board 3
-    public static final int END_EFFECTOR_LOAD_HIGH_LIGHTGATE = 3; //3 on bot on board 3
-    public static final int GroundIntakeLightGateDown = 0; // TBD 1/25/25 needs to be assigned
-    public static final int GroundIntakeLightGateUp = 1; // TBD 1/25/25 needs to be assigned
-    public static final int ElevatorZeroLS = 4; //does noo exist on elecdoc
+    //TODO - fix these values once wired TODO update/check with google docs
+    public static final int GroundIntakeHasCoral = 0; 
+    public static final int GroundIntakeHasAlgae = 1;
+    public static final int END_EFFECTOR_WHEEL_LOW_LIGHTGATE = 2; 
+    public static final int END_EFFECTOR_LOAD_HIGH_LIGHTGATE = 3; 
+    public static final int ElevatorZeroLS = 4;                  
   }
 
   // TODO fix for 2025!!!!

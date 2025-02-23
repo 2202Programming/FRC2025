@@ -17,10 +17,6 @@ public class ElevatorMove extends Command {
   Levels setPoint;
 
   public ElevatorMove(Levels setPoint) {
-
-    // TODO Mr.L wants to know how hasCoral changes anything?
-
-    // Use addRequirements() here to declare subsystem dependencies.
     this.elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.setPoint = setPoint;
     intendedPoint = setPoint.height;

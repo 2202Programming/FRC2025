@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Wrist extends SubsystemBase {
+  final static double PowerUpPosition = 0.0;  //TODO - confirm this.
+
   /** Creates a new linearServo. */
   PWM servo;
 
@@ -19,6 +21,10 @@ public class Wrist extends SubsystemBase {
   public final double pickup = 0.0;
   public final double drop = 0.5;
 
+  public Wrist() {
+    this(PowerUpPosition);
+  }
+  
   public Wrist(double initPos) {
     //works on a scale of 0-1, and autoclamps 
     servo = new PWM(0);

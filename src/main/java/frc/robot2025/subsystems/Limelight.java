@@ -62,7 +62,7 @@ public class Limelight extends BaseLimelight {
         bluePose = mt1.pose;
         // @Dr.J - I think getHeading() is not an angular-velocity so this check realy
         // isn't doing anything.
-        // TODO IF this is rate based, need to calc the yaw-rate from yaw samples
+        // TODO IF this is rate based, need to use yaw_rate
         if (Math.abs(gyro.getHeading().getDegrees()) < 720) // if our angular velocity is greater than 720 degrees per
                                                             // second, ignore vision updates
         {
