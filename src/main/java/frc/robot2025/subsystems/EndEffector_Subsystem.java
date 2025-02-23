@@ -4,48 +4,36 @@
 
 package frc.robot2025.subsystems;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.command.WatcherCmd;
-import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.Constants.DigitalIO;
 
 public class EndEffector_Subsystem extends SubsystemBase {
   final SparkMax mtr;
-  final SparkClosedLoopController controller;
-  final RelativeEncoder encoder;
-  SparkBaseConfig config;
-  final double kF = 1.0 / 5500.0; // placeholder
-  public final double adjustment = 0.0;
   private double cmdRPM;
   private double measRPM;
-  PIDFController pid = new PIDFController(0.1, 0.0, 0.0, kF);
-  PIDFController pidConsts_freeSpin = new PIDFController(0.0, 0.0, 0.0, 0.0);
-  final double velocityConversionFactor = 1.0;
-  DigitalInput lightGate = new DigitalInput(DigitalIO.EndEffector_Lightgate);
+  private double commandPercent;
+  private double measuredPercent;
+
+  DigitalInput loadLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_LOAD_HIGH_LIGHTGATE);  // false is broken(coral loaded), true is not broken(no coral)
+  DigitalInput wheelLightGate = new DigitalInput(DigitalIO.END_EFFECTOR_WHEEL_LOW_LIGHTGATE);
 
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
-    mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless);
-    encoder = mtr.getEncoder();
-    controller = motor_config(mtr, pid, false);
-
+    mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless); //26 on bot on board 3
+    mtr.clearFaults();
   }
 
   @Override
   public void periodic() {
-    measRPM = encoder.getVelocity();
+    measRPM = mtr.getEncoder().getVelocity();
+    measuredPercent = mtr.get();
   }
 
   public boolean isAtRPM(double tolerance) {
@@ -53,33 +41,24 @@ public class EndEffector_Subsystem extends SubsystemBase {
   }
 
   public void setRPM(double RPM) {
-    if (RPM == 0.0) {
-      controller.setIAccum(0.0);
-      controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-    }
-    controller.setReference(RPM, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
+    //mtr.set(RPM);
+    System.out.println("RPM MODE IS NOT IMPLEMENTED, use setPercent");
     cmdRPM = RPM;
   }
 
+  public void setPercent(double percent) {
+    mtr.set(percent);
+    commandPercent = percent;
+  }
+
   public boolean hasPiece() {
-    return lightGate.get();
+    return !loadLightGate.get();
   }
 
-  // configure our motor controller and retun it
-  SparkClosedLoopController motor_config(SparkMax mtr, PIDFController hwPidConsts, boolean inverted) {
-    mtr.clearFaults();
-    config.encoder.velocityConversionFactor(velocityConversionFactor); // idk if this is the best way to do it?
-    // mtr.restoreFactoryDefaults(); //removed from API, shouldn't need
-    var mtrpid = mtr.getClosedLoopController();
-    pid.copyTo(mtr, config);
-    config.closedLoop.iZone(150.0); // placeholder
-    pidConsts_freeSpin.copyTo(mtr, config);
-    config.closedLoop.iMaxAccum(150.0);
-    // mtr.setInverted(inverted); //deprecated
-    config.idleMode(IdleMode.kBrake);
-    return mtrpid;
+  public boolean pieceReady(){
+    return !wheelLightGate.get();
   }
-
+  
   public WatcherCmd getWatcher() {
     return this.new EndEffectorWatcherCmd();
   }
@@ -87,9 +66,10 @@ public class EndEffector_Subsystem extends SubsystemBase {
   class EndEffectorWatcherCmd extends WatcherCmd {
     NetworkTableEntry nt_cmdRPM;
     NetworkTableEntry nt_measRPM;
-    NetworkTableEntry nt_kP;
-    NetworkTableEntry nt_kF;
+    NetworkTableEntry nt_cmdPercent;
+    NetworkTableEntry nt_measPercent;
     NetworkTableEntry nt_hasPiece;
+    NetworkTableEntry nt_pieceReady;
 
     // add nt for pos when we add it
     @Override
@@ -101,17 +81,19 @@ public class EndEffector_Subsystem extends SubsystemBase {
       NetworkTable table = getTable();
       nt_cmdRPM = table.getEntry("cmdRPM");
       nt_measRPM = table.getEntry("measRPM");
-      nt_kP = table.getEntry("kP");
-      nt_kF = table.getEntry("kF");
+      nt_cmdPercent = table.getEntry("cmdPCT");
+      nt_measPercent = table.getEntry("measPCT");
       nt_hasPiece = table.getEntry("hasPiece");
+      nt_pieceReady = table.getEntry("pieceReady");
     }
 
     public void ntupdate() {
       nt_cmdRPM.setDouble(cmdRPM);
       nt_measRPM.setDouble(measRPM);
-      nt_kP.setDouble(pid.getP());
-      nt_kF.setDouble(pid.getF());
+      nt_cmdPercent.setDouble(commandPercent);
+      nt_measPercent.setDouble(measuredPercent);
       nt_hasPiece.setBoolean(hasPiece());
+      nt_pieceReady.setBoolean(pieceReady());
     }
   }
 

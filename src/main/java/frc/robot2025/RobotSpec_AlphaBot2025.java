@@ -33,8 +33,10 @@ import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
+import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.Wrist;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
@@ -72,7 +74,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
-      });
+      })
+      .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
+      .add(Wrist.class);
 
   boolean swerve = true;
 

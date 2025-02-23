@@ -15,6 +15,7 @@ public final class Main {
     new RobotSpec_AlphaBot2025();
     new RobotSpec_BotOnBoard();
     new RobotSpec_BotOnBoard2();
+    new RobotSpec_BotOnBoard3();
 
   }
  

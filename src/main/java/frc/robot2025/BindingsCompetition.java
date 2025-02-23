@@ -61,8 +61,8 @@ public final class BindingsCompetition {
             if(RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 operator.a().whileTrue(new PickupSequence("coral"));
                 operator.b().whileTrue(new PlaceSequence("coral"));
-                operator.x().whileTrue(new PickupSequence("algea"));
-                operator.y().whileTrue(new PlaceSequence("algea"));
+                operator.x().whileTrue(new PickupSequence("algae"));
+                operator.y().whileTrue(new PlaceSequence("algae"));
             }
         }
         else {

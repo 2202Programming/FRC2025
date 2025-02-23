@@ -25,12 +25,11 @@ public class DropSequenceHeightTest extends Command {
   }
 
   Phase phase;
-  public DropSequenceHeightTest(double height, double wristHeight) {
+  public DropSequenceHeightTest(double height) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     wrist = RobotContainer.getSubsystem(Wrist.class);
     endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     this.height = height;
-    this.wristHeight = wristHeight;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -47,9 +46,8 @@ public class DropSequenceHeightTest extends Command {
     switch(phase){
       case ElevatorUp:
         elevator.setHeight(height);
-        wrist.setWristSetpoint(wristHeight);
-        if(elevator.atSetpoint() && wrist.atSetPoint()){
-          wrist.setWristVelocity(0);
+        wrist.setPos(wrist.drop);
+        if(elevator.atSetpoint() && wrist.atSetpoint()){
           elevator.setVelocity(0);
           phase = Phase.Drop;
         }
@@ -72,7 +70,7 @@ public class DropSequenceHeightTest extends Command {
   @Override
   public void end(boolean interrupted) {
     elevator.setHeight(0); //pickup level
-    wrist.setWristSetpoint(0); //default pos
+    wrist.setPos(wrist.pickup); //default pos
   }
 
   // Returns true when the command should end.

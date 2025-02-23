@@ -10,7 +10,6 @@ import frc.robot2025.subsystems.Wrist;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
-import frc.robot2025.subsystems.Wrist.WristLevels;;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class PickupSequence extends Command {
@@ -18,7 +17,7 @@ public class PickupSequence extends Command {
   Wrist wrist;
   EndEffector_Subsystem endEffector;
   Levels level;
-  WristLevels wristLevel;
+  boolean station;
   final int DELAY_COUNT = 25;
   int count;
 
@@ -28,13 +27,18 @@ public class PickupSequence extends Command {
   }
 
   Phase phase;
+  /**
+   * 
+   * @param level what level you want to go after pickup
+   * @param station whether pickup is from the station or no
+   */
 
-  public PickupSequence(Levels level, WristLevels wristLevel) {
+  public PickupSequence(Levels level, boolean station) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     wrist = RobotContainer.getSubsystem(Wrist.class);
     endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
+    this.station = station;
     this.level = level;
-    this.wristLevel = wristLevel;
     // Use addRequirements() here to declare subsystem dependencies.
     //systwem.out.println("sup, from Avdhut");
   }
@@ -51,19 +55,29 @@ public class PickupSequence extends Command {
   public void execute() {
     switch(phase){
       case ElevatorInPos:
-        elevator.setHeight(level);
-        wrist.setWristSetpoint(wristLevel);
-        if(elevator.atSetpoint() && wrist.atSetPoint()){
-          wrist.setWristVelocity(0);
+      if(station){
+        elevator.setHeight(Levels.LTwo);
+      } else{
+        elevator.setHeight(Levels.Ground);
+      }
+        wrist.setPos(wrist.drop);
+        if(elevator.atSetpoint() && wrist.atSetpoint()){
           elevator.setVelocity(0);
           phase = Phase.WaitingForCoral;
         }
         break;
       case WaitingForCoral:
+      if(station){
+        endEffector.setRPM(500); //placeholder
+        if(endEffector.pieceReady()){
+          count++;
+        }
+      } else {
         endEffector.setRPM(-500); //placeholder
         if(endEffector.hasPiece()){
           count++;
         }
+      }
         if(count >= DELAY_COUNT){
           phase = Phase.Finished;
         }
@@ -76,7 +90,7 @@ public class PickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    wrist.setWristSetpoint(WristLevels.LFour);
+    wrist.setPos(wrist.drop);
     elevator.setHeight(Levels.LFour);
 
   }
