@@ -16,7 +16,7 @@ public final class Main {
     new RobotSpec_BotOnBoard();
     new RobotSpec_BotOnBoard2();
     new RobotSpec_BotOnBoard3();
-
+    new RobotSpec_test2024();      //2024 platform, 2025 limelight and paths
   }
  
   public static void main(String... args) {
