@@ -50,6 +50,15 @@ public class GroundIntake extends SubsystemBase {
     }
   }
 
+  class PositionPair {
+    public double top;
+    public double bottom;
+
+    PositionPair(double topval, double bottomval) {
+      this.top = topval;
+      this.bottom = bottomval;
+    }
+  }
   // motor config constants
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
   final int wheelStallLimit = 40;
@@ -82,6 +91,10 @@ public class GroundIntake extends SubsystemBase {
 
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
+  
+  PositionPair constrained = new PositionPair(0.0, 0.0);
+  PositionPair targetPosition = new PositionPair(0.0, 0.0);
+  PositionPair measured = new PositionPair(0.0, 0.0);
 
   boolean topControlModeAbsolute = false;
   double topAbsolutePositionTarget = 0.0;
@@ -143,8 +156,10 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setSetpoint(double top, double btm) {
-    topServo.setSetpoint(top);
-    btmServo.setSetpoint(btm);
+    //topServo.setSetpoint(top);
+    //btmServo.setSetpoint(btm);
+    targetPosition.top = top;
+    targetPosition.bottom = btm;
   }
 
   public void debugBtmVelocity(double dir) {    
@@ -214,18 +229,30 @@ public class GroundIntake extends SubsystemBase {
     btmServo.setPosition(0.0);
   }
 
+  // Fill constrained with the closest values to the target we can allow 
+  public PositionPair constrain(double c) {
+    if(targetPosition.bottom + targetPosition.top >= c) {
+      if(targetPosition.bottom > c) {
+        constrained.top = c - targetPosition.bottom;
+      } else {
+        constrained.bottom = c;
+      }
+    } else {
+      constrained.top = targetPosition.top;
+      constrained.bottom = targetPosition.bottom;
+    }
+    return constrained; 
+  }
+
+
+
   @Override
   public void periodic() {
-    if (barrierCrossed()){    // Checking if the top arm has cross the vertical plane
-      setTopAbsolutePosition(0);  //Changes to absolute mode
-    }
-    else {
-      topControlModeAbsolute = false;
-    }
-    if (topControlModeAbsolute) {
-      topServo.setSetpoint(getBtmPosition() - topAbsolutePositionTarget); //Converts relative to absolute
-    }
 
+    measured.top = topServo.getPosition();
+    measured.bottom = btmServo.getPosition();
+    topServo.setSetpoint(constrained.top);
+    btmServo.setSetpoint(constrained.bottom);
     // protect against bad motion
     topServo.periodic();
     btmServo.periodic();
