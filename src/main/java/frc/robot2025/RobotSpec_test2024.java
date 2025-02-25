@@ -152,28 +152,25 @@ public class RobotSpec_test2024 implements IRobotSpec {
     public ModuleConfig[] getModuleConfigs() {
         ModuleConfig[] modules = new ModuleConfig[4];
 
-        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
+        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
                 29, 24, 25,
                 -125.595)
-                .setInversions(true, true, false);
-
-        modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-                30, 26, 27,
-                -114.785)
                 .setInversions(false, true, false);
 
         modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-                28, 22, 23,
-                28.125)
+                30, 26, 27,
+                -114.785)
                 .setInversions(true, true, false);
 
-        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
+        modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
+                28, 22, 23,
+                28.125)
+                .setInversions(false, true, false);
+                
+        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
                 31, 20, 21,
                 -115.752)
-                .setInversions(false, true, false);
-
-        
-        
+                .setInversions(true, true, false);
         
         return modules;
     }
