@@ -65,7 +65,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
     final SubsystemConfig config = new SubsystemConfig(
         // Subsystems and other hardware for testing with 2024 comp-bot
         // $env:serialnum = "032D2062"
-        "CompetitionBotBeta2024", "032D2062")
+        "CompetitionBot2024 as testing platform.", "032D2062")
         // deferred construction via Supplier<Object> lambda
         .add(PowerDistribution.class, "PDP", () -> {
                 var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -148,8 +148,10 @@ public class RobotSpec_test2024 implements IRobotSpec {
     }
 
     @Override
+    /// swapped corner Ids for matching 2025 Limelight placement.
     public ModuleConfig[] getModuleConfigs() {
         ModuleConfig[] modules = new ModuleConfig[4];
+
         modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
                 29, 24, 25,
                 -125.595)
@@ -170,6 +172,9 @@ public class RobotSpec_test2024 implements IRobotSpec {
                 -115.752)
                 .setInversions(false, true, false);
 
+        
+        
+        
         return modules;
     }
 
