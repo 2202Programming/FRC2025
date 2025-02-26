@@ -1,6 +1,11 @@
 package frc.robot2025;
 
-import frc.lib2202.util.AprilTag2d;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
+
+import frc.lib2202.util.AprilTag2d;  //TODO - prefer WPILIB class, deprecate
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -92,41 +97,25 @@ public final class Constants {
     public static final int ElevatorZeroLS = 4;                  
   }
 
-  // TODO fix for 2025!!!!
-  public static final class Tag_Pose {
-    public static final AprilTag2d ID0 = new AprilTag2d(0, 0.0,0.0); //dont use tag ID 0, placeholder for array
-    /**Blue source right */
-    public static final AprilTag2d ID1 = new AprilTag2d(1, 15.079472, 0.245872);
-    /**Blue source left */
-    public static final AprilTag2d ID2 = new AprilTag2d(2, 16.185134, 0.883666);
-    /**Red speaker right */
-    public static final AprilTag2d ID3 = new AprilTag2d(3, 16.579342, 4.982718);
-    /**Red speaker left */
-    public static final AprilTag2d ID4 = new AprilTag2d(4, 16.579342, 5.547868);
-    /**Red amp */
-    public static final AprilTag2d ID5 = new AprilTag2d(5, 14.700758, 8.2042);
-    /**Blue amp */
-    public static final AprilTag2d ID6 = new AprilTag2d(6, 1.8415, 8.2042);
-    /**Blue speaker right */
-    public static final AprilTag2d ID7 = new AprilTag2d(7, 0.0381, 5.547868);
-    /**Blue speaker left */
-    public static final AprilTag2d ID8 = new AprilTag2d(8, 0.0381, 4.982718);
-    /**Red source right */
-    public static final AprilTag2d ID9 = new AprilTag2d(9, 0.356108, 0.883666);
-    /**Red source left */
-    public static final AprilTag2d ID10 = new AprilTag2d(10, 1.461516, 0.245872);
-    /**Red stage (counter-clockwse starting at Stage Left) */
-    public static final AprilTag2d ID11 = new AprilTag2d(11, 11.904726, 3.713226);
-    public static final AprilTag2d ID12 = new AprilTag2d(12, 11.904726, 4.49834);
-    public static final AprilTag2d ID13 = new AprilTag2d(13, 11.220196, 4.105148);
-    /**Blue state (counter-clockwise starting at Center Stage) */
-    public static final AprilTag2d ID14 = new AprilTag2d(14, 5.320792, 4.105148);
-    public static final AprilTag2d ID15 = new AprilTag2d(15, 4.641342, 4.49834);
-    public static final AprilTag2d ID16 = new AprilTag2d(16, 4.641342, 3.713226);
+  //The Field info use WPILIB data
+  public class TheField {
+    public static AprilTagFields fieldChoice = AprilTagFields.k2025ReefscapeWelded;
+    public static AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(fieldChoice);
 
-    public static AprilTag2d[] tagLocations = {ID0, ID1, ID2, ID3, ID4, ID5, ID6, ID7, ID8, ID9, ID10, ID11, ID12,
-                                      ID13, ID14, ID15, ID16};     
+    public static int[] ReefIdsRed =  { 6,  7,  8,  9, 10, 11};
+    public static int[] ReefIdsBlue = {17, 18, 19, 20, 21, 22};
+
+    // Below tags are just examples for testing and to complete AprilTag2d to be deprecated
+    // take care to use ids that exist, optional check not done here.
+    public static Pose3d Tag4 = fieldLayout.getTagPose(4).get();
+    public static Pose3d Tag7 = fieldLayout.getTagPose(7).get();    
   }
-
+  
+  // Tags called out in registered command - TODO use 3DPose
+  public static final class Tag_Pose {
+    // DON'T do this, only setup to get Registered command WIP working
+    static AprilTag2d ID4 = new AprilTag2d(4, TheField.Tag4.getX(),TheField.Tag4.getY() );
+    static AprilTag2d ID7 = new AprilTag2d(7, TheField.Tag7.getX(),TheField.Tag7.getY() );
+  }
 
 }

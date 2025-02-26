@@ -30,8 +30,7 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
-
-
+import frc.robot2025.commands.DriveToReefTag;
 // 2024 robot has a pigeon, so use its sensors, add LL4
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
@@ -202,8 +201,8 @@ public class RobotSpec_test2024 implements IRobotSpec {
         }
 
         // Keep binding in this file please - this bot is only for driver or path testing.
-
-        
+        @SuppressWarnings("unused")  //wip
+        Command  test = new DriveToReefTag("l");
 
     }
 
