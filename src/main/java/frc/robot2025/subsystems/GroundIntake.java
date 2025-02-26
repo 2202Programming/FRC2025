@@ -135,6 +135,10 @@ public class GroundIntake extends SubsystemBase {
     setSetpoint(currentPos); // changes setpoints
 
     this.new GroundIntakeWatcher();
+
+    //testing PIDF smartdashboard stuff
+    topHwAngleVelPID.setName("topGndIn");
+
   }
 
   public void setSetpoint(Position cmd) {
@@ -279,6 +283,10 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
+
+      //call the pidf update so we can edit pids
+      topHwAngleVelPID.NT_update();
+      btmHwAngleVelPID.NT_update();  // must setup name - testing no-op 
     }
   } 
 
