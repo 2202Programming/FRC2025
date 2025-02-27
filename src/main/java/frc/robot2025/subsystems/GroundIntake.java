@@ -229,13 +229,15 @@ public class GroundIntake extends SubsystemBase {
     btmServo.setPosition(0.0);
   }
 
-  // Fill constrained with the closest values to the target we can allow 
+  // Fill constrained with the closest values to the target we can allow, where c is any constant 
   public PositionPair constrain(double c) {
-    if(targetPosition.bottom + targetPosition.top >= c) {
+    if(targetPosition.bottom + targetPosition.top <= c) {
       if(targetPosition.bottom > c) {
         constrained.top = c - targetPosition.bottom;
+        constrained.bottom = targetPosition.bottom;
       } else {
         constrained.bottom = c;
+        constrained.top = 0.0;
       }
     } else {
       constrained.top = targetPosition.top;
