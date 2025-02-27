@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos1 to D1"
+            "pathName": "Pos2 to Tags 10 or 21 Right"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Comp Autos",
   "choreoAuto": false
 }
