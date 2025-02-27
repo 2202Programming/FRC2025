@@ -15,9 +15,9 @@ import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.EndEffectorPercent;
-import frc.robot2025.subsystems.EndEffector_Subsystem;
-
+import frc.robot2025.commands.Climb;
+import frc.robot2025.commands.ClimberVelMove;
+import frc.robot2025.subsystems.Climber;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.MperFT;
@@ -66,7 +66,8 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
         })
         //.add(Sensors_Subsystem.class)
         // .add(Limelight.class)
-        .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
+        //.add(EndEffector_Subsystem.class, "endEffectorSubsystem")
+        .add(Climber.class)
         //.add(GroundIntake.class)
         //.add(SwerveDrivetrain.class, () -> {
         //    return new SwerveDrivetrain(SparkFlex.class);
@@ -112,19 +113,14 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
         // and avoid messing with BindingsOther or Comp.
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
         if(dc.Operator() instanceof CommandXboxController operator) {
-            //operator.a().whileTrue(new RollersDebug(10.0));
-            operator.a().whileTrue(new EndEffectorPercent(-.3, "a")); //reverse
-            operator.b().whileTrue(new EndEffectorPercent(.2, "b")); //very slow
-            operator.x().whileTrue(new EndEffectorPercent(.5, "x")); //ok
-            operator.y().whileTrue(new EndEffectorPercent(1, "y")); //fast
-        } else if(dc.Operator() instanceof CommandPS4Controller operator) {
-            //EndEffector_Subsystem endEffectorSubsystem = RobotContainer.getSubsystem("endEffectorSubsystem");
-            operator.circle().whileTrue(new EndEffectorPercent(-.3, "circle")); //reverse
-            operator.cross().whileTrue(new EndEffectorPercent(.2, "cross")); //very slow
-            operator.square().whileTrue(new EndEffectorPercent(.5, "square")); //ok
-            operator.triangle().whileTrue(new EndEffectorPercent(1, "triangle")); //fast
-        }
 
+            operator.povUp().whileTrue(new ClimberVelMove(0.75));
+            operator.povDown().whileTrue(new ClimberVelMove(-0.75));
+
+            operator.rightBumper().onTrue(new Climb(3.0, 0.75));
+
+
+        }
         //BindingsCompetition.ConfigureCompetition(dc);
         //BindingsOther.ConfigureOther(dc);
     }

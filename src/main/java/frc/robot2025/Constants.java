@@ -38,7 +38,7 @@ public final class Constants {
     public static final int IntakeBtm = 52; 
     public static final int IntakeWheel = 50; 
     //CAN IDs
-    public static final int CLIMBER = 10; //placeholder
+    public static final int CLIMBER = 26; //placeholder | Changed to 26 for testing by BG
     public static final int ELEVATOR_MAIN = 40; //placeholder
     public static final int ELEVATOR_FOLLOW = 41; //placeholder
     public static final int WRIST = 38; //placeholder
