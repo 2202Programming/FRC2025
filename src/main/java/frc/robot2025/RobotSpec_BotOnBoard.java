@@ -29,7 +29,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "032381BF"
-  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
+  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "03282B65")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -117,7 +117,7 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       CommandXboxController opp = (CommandXboxController)dc.Driver();
       final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
       opp.x().whileTrue(new testElevatorVelComd(30.0));
-      opp.rightBumper().onTrue(new ElevatorCalibrate(-70.0));
+      opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
       opp.y().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(0.0);
       }));
