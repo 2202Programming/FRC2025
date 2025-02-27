@@ -34,8 +34,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.ElevatorCalibrate;
-import frc.robot2025.commands.testElevatorVelComd;
+import frc.robot2025.commands.*;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
@@ -221,6 +220,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       opp.rightTrigger().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(75.0);
       }));
+      //for end effector
+      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
       // opp.x().whileTrue(new backupEE_Move(1000.0)); 
     }
   }

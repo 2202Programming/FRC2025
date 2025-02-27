@@ -136,6 +136,10 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       opp.rightTrigger().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(75.0);
       }));
+      //for end effector
+      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
+      
       // opp.x().whileTrue(new backupEE_Move(1000.0)); 
     }
 
