@@ -114,7 +114,8 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       // opp.triangle().onTrue(new WristToPos(0.0));
       // opp.cross().onTrue(new WristToPos(0.5));
     } else {
-      CommandXboxController opp = (CommandXboxController)dc.Driver();
+      CommandXboxController driver = (CommandXboxController)dc.Driver();
+      CommandXboxController opp = (CommandXboxController)dc.Operator();
       final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
       opp.x().whileTrue(new testElevatorVelComd(30.0));
       opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
@@ -136,6 +137,8 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       opp.rightTrigger().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(75.0);
       }));
+      opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
       //for end effector
       //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
       //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
