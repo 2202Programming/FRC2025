@@ -2,6 +2,7 @@ package frc.robot2025;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
@@ -11,6 +12,7 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.EndEffectorPercent;
+import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
 import frc.robot2025.subsystems.Elevator_Subsystem;
@@ -46,8 +48,11 @@ public final class BindingsCompetition {
             driver.y().onTrue(new AllianceAwareGyroReset(true));
            // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
 
-           // TODO driver will wants precision/ throttle drive on left trigger, end effector centric drive on right trigger
+           // Driver will wants precision/ throttle drive on left trigger, end effector centric drive on right trigger
            // also wants y to be field centric on true? couldnt tell you why
+            driver.leftTrigger().whileTrue(new ParallelCommandGroup(
+                    new ScaleDriver(0.3),
+                    new RobotCentricDrive(drivetrain, dc)) );
         }
         else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
