@@ -18,13 +18,17 @@ public class PickupSequence extends Command {
     WaitForGamepiece, // wait until coral trips limitswitch
     Rest, // sets position to transport coral
     WaitForMove,
-    Finished // sequence is finished, either no coral was picked up or its ready for transport
+    Finished, // sequence is finished, either no coral was picked up or its ready for transport
+    WaitForPickupPos // wait for system to get to setpoint
   }
   State state;
+  public static final int FrameCount = 3;
   final GroundIntake groundIntake;
   final Position pickup;
   final Position rest;
-  final BooleanSupplier  hasPiece;
+  final BooleanSupplier hasPiece;
+  int pickupFrameCounter;
+
 
   public PickupSequence(String gp) {
   this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
@@ -42,24 +46,29 @@ public class PickupSequence extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    pickupFrameCounter = 0; 
     groundIntake.setSetpoint(pickup);
     groundIntake.setWheelSpeed(5.0); 
-    state = State.WaitForGamepiece;
-
+    state = State.WaitForPickupPos;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     switch(state){
+      
+      case WaitForPickupPos:
+        state = groundIntake.isAtSetpoint() ? State.WaitForGamepiece : State.WaitForPickupPos;
+        break;
 
-      case WaitForGamepiece:
-        state = hasPiece.getAsBoolean() ? State.Rest : State.WaitForGamepiece;
+      case WaitForGamepiece: 
+        state = hasPiece.getAsBoolean() && pickupFrameCounter++ == FrameCount ? State.Rest : State.WaitForGamepiece;
         break;
       
       case Rest:
         groundIntake.setSetpoint(rest);
         groundIntake.setWheelSpeed(0.0);
+        groundIntake.setWheelHold(0.5);
         state = State.WaitForMove;
         break;
       

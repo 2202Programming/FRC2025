@@ -72,6 +72,7 @@ public final class Constants {
   }
 
   public static final class AnalogIn {
+    
   }
 
   // pnumatics control module 1
@@ -83,9 +84,9 @@ public final class Constants {
   }
 
   public final class DigitalIO {
-    public static final int EndEffector_Lightgate = 0;
-    public static final int GroundIntakeHasCoral = 4; // TBD 1/25/25 needs to be assigned
-    public static final int GroundIntakeHasAlgae = 4;
+    public static final int EndEffector_Lightgate = 2;
+    public static final int GroundIntakeHasCoral = 0; // limitswitch
+    public static final int GroundIntakeHasAlgae = 9; // lightgate
   }
 
   // TODO fix for 2025!!!!

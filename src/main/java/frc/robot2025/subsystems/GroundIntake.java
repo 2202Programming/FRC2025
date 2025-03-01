@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -36,7 +37,7 @@ public class GroundIntake extends SubsystemBase {
     ALGAE_PICKUP(-45.0, 120.0),
     ALGAE_PLACE(-45.0, 60), // algae place
     ALGAE_REST(-45.0, 100.0),
-    CORAL_PICKUP(-20.0, 120.0),
+    CORAL_PICKUP(-15.0, 120.0),
     CORAL_PLACE(-20.0, 45.0), // coral place
     CORAL_REST(-20.0, 45.0),
     FLOOR(0.0, 120.0);
@@ -74,6 +75,7 @@ public class GroundIntake extends SubsystemBase {
 
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
+  public static final double WheelMaxVolts = 0.5;
 
   PIDFController topHwAngleVelPID = new PIDFController(0.00075, 0.0, 0.0, 0.0013); // placeholder PIDs
   final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);
@@ -143,6 +145,8 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setSetpoint(double top, double btm) {
+    topServo.setArbFeedforward(0.0);
+    btmServo.setArbFeedforward(0.0);
     topServo.setSetpoint(top + holdOffset);
     btmServo.setSetpoint(btm);
   }
@@ -191,6 +195,13 @@ public class GroundIntake extends SubsystemBase {
     wheelMtr_ctrl.setReference(speed, ControlType.kVelocity);
   }
 
+  public void setWheelHold(double voltage){
+    double clampVoltage = Math.abs(voltage) <= WheelMaxVolts ? voltage : WheelMaxVolts;
+    clampVoltage = Math.copySign(clampVoltage, voltage);
+    // MathUtil.clamp(voltage, -1.0 * WheelMaxVolts, WheelMaxVolts);
+    // wheelMtr_ctrl.setReference(MathUtil.clamp(voltage, -1.0 * WheelMaxVolts, WheelMaxVolts);, ControlType.kVoltage);
+    wheelMtr_ctrl.setReference(clampVoltage, ControlType.kVoltage);
+  }
   public double getTopPosition() {
     return topServo.getPosition();
   }
@@ -235,6 +246,8 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_btmCmdPos;
     NetworkTableEntry NT_topAtSetpoint;
     NetworkTableEntry NT_topGetIAccum;
+    NetworkTableEntry NT_groundIntakeHasCoral;
+    NetworkTableEntry NT_groundIntakeHasAlgae;
 
     public GroundIntakeWatcher() {
     }
@@ -260,8 +273,6 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos = MonitorTable.getEntry("bottom cmd position");
       NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
-
-
     }
 
     @Override
@@ -279,6 +290,7 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
+
     }
   } 
 
