@@ -68,7 +68,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Command.class, "ElevatorWatcher", () -> {
        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       })
-      
+
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
@@ -222,17 +222,20 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // opp.a().onTrue(new InstantCommand(() -> {
       //   elevator_Subsystem.setHeight(90.0);
       // }));
-      opp.leftBumper().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(110.0);
+      opp.povDown().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(46.0);
       }));
-      opp.leftTrigger().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(148.0);
+      opp.povLeft().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(86.0);
+      }));
+      opp.povRight().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(0.0);
       }));
       // opp.rightTrigger().onTrue(new InstantCommand(() -> {
       //   elevator_Subsystem.setHeight(75.0);
       // }));
-      opp.rightBumper().whileTrue(new EndEffectorPercent(-1.0, "rightBumper")); //reverse
-      opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
+      opp.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")); //reverse
+      opp.rightTrigger().whileTrue(new EndEffectorPercent(.3, "rightTrigger"));
       //for end effector
       //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
       //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
