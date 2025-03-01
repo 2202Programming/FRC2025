@@ -86,7 +86,7 @@ public final class Constants {
   public final class DigitalIO {
     public static final int EndEffector_Lightgate = 2;
     public static final int GroundIntakeHasCoral = 0; // limitswitch
-    public static final int GroundIntakeHasAlgae = 9; // lightgate
+    public static final int GroundIntakeHasAlgae = 1; // lightgate
   }
 
   // TODO fix for 2025!!!!
