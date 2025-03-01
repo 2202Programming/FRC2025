@@ -89,7 +89,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       })
       .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
       .add(Command.class, "endEffectorWatcher", () -> {
-        return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
+        return ((EndEffector_Subsystem)RobotContainer.getSubsystem("endEffectorSubsystem")).getWatcher();
       })
       ;
       // .add(Wrist.class);
