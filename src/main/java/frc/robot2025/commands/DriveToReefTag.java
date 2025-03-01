@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib2202.command.swerve.MoveToPoint;
 import frc.robot2025.Constants.TheField;
 
 
@@ -30,6 +31,7 @@ public class DriveToReefTag extends Command {
         double x, y, rot;
         for (int tagId : tags) {
             Pose3d tagPose = TheField.fieldLayout.getTagPose(tagId).get();
+            Pose2d foo = tagPose.toPose2d();  //test
             var matrix = tagPose.toMatrix();
             x = tagPose.getX();
             y = tagPose.getY();
@@ -61,44 +63,66 @@ public class DriveToReefTag extends Command {
     }
     
     final boolean leftSide;  //side of reef to deliver to
-    
+    final Map<Integer, Pose2d> redPoses;
+    final Map<Integer, Pose2d> bluePoses;
+
     // command vars set at init time
     boolean done;
-    Alliance alliance;
-    
-    public DriveToReefTag(String side) {
+    Command moveComand;
+    Map<Integer, Pose2d> alliancePoses;
+
+    public DriveToReefTag(String reefSide) {
         // pick a direction to go
-        leftSide = side.toLowerCase().startsWith("l");
+        leftSide = reefSide.toLowerCase().startsWith("l");
 
-
+        // setup red/blue for this commands side
+        redPoses = leftSide ? redReefLeft : redReefRight;
+        bluePoses = leftSide ? blueReefLeft : blueReefRight;
     }
     
     @Override
     public void initialize() {
-        done = true;   // incase we need to bail
+        done = false;  //true when we found a reef tag or gave up
+        moveComand = null;       
+        done = true;   
+
+        Alliance alliance;
         // get our alliance
         if (DriverStation.getAlliance().isPresent()) {
-            alliance = DriverStation.getAlliance().get();          
+            alliance = DriverStation.getAlliance().get();            
         }
         else return;
+        alliancePoses = (alliance == Alliance.Blue) ? bluePoses : redPoses;
+        
+        // set LL targets to our side
+        @SuppressWarnings("unused")  //wip
+        var tags = alliancePoses.keySet();
+        //LL call 
 
-        // get LL target 
-
-        // build path to target
     }
 
     @Override
-    public void execute() { //tbd 
+    public void execute() { 
+        // Look for our tags and create a moveTo if we find 
+        int foundTag = 0;
+
+        // read LL for tag
+
+        if (foundTag > 0 ) { //also check it is good...
+            Pose2d targetPose = alliancePoses.get(foundTag);
+            // build path to target
+            moveComand = new MoveToPoint(targetPose);
+            moveComand.schedule();
+            done = true;
+        }
     }
 
-
-@Override
-  public void end(boolean interrupted) {
-    if(interrupted){
-    
+    @Override
+    public void end(boolean interrupted) {
+        if (interrupted) {
+           if (moveComand != null) moveComand.cancel();
+        }
     }
-  }
-
 
     @Override
     public boolean isFinished() {
