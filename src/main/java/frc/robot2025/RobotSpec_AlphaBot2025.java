@@ -87,7 +87,11 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
       })
-      .add(EndEffector_Subsystem.class, "endEffectorSubsystem");
+      .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
+      .add(Command.class, "endEffectorWatcher", () -> {
+        return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
+      })
+      ;
       // .add(Wrist.class);
 
   boolean swerve = true;
