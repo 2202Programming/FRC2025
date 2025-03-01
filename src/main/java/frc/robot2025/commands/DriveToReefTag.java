@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib2202.command.swerve.MoveToPoint;
+import frc.lib2202.command.pathing.MoveToPose;
 import frc.robot2025.Constants.TheField;
 
 
@@ -111,7 +111,7 @@ public class DriveToReefTag extends Command {
         if (foundTag > 0 ) { //also check it is good...
             Pose2d targetPose = alliancePoses.get(foundTag);
             // build path to target
-            moveComand = new MoveToPoint(targetPose);
+            moveComand = new MoveToPose(targetPose);
             moveComand.schedule();
             done = true;
         }

@@ -94,7 +94,11 @@ public final class Constants {
     public static final int GroundIntakeHasAlgae = 1;
     public static final int END_EFFECTOR_WHEEL_LOW_LIGHTGATE = 2; 
     public static final int END_EFFECTOR_LOAD_HIGH_LIGHTGATE = 3; 
-    public static final int ElevatorZeroLS = 4;                  
+    public static final int ElevatorZeroLS = 4;    
+    
+    public static final int SignalLight1 = 7;
+    public static final int SignalLight2 = 8;
+    public static final int SignalLight3 = 9;              
   }
 
   //The Field info use WPILIB data
