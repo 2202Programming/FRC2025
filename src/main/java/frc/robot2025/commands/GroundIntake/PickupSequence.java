@@ -67,7 +67,7 @@ public class PickupSequence extends Command {
       
       case Rest:
         groundIntake.setSetpoint(rest);
-        groundIntake.setWheelSpeed(0.0);
+        //groundIntake.setWheelSpeed(0.0); //Shouldn't need if holding 
         groundIntake.setWheelHold(5.0);
         state = State.WaitForMove;
         break;
@@ -86,7 +86,8 @@ public class PickupSequence extends Command {
   public void end(boolean interrupted) {
     if(interrupted){
       groundIntake.setSetpoint(hasPiece.getAsBoolean() ? rest : Position.ZERO);
-      groundIntake.setWheelSpeed(0.0);
+      //groundIntake.setWheelSpeed(0.0);  This would break the hold voltage.
+      // remember, last command sent to controller will be what the motor controller does.
       System.out.println("pickup sequence interrupted");
     }
   }
