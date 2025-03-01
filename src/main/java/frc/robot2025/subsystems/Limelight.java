@@ -54,20 +54,14 @@ public class Limelight extends BaseLimelight {
         mt1.rawFiducials.length == 1) // stricter criteria if only 1 tag seen
     {
       // rejectUpdate on poor conditions @Dr.J ?? what does [0] refer too???
-      doRejectUpdate = (mt1.rawFiducials[0].ambiguity > .7) ||
-          (mt1.rawFiducials[0].distToCamera > 3) ||
-          (mt1.tagCount == 0);
+      doRejectUpdate = (mt1.rawFiducials[0].ambiguity > 0.7) ||
+          (mt1.rawFiducials[0].distToCamera > 3.0) ||
+          (mt1.tagCount == 0) ||
+          (Math.abs(gyro.getYawRate()) > 720.0); //reject if spining fast
 
       if (!doRejectUpdate) {
         bluePose = mt1.pose;
-        // @Dr.J - I think getHeading() is not an angular-velocity so this check realy
-        // isn't doing anything.
-        // TODO IF this is rate based, need to use yaw_rate
-        if (Math.abs(gyro.getHeading().getDegrees()) < 720) // if our angular velocity is greater than 720 degrees per
-                                                            // second, ignore vision updates
-        {
-          bluePose2 = mt2.pose;
-        }
+        bluePose2 = mt2.pose;        
       }
       numAprilTags = mt1.tagCount;
     }

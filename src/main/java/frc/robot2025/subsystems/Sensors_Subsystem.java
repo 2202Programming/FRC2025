@@ -159,7 +159,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_yaw_simple = ModMath.fmod360_2(m_pigeon.getYaw(false).getValueAsDouble() 
       + m_yaw_offset); 
     
-    // Getting the angular velocities
+    // Getting the angular velocities [deg/s]
     m_roll_d = m_pigeon.getAngularVelocityXWorld(false).getValueAsDouble();
     m_pitch_d = m_pigeon.getAngularVelocityYWorld(false).getValueAsDouble();
     m_yaw_d = m_pigeon.getAngularVelocityZWorld(false).getValueAsDouble();
