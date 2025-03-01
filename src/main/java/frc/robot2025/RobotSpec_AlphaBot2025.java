@@ -37,7 +37,9 @@ import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.testBindings.DPLPathBindings;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
@@ -77,7 +79,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return new DTMonitorCmd();
       })
       .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
-      .add(Wrist.class);
+      .add(Wrist.class)
+      .add(SignalLight.class, "signal")
+      ;
 
   boolean swerve = true;
 
@@ -160,6 +164,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // Select either comp or other for testing
     BindingsCompetition.ConfigureCompetition(dc);
     //BindingsOther.ConfigureOther(dc);
+
+    DPLPathBindings.myBindings(dc);
 
     // Initialize PathPlanner
     OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");

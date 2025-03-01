@@ -36,7 +36,7 @@ public class SignalLight {
     final DigitalOutput d2;
 
     public SignalLight() {
-        this(DigitalIO.SignalLight1, DigitalIO.SignalLight1, DigitalIO.SignalLight1);
+        this(DigitalIO.SignalLight1, DigitalIO.SignalLight2, DigitalIO.SignalLight3);
     }
 
     public SignalLight(int dio1, int dio2, int dio3) {
@@ -55,14 +55,14 @@ public class SignalLight {
         d2.set((b & 0x04) != 0);
     }
 
-    Command getColorCommand(Color c) {
+    public Command getColorCommand(Color c) {
         return new InstantCommand(() -> {
             setLight(c);
         } );
     }
 
 
-    Command getDemoCommand() {
+    public Command getDemoCommand() {
         return this.new DemoCommand();
     }
 
