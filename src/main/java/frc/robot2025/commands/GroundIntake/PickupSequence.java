@@ -48,7 +48,7 @@ public class PickupSequence extends Command {
   public void initialize() {
     pickupFrameCounter = 0; 
     groundIntake.setSetpoint(pickup);
-    groundIntake.setWheelSpeed(5.0); 
+    groundIntake.setWheelSpeed(15.0); 
     state = State.WaitForPickupPos;
   }
 
@@ -68,7 +68,7 @@ public class PickupSequence extends Command {
       case Rest:
         groundIntake.setSetpoint(rest);
         groundIntake.setWheelSpeed(0.0);
-        groundIntake.setWheelHold(0.5);
+        groundIntake.setWheelHold(5.0);
         state = State.WaitForMove;
         break;
       

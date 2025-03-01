@@ -34,11 +34,11 @@ public class GroundIntake extends SubsystemBase {
   public enum Position {
     POWERUP(0.0, 0.0), // pwr up could be different from ZERO
     ZERO(0.0, 0.0),
-    ALGAE_PICKUP(-45.0, 120.0),
-    ALGAE_PLACE(-45.0, 60), // algae place
+    ALGAE_PICKUP(-45.0, 125.0),
+    ALGAE_PLACE(-45.0, 100.0), // algae place
     ALGAE_REST(-45.0, 100.0),
-    CORAL_PICKUP(-15.0, 120.0),
-    CORAL_PLACE(-20.0, 45.0), // coral place
+    CORAL_PICKUP(-14.0, 125.0),
+    CORAL_PLACE(-18.0, 45.0), // coral place
     CORAL_REST(-20.0, 45.0),
     FLOOR(0.0, 120.0);
 
@@ -75,7 +75,7 @@ public class GroundIntake extends SubsystemBase {
 
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
-  public static final double WheelMaxVolts = 0.5;
+  public static final double WheelMaxVolts = 5.0;
 
   PIDFController topHwAngleVelPID = new PIDFController(0.00075, 0.0, 0.0, 0.0013); // placeholder PIDs
   final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);

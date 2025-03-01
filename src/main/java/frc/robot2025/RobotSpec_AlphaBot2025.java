@@ -176,9 +176,9 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
     // real pickup and place sequences
     operator.x().whileTrue(new PickupSequence("a"));
-    operator.y().whileTrue(new PlaceSequence("a", 5.0));
+    operator.y().whileTrue(new PlaceSequence("a", -15.0)); //speed is slower than expected??
     operator.a().whileTrue(new PickupSequence("c"));
-    operator.b().whileTrue(new PlaceSequence("c", 5.0));
+    operator.b().whileTrue(new PlaceSequence("c", -10.0));
 
     // Initialize PathPlanner
     OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
