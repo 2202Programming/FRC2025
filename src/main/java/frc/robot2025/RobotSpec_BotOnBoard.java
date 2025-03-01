@@ -115,6 +115,7 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       // opp.triangle().onTrue(new WristToPos(0.0));
       // opp.cross().onTrue(new WristToPos(0.5));
     } else {
+      @SuppressWarnings("unused")
       CommandXboxController driver = (CommandXboxController)dc.Driver();
       CommandXboxController opp = (CommandXboxController)dc.Operator();
       final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);

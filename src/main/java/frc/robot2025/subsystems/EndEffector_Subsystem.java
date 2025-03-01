@@ -4,7 +4,10 @@
 
 package frc.robot2025.subsystems;
 
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -27,6 +30,10 @@ public class EndEffector_Subsystem extends SubsystemBase {
   /** Creates a new EE_Subsystem. */
   public EndEffector_Subsystem() {
     mtr = new SparkMax(CAN.END_EFFECTOR, SparkMax.MotorType.kBrushless); //26 on bot on board 3
+    var mtrCfg = new SparkMaxConfig();
+    // try setting current limit for stall point. 20 is good for 550s
+    mtrCfg.smartCurrentLimit(20);
+    mtr.configure(mtrCfg, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     mtr.clearFaults();
   }
 
