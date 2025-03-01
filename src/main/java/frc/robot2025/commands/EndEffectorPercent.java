@@ -29,9 +29,9 @@ public class EndEffectorPercent extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(endEffector.pieceReady()) {
+
       endEffector.setPercent(SmartDashboard.getNumber("End Effector Motor Percent "+ label, percent));
-    }
+    
   }
 
   // Called once the command ends or is interrupted.

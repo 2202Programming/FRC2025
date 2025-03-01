@@ -22,6 +22,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.ElevatorCalibrate;
+import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
@@ -29,7 +30,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "032381BF"
-  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "03282B65")
+  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "temp")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -134,9 +135,9 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       opp.leftTrigger().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(148.0);
       }));
-      opp.rightTrigger().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(75.0);
-      }));
+      // opp.rightTrigger().onTrue(new InstantCommand(() -> {
+      //   elevator_Subsystem.setHeight(75.0);
+      // }));
       opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
       opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
       //for end effector
