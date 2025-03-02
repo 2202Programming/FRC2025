@@ -9,6 +9,7 @@ import frc.lib2202.command.pathing.MoveToPose;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
+import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.subsystems.SignalLight;
 
 public final class DPLPathBindings {
@@ -35,7 +36,7 @@ public final class DPLPathBindings {
 
     static void xboxOperator(CommandXboxController opr) {
         // test moveToPose
-        opr.povUp().whileTrue(new InstantCommand(() -> {
+        opr.povUp().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose();         //field coords
             // add 1m forward, field not robot.
             Pose2d target = new Pose2d(currentPose.getX() + 1.0,
@@ -49,6 +50,9 @@ public final class DPLPathBindings {
                 cmd =  cmd.andThen(signal.getColorCommand(SignalLight.Color.OFF));
             cmd.schedule();
         }));
+
+        opr.leftStick().whileTrue(new DriveToReefTag("l") );
+        opr.rightStick().whileTrue(new DriveToReefTag("r") );
     }
 
 }
