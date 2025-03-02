@@ -1,4 +1,6 @@
 package frc.robot2025.commands;
+import static frc.lib2202.Constants.DEGperRAD;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,13 +34,11 @@ public class DriveToReefTag extends Command {
         // loop over given tags and build the 2d targets
         double x, y, rot;
         for (int tagId : tags) {
-            Pose3d tagPose = TheField.fieldLayout.getTagPose(tagId).get();
-            Pose2d foo = tagPose.toPose2d();  //test
-            var matrix = tagPose.toMatrix();
+            Pose3d tagPose = TheField.fieldLayout.getTagPose(tagId).get();           
             x = tagPose.getX();
             y = tagPose.getY();
             rot = tagPose.getRotation().getAngle();
-            var rotdeg = rot*57.3; //debug assist
+            var rotdeg = rot*DEGperRAD; //debug assist
             var rot2d = new Rotation2d(rot);
 
             // Backup robot along tag face
