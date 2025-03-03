@@ -26,6 +26,7 @@ import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.Constants.DigitalIO;
+import frc.robot2025.utils.UXTrim;
 
 public class GroundIntake extends SubsystemBase {
   // TODO change degree values once we know actual positions. these are
@@ -88,10 +89,15 @@ public class GroundIntake extends SubsystemBase {
 
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
+  double top_cmd, btm_cmd;  //tracks last commanded positions
+  UXTrim topTrim;
   double holdOffset;
   
 
   public GroundIntake() { 
+    topTrim = new UXTrim("giTop2");
+    topTrim.addChangeCallback(this::trimChange);
+
     topHwAngleVelPID.setIZone(25.0);
     topPositionPID.setIntegratorRange(-topIRange, topIRange);
     btmHwAngleVelPID.setIZone(25.0);
@@ -109,7 +115,6 @@ public class GroundIntake extends SubsystemBase {
   
    
     // configure wheel motor
-
     wheelMtr_cfg = new SparkMaxConfig();
     wheelMtr_cfg.inverted(false)
         .idleMode(IdleMode.kBrake)
@@ -138,6 +143,7 @@ public class GroundIntake extends SubsystemBase {
 
     //testing PIDF smartdashboard stuff
     topHwAngleVelPID.setName("topGndIn");
+   
 
   }
 
@@ -147,9 +153,22 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setSetpoint(double top, double btm) {
-    topServo.setSetpoint(top + holdOffset);
+    //track our targets for trimChange
+    this.top_cmd = top;
+    this.btm_cmd = btm;
+
+    double trimedTop = topTrim.getValue(top) + holdOffset;  // testing trim api
+    topServo.setSetpoint(trimedTop);
     btmServo.setSetpoint(btm);
   }
+
+  // on a trim change, adjust the cmds
+  // Returns bool because Void type seems bugged.
+  Boolean trimChange() {
+    setSetpoint(top_cmd, btm_cmd);
+    return true;
+  }
+
 
   public void debugBtmVelocity(double dir) {    
     double aff = 0.0;
