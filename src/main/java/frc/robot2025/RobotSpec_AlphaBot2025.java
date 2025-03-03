@@ -43,6 +43,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.Wrist;
 import frc.robot2025.testBindings.DPLPathBindings;
+import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
@@ -216,5 +217,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       drivetrain.setDefaultCommand(new FieldCentricDrive());
     }
   }
+
+  /*
+   * Add additional calls to the robotPeriodic loop
+   */
+  @Override
+  public void periodic() {
+    UXTrim.periodic();
+  }
+
 
 }
