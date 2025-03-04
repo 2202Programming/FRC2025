@@ -22,6 +22,11 @@ public class ClimberSetPos extends Command {
     this.pos = pos;
   }
 
+  public Climb(double vel) {
+    // 3.0 tested on test stand, good default value; re-tune when needed
+    this(3.0, vel);
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -32,6 +37,7 @@ public class ClimberSetPos extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    climber.setVelocity(0.0);
   }
 
   // Returns true when the command should end.
