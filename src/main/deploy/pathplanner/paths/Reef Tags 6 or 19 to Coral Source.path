@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.575,
-        "y": 6.1478230104608045
+        "x": 3.640691489361702,
+        "y": 5.366921542553191
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.787515568746999,
-        "y": 6.475977004269565
+        "x": 3.1039228723404255,
+        "y": 5.751994680851063
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.188914207175925,
-        "y": 3.9233850549768516
+        "x": 1.3302526595744681,
+        "y": 7.140591755319149
       },
       "prevControl": {
-        "x": 6.056681688148457,
-        "y": 3.7103424477248184
+        "x": 2.1470744680851066,
+        "y": 6.650498670212766
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 36.869897645843956
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Reef to Coral Source Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 31.689810857615527
   },
   "useDefaultConstraints": true
 }

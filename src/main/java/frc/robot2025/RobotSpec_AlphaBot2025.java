@@ -2,10 +2,14 @@ package frc.robot2025;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.revrobotics.spark.SparkFlex;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -48,11 +52,18 @@ import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.testBindings.DPLPathBindings;
+import frc.robot2025.utils.UXTrim;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
+
+  
+
+
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "03282B65"
   final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "03282B65")
@@ -78,9 +89,15 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
-      .add(Limelight.class, "limelight")
-      .add(SwerveDrivetrain.class, "drivetrain", () -> {
-        return new SwerveDrivetrain(SparkFlex.class);
+      .add(Limelight.class, "limelight", ()-> {
+
+        // Limelight position in robot coords - this has LL in the front of bot
+        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
+          new Rotation3d(0.0, 30.0/DEGperRAD, 0.0));
+        return new Limelight("limelight", LimelightPosition );
+      })
+      .add(SwerveDrivetrain.class, "drivetrain", () ->{
+          return new SwerveDrivetrain(SparkFlex.class);
       })
       .add(OdometryInterface.class, "odometry", () -> {
         var obj = new Odometry();
@@ -94,13 +111,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return new DTMonitorCmd();
       })
       .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
+      .add(Wrist.class)
+      .add(SignalLight.class, "signal")
+      ;
       .add(Command.class, "endEffectorWatcher", () -> {
         return ((EndEffector_Subsystem)RobotContainer.getSubsystem("endEffectorSubsystem")).getWatcher();
       })
       //.add(Wrist.class) TODO add once liner actuator is added
       ;
-
-  boolean swerve = true;
 
   // Robot Speed Limits
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
@@ -111,9 +129,13 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   double kDriveGR = 6.12;
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
+
   final ChassisConfig chassisConfig = new ChassisConfig(
-      0.57785 / 2.0, // x, based on direct measurements
-      0.57785 / 2.0, // y, based on direct measurements
+      //0.57785 / 2.0, 
+      //0.57785 / 2.0,  
+      //dpl - 28" x 28"
+      0.7112 / 2.0,  // x,  
+      0.7112 / 2.0,  // y, 
       kWheelCorrectionFactor, // scale [] <= 1.0
       kWheelDiameter,
       kSteeringGR,
@@ -121,6 +143,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       new PIDFController(0.085, 0.00055, 0.0, 0.21292), // drive
       new PIDFController(0.01, 0.0, 0.0, 0.0) // angle
   );
+
+   
 
   public RobotSpec_AlphaBot2025() {
     // finish BetaBot's drivePIDF
@@ -146,6 +170,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     return chassisConfig;
   }
 
+  //TODO rotate the chassis 90 so intake is front and pickup on back.
+  //(currently set to battery on back...)
   @Override
   public ModuleConfig[] getModuleConfigs() {
     ModuleConfig[] modules = new ModuleConfig[4];
@@ -175,12 +201,16 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public void setBindings() {
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
-    CommandXboxController operator = (CommandXboxController) dc.Operator();
-
+    
     // Select either comp or other for testing
-    // BindingsCompetition.ConfigureCompetition(dc);
-    // BindingsOther.ConfigureOther(dc);
+    BindingsCompetition.ConfigureCompetition(dc);
 
+    //Place your test binding in ./testBinding/<yourFile>.java and call it here
+    //comment out any conflicting bindings. Try not to push with your bindings
+    //active. Just comment them out.
+    DPLPathBindings.myBindings(dc);  //DPL testing LL and odometry stuff.
+
+    // Initialize PathPlanner, if we have the needed SS.
     // velocity commands for calibration
     operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
     operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
@@ -202,6 +232,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
     if (odo != null && sdt != null) {
       AutoPPConfigure.configureAutoBuilder(sdt, odo);
+      PathfindingCommand.warmupCommand().schedule();
     }
 
   //   // start anyting else
@@ -292,5 +323,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       drivetrain.setDefaultCommand(new FieldCentricDrive());
     }
   }
+
+  /*
+   * Add additional calls to the robotPeriodic loop
+   */
+  @Override
+  public void periodic() {
+    UXTrim.periodic();
+  }
+
 
 }

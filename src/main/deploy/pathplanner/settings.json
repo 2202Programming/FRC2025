@@ -3,12 +3,16 @@
   "robotLength": 0.796,
   "holonomicMode": true,
   "pathFolders": [
+    "Coral Source to Reef Paths",
+    "No Potato Paths",
     "Placing Paths",
-    "No Potato Paths"
+    "Reef to Coral Source Paths",
+    "Starting To Reef Paths"
   ],
   "autoFolders": [
-    "Placing Autos",
-    "No Potato Auto"
+    "No Potato Auto",
+    "Comp Autos",
+    "Placing Autos"
   ],
   "defaultMaxVel": 3.0,
   "defaultMaxAccel": 3.0,

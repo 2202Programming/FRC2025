@@ -27,6 +27,7 @@ import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.Constants.DigitalIO;
+import frc.robot2025.utils.UXTrim;
 
 public class GroundIntake extends SubsystemBase {
   // TODO change degree values once we know actual positions. these are
@@ -90,10 +91,15 @@ public class GroundIntake extends SubsystemBase {
 
   // Where we are heading, use atSetpoint to see if we are there
   Position currentPos = Position.POWERUP;
+  double top_cmd, btm_cmd;  //tracks last commanded positions
+  UXTrim topTrim;
   double holdOffset;
   
 
   public GroundIntake() { 
+    topTrim = new UXTrim("giTop2");
+    topTrim.addChangeCallback(this::trimChange);
+
     topHwAngleVelPID.setIZone(25.0);
     topPositionPID.setIntegratorRange(-topIRange, topIRange);
     btmHwAngleVelPID.setIZone(25.0);
@@ -111,7 +117,6 @@ public class GroundIntake extends SubsystemBase {
   
    
     // configure wheel motor
-
     wheelMtr_cfg = new SparkMaxConfig();
     wheelMtr_cfg.inverted(false)
         .idleMode(IdleMode.kBrake)
@@ -137,6 +142,11 @@ public class GroundIntake extends SubsystemBase {
     setSetpoint(currentPos); // changes setpoints
 
     this.new GroundIntakeWatcher();
+
+    //testing PIDF smartdashboard stuff
+    topHwAngleVelPID.setName("topGndIn");
+   
+
   }
 
   public void setSetpoint(Position cmd) {
@@ -148,8 +158,22 @@ public class GroundIntake extends SubsystemBase {
     topServo.setArbFeedforward(0.0);
     btmServo.setArbFeedforward(0.0);
     topServo.setSetpoint(top + holdOffset);
+    //track our targets for trimChange
+    this.top_cmd = top;
+    this.btm_cmd = btm;
+
+    double trimedTop = topTrim.getValue(top) + holdOffset;  // testing trim api
+    topServo.setSetpoint(trimedTop);
     btmServo.setSetpoint(btm);
   }
+
+  // on a trim change, adjust the cmds
+  // Returns bool because Void type seems bugged.
+  Boolean trimChange() {
+    setSetpoint(top_cmd, btm_cmd);
+    return true;
+  }
+
 
   public void debugBtmVelocity(double dir) {    
     double aff = 0.0;
@@ -291,6 +315,9 @@ public class GroundIntake extends SubsystemBase {
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
 
+      //call the pidf update so we can edit pids
+      topHwAngleVelPID.NT_update();
+      btmHwAngleVelPID.NT_update();  // must setup name - testing no-op 
     }
   } 
 
