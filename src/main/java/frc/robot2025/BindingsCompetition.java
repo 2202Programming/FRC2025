@@ -16,6 +16,7 @@ import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Wrist;
 
@@ -38,29 +39,28 @@ public final class BindingsCompetition {
         if (generic_driver instanceof TMJoystickController) {
             // Joystick
             @SuppressWarnings("unused")
-            TMJoystickController joystick = (TMJoystickController)generic_driver;
+            TMJoystickController joystick = (TMJoystickController) generic_driver;
 
             // put Driver's joystick bindings here
 
-        } 
-        else if (generic_driver instanceof CommandXboxController) {
+        } else if (generic_driver instanceof CommandXboxController) {
             // XBox
-            CommandXboxController driver = (CommandXboxController)generic_driver;
+            CommandXboxController driver = (CommandXboxController) generic_driver;
             driver.rightTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
-           // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
+            // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4,
+            // Tag_Pose.ID7));
 
-           // Driver will wants precision/ throttle drive on left trigger, end effector centric drive on right trigger
-           // also wants y to be field centric on true? couldnt tell you why
+            // Driver will wants precision/ throttle drive on left trigger, end effector
+            // centric drive on right trigger
+            // also wants y to be field centric on true? couldnt tell you why
             driver.leftTrigger().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.3),
-                    new RobotCentricDrive(drivetrain, dc)) );
-        }
-        else {
-            DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
+                    new RobotCentricDrive(drivetrain, dc)));
+        } else {
+            DriverStation.reportWarning("Comp Bindings: No driver bindings set, check controllers.", false);
         }
     }
-
 
     static void OperatorBindings(HID_Subsystem dc) {
         @SuppressWarnings("unused")
@@ -68,57 +68,60 @@ public final class BindingsCompetition {
         var generic_opr = dc.Operator();
         final Elevator_Subsystem elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
 
-        //buttons depend on what controller is plugged in
+        // buttons depend on what controller is plugged in
         if (generic_opr instanceof CommandXboxController) {
 
-            CommandXboxController operator = (CommandXboxController)generic_opr;
+            CommandXboxController operator = (CommandXboxController) generic_opr;
 
             operator.a().whileTrue(new PickupSequence("coral"));
             operator.b().whileTrue(new PlaceSequence("coral")); // l1 place
             operator.x().whileTrue(new PickupSequence("algae"));
             operator.y().whileTrue(new PlaceSequence("algae"));
 
-            //TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready. 
-            operator.povDown().onTrue(new InstantCommand(() -> {elevator.setHeight(46.25); // l2
+            // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
+            operator.povDown().onTrue(new InstantCommand(() -> {
+                elevator.setHeight(46.25); // l2
             })); // seriously, tell me once its changed
-            operator.povLeft().onTrue(new InstantCommand(() -> {elevator.setHeight(87.25); // l3
+            operator.povLeft().onTrue(new InstantCommand(() -> {
+                elevator.setHeight(87.25); // l3
             }));
-            //TODO change value once mechanical adds more height
-            operator.povUp().onTrue(new InstantCommand(() -> {elevator.setHeight(152.0);
+            // TODO change value once mechanical adds more height
+            operator.povUp().onTrue(new InstantCommand(() -> {
+                elevator.setHeight(152.0);
             }));
 
-            //TODO change to rpm, i just plucked these values off so i have no clue if they're viable -er
-            operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
-            operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
-            if(RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
+            if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 operator.a().whileTrue(new PickupSequence("coral"));
                 operator.b().whileTrue(new PlaceSequence("coral"));
                 operator.x().whileTrue(new PickupSequence("algae"));
                 operator.y().whileTrue(new PlaceSequence("algae"));
             }
-            if(RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
-                /* From drive team
-                operator.povUp().onTrue();//high
-                operator.povLeft().onTrue();//mid
-                operator.povDown().onTrue();//low
-                operator.povRight().onTrue();//intake height
-                */
+            if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
+                /*
+                 * From drive team
+                 * operator.povUp().onTrue(); //high
+                 * operator.povLeft().onTrue(); //mid
+                 * operator.povDown().onTrue(); //low
+                 * operator.povRight().onTrue(); //intake height
+                 */
             }
-            if(RobotContainer.getSubsystemOrNull("endEffectorSubsystem") != null) {
-                operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+            if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
+                // TODO change to rpm, i just plucked these values off so i have no clue if
+                // they're viable -er
+                operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
                 operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
             }
-            if(RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
+            if (RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
 
             }
         }
 
         else {
-            DriverStation.reportWarning("Bindings: No operator bindings set, check controllers.", false);
+            DriverStation.reportWarning("Comp Bindings: No operator bindings set, check controllers.", false);
         }
-        
+
         // Switchboard buttons too
-        
+
         // Calibration commands
 
     }

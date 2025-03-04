@@ -19,7 +19,7 @@ public class EndEffectorPercent extends Command {
     this(percent, "default button");
   }
   public EndEffectorPercent(double percent, String label) {
-    endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
+    endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     this.label=label;
     this.percent=percent;
     SmartDashboard.putNumber("End Effector Motor Percent "+ label, percent);

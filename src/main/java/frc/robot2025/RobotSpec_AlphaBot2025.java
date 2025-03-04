@@ -14,15 +14,12 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
-import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.FieldCentricDrive;
-import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
@@ -75,7 +72,6 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight", ()-> {
-
         // Limelight position in robot coords - this has LL in the front of bot
         Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
           new Rotation3d(0.0, 30.0/DEGperRAD, 0.0));
@@ -95,11 +91,11 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
       })
-      .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
       .add(Wrist.class)
       .add(SignalLight.class, "signal")
+      .add(EndEffector_Subsystem.class)
       .add(Command.class, "endEffectorWatcher", () -> {
-        return ((EndEffector_Subsystem)RobotContainer.getSubsystem("endEffectorSubsystem")).getWatcher();
+        return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
       })
       .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
       ;
@@ -195,13 +191,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       PathfindingCommand.warmupCommand().schedule();
     }
     
-    // Minimal commands to drive, if we have the usual xbox controller
-    CommandXboxController driver = (CommandXboxController) dc.Driver();
-    if (driver != null) {
-      driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
-      driver.y().onTrue(new AllianceAwareGyroReset(true));
-    }
-    // Rest of the competition bindings
+    // Competition bindings
     BindingsCompetition.ConfigureCompetition(dc);
     //BindingsOther.ConfigureOther(dc);  TODO - are these set yet, please review
 
