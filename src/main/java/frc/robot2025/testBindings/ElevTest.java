@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
-import frc.robot2025.commands.ClimberSetPos;
+import frc.robot2025.commands.ClimberPosition;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
@@ -21,7 +21,7 @@ public class ElevTest {
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
 
-        opr.y().onTrue(new ClimberSetPos(0.0));
+        opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(50.0);
         // }));

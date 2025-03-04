@@ -23,7 +23,7 @@ public class Climber extends SubsystemBase {
 ClimberWatcherCmd watcher;
 
   // Motor settings for Servo
-  final int STALL_CURRENT = 20;
+  final int STALL_CURRENT = 40;
   final int FREE_CURRENT = 40;
   final boolean motor_inverted = true;
   // Servo speed/positions
@@ -85,6 +85,10 @@ ClimberWatcherCmd watcher;
     return cmdVel;
   }
 
+  public boolean atSetpoint(){
+    return servo.atSetpoint();
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -111,7 +115,6 @@ ClimberWatcherCmd watcher;
       nt_cmdVelocity = table.getEntry("cmdVelocity");
       nt_measVelocity = table.getEntry("measVelocity");
       nt_measPosition = table.getEntry("measPosition");
-
       nt_cmdPosition = table.getEntry("cmdPosition");
     }
 
