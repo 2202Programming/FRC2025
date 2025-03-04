@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.6384333846228465,
-        "y": 1.241026380152094
+        "x": 6.623959291635754,
+        "y": 1.2091969547828672
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 2.6501498287671232
       },
       "prevControl": {
-        "x": 5.835118827367491,
-        "y": 1.9349898203991545
+        "x": 5.844925919844079,
+        "y": 1.9541832567283328
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -149.03624346792645
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "Starting To Reef Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -89.4545785055121
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

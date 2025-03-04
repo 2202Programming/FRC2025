@@ -5,15 +5,28 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "P1 to Tags 11 or 20 Left"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "P1 to Tags 11 or 20 Left"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "L3Place"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 3.0
+            "name": "Release"
           }
         },
         {
