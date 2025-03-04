@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
@@ -40,29 +38,16 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.GroundIntake.PickupSequence;
-import frc.robot2025.commands.GroundIntake.PlaceSequence;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
-import frc.robot2025.commands.GroundIntake.Debug.SetZero;
-import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.TopHold;
 import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
+import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.Wrist;
-import frc.robot2025.testBindings.DPLPathBindings;
 import frc.robot2025.utils.UXTrim;
-import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
-
-  
-
 
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "03282B65"
@@ -80,7 +65,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
-      // .add(GroundIntake.class)
+      .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
       .add(Command.class, "ElevatorWatcher", () -> {
        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
@@ -113,11 +98,10 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
       .add(Wrist.class)
       .add(SignalLight.class, "signal")
-      ;
       .add(Command.class, "endEffectorWatcher", () -> {
         return ((EndEffector_Subsystem)RobotContainer.getSubsystem("endEffectorSubsystem")).getWatcher();
       })
-      //.add(Wrist.class) TODO add once liner actuator is added
+      .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
       ;
 
   // Robot Speed Limits
@@ -200,115 +184,44 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public void setBindings() {
-    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
-    
-    // Select either comp or other for testing
-    BindingsCompetition.ConfigureCompetition(dc);
-
-    //Place your test binding in ./testBinding/<yourFile>.java and call it here
-    //comment out any conflicting bindings. Try not to push with your bindings
-    //active. Just comment them out.
-    DPLPathBindings.myBindings(dc);  //DPL testing LL and odometry stuff.
-
-    // Initialize PathPlanner, if we have the needed SS.
-    // velocity commands for calibration
-    operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
-    operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
-    operator.povRight().whileTrue(new TopArmFwd(30.0));
-    operator.povLeft().whileTrue(new TopArmFwd(-30.0));
-
-    operator.povUp().onTrue(new BtmArmRelPos(0.0));
-    operator.povDown().onTrue(new SetZero()); // should be bound to an actual button but we dont have room rn -er
-    operator.rightTrigger().whileTrue(new TopHold(5.0));
-
-    // real pickup and place sequences
-    operator.x().whileTrue(new PickupSequence("a"));
-    operator.y().whileTrue(new PlaceSequence("a", -15.0)); //speed is slower than expected??
-    operator.a().whileTrue(new PickupSequence("c"));
-    operator.b().whileTrue(new PlaceSequence("c", -10.0));
-
-    // Initialize PathPlanner
+    // SS we need to test
     OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
     DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
+    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
+
+    // Initialize PathPlanner, if we have needed Subsystems
     if (odo != null && sdt != null) {
       AutoPPConfigure.configureAutoBuilder(sdt, odo);
       PathfindingCommand.warmupCommand().schedule();
     }
+    
+    // Minimal commands to drive, if we have the usual xbox controller
+    CommandXboxController driver = (CommandXboxController) dc.Driver();
+    if (driver != null) {
+      driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
+      driver.y().onTrue(new AllianceAwareGyroReset(true));
+    }
+    // Rest of the competition bindings
+    BindingsCompetition.ConfigureCompetition(dc);
+    //BindingsOther.ConfigureOther(dc);  TODO - are these set yet, please review
 
-  //   // start anyting else
-  //   new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
-  // }
+    // Place your test binding in ./testBinding/<yourFile>.java and call it here
+    // comment out any conflicting bindings. Try not to push with your bindings
+    // active. Just comment them out.
+    //DPLPathTest.myBindings(dc); 
+    //ElevTest.myBindings(dc);
+    //EndEffectorTest.myBindings(dc);
+    //GITest.myBindings(dc);
+
+    // FOR BOT ON BOARD you can configure bindings directly here
+    // or create a binding file in ./testBindings/BotOnBoard<N>.java
+
+  }
 
   @Override
   public boolean burnFlash() {
     return true;
   }
-
- @Override
-  public void setBindings() {
-    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
-    if (dc.Driver() instanceof CommandPS4Controller) {
-      // CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
-
-      // opp.square().onTrue(new WristToPos(1.0));
-      // opp.triangle().onTrue(new WristToPos(0.0));
-      // opp.cross().onTrue(new WristToPos(0.5));
-    } else {
-      CommandXboxController driver = (CommandXboxController)dc.Driver();
-      CommandXboxController opp = (CommandXboxController)dc.Operator();
-      OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
-      DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
-      if (odo != null && sdt != null) {
-      AutoPPConfigure.configureAutoBuilder(sdt, odo);
-      }
-                  driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
-            driver.y().onTrue(new AllianceAwareGyroReset(true));
-      final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-      opp.x().whileTrue(new testElevatorVelComd(30.0));
-      opp.a().onTrue(new ElevatorCalibrate(-30.0));
-
-      opp.y().onTrue(new ClimberSetPos(0.0));
-      // opp.b().onTrue(new InstantCommand(() -> {
-      //   elevator_Subsystem.setHeight(50.0);
-      // }));
-      // opp.a().onTrue(new InstantCommand(() -> {
-      //   elevator_Subsystem.setHeight(90.0);
-      // }));
-      opp.povDown().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(46.0);
-      }));
-      opp.povLeft().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(86.0);
-      }));
-      opp.povRight().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(0.0);
-      }));
-      // opp.rightTrigger().onTrue(new InstantCommand(() -> {
-      //   elevator_Subsystem.setHeight(75.0);
-      // }));
-      opp.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")); //reverse
-      opp.rightTrigger().whileTrue(new EndEffectorPercent(.3, "rightTrigger"));
-      //for end effector
-      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
-      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
-      
-      // opp.x().whileTrue(new backupEE_Move(1000.0));
-
-      // TODO add once liner actuator is added
-      // opp.x().onTrue(new WristToPos(1.0, "x"));
-      // opp.y().onTrue(new WristToPos(0.0, "y"));
-      // opp.a().onTrue(new WristToPos(0.5, "a"));
-    }
-
-    
-
-    // FOR BOT ON BOARD you can configure bindings directly here
-    // and avoid messing with BindingsOther or Comp.
-
-    //BindingsOther.ConfigureOther(dc);
-  }
-
-
 
   @Override
   public SendableChooser<Command> getRegisteredCommands() {

@@ -12,7 +12,7 @@ import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.subsystems.SignalLight;
 
-public final class DPLPathBindings {
+public final class DPLPathTest {
 
     static OdometryInterface odo;
     static DriveTrainInterface sdt;
@@ -37,22 +37,23 @@ public final class DPLPathBindings {
     static void xboxOperator(CommandXboxController opr) {
         // test moveToPose
         opr.povUp().onTrue(new InstantCommand(() -> {
-            Pose2d currentPose = odo.getPose();         //field coords
+            Pose2d currentPose = odo.getPose(); // field coords
             // add 1m forward, field not robot.
             Pose2d target = new Pose2d(currentPose.getX() + 1.0,
                     currentPose.getY(), currentPose.getRotation());
-            //force a color
-            if (signal != null) signal.setLight(SignalLight.Color.BLUE);
-             // calc path
-            Command cmd =  new MoveToPose(target);
+            // force a color
+            if (signal != null)
+                signal.setLight(SignalLight.Color.BLUE);
+            // calc path
+            Command cmd = new MoveToPose(target);
             // turn signal off after our move, if we have a signal object
             if (signal != null)
-                cmd =  cmd.andThen(signal.getColorCommand(SignalLight.Color.OFF));
+                cmd = cmd.andThen(signal.getColorCommand(SignalLight.Color.OFF));
             cmd.schedule();
         }));
 
-        opr.leftStick().whileTrue(new DriveToReefTag("l") );
-        opr.rightStick().whileTrue(new DriveToReefTag("r") );
+        opr.leftStick().whileTrue(new DriveToReefTag("l"));
+        opr.rightStick().whileTrue(new DriveToReefTag("r"));
     }
 
 }
