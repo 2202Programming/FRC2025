@@ -22,6 +22,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.ElevatorCalibrate;
+import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
@@ -29,7 +30,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "032381BF"
-  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
+  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "temp")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -114,10 +115,12 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       // opp.triangle().onTrue(new WristToPos(0.0));
       // opp.cross().onTrue(new WristToPos(0.5));
     } else {
-      CommandXboxController opp = (CommandXboxController)dc.Driver();
+      @SuppressWarnings("unused")
+      CommandXboxController driver = (CommandXboxController)dc.Driver();
+      CommandXboxController opp = (CommandXboxController)dc.Operator();
       final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
       opp.x().whileTrue(new testElevatorVelComd(30.0));
-      opp.rightBumper().onTrue(new ElevatorCalibrate(-70.0));
+      opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
       opp.y().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(0.0);
       }));
@@ -133,9 +136,15 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       opp.leftTrigger().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(148.0);
       }));
-      opp.rightTrigger().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(75.0);
-      }));
+      // opp.rightTrigger().onTrue(new InstantCommand(() -> {
+      //   elevator_Subsystem.setHeight(75.0);
+      // }));
+      opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
+      //for end effector
+      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
+      
       // opp.x().whileTrue(new backupEE_Move(1000.0)); 
     }
 

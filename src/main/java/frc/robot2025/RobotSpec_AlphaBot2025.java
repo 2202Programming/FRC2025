@@ -10,13 +10,17 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
+import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.FieldCentricDrive;
+import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
@@ -45,6 +49,8 @@ import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
@@ -63,10 +69,13 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
-      .add(GroundIntake.class)
+      // .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
-      // Sensors, limelight and drivetrain all use interfaces, so make sure their
-      // alias names
+      .add(Command.class, "ElevatorWatcher", () -> {
+       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
+      })
+
+      // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight")
@@ -85,7 +94,11 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return new DTMonitorCmd();
       })
       .add(EndEffector_Subsystem.class, "endEffectorSubsystem")
-      .add(Wrist.class);
+      .add(Command.class, "endEffectorWatcher", () -> {
+        return ((EndEffector_Subsystem)RobotContainer.getSubsystem("endEffectorSubsystem")).getWatcher();
+      })
+      //.add(Wrist.class) TODO add once liner actuator is added
+      ;
 
   boolean swerve = true;
 
@@ -191,14 +204,80 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       AutoPPConfigure.configureAutoBuilder(sdt, odo);
     }
 
-    // start anyting else
-    new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
-  }
+  //   // start anyting else
+  //   new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
+  // }
 
   @Override
   public boolean burnFlash() {
     return true;
   }
+
+ @Override
+  public void setBindings() {
+    HID_Subsystem dc = RobotContainer.getSubsystem("DC");
+    if (dc.Driver() instanceof CommandPS4Controller) {
+      // CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
+
+      // opp.square().onTrue(new WristToPos(1.0));
+      // opp.triangle().onTrue(new WristToPos(0.0));
+      // opp.cross().onTrue(new WristToPos(0.5));
+    } else {
+      CommandXboxController driver = (CommandXboxController)dc.Driver();
+      CommandXboxController opp = (CommandXboxController)dc.Operator();
+      OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
+      DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
+      if (odo != null && sdt != null) {
+      AutoPPConfigure.configureAutoBuilder(sdt, odo);
+      }
+                  driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
+            driver.y().onTrue(new AllianceAwareGyroReset(true));
+      final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+      opp.x().whileTrue(new testElevatorVelComd(30.0));
+      opp.a().onTrue(new ElevatorCalibrate(-30.0));
+
+      opp.y().onTrue(new ClimberSetPos(0.0));
+      // opp.b().onTrue(new InstantCommand(() -> {
+      //   elevator_Subsystem.setHeight(50.0);
+      // }));
+      // opp.a().onTrue(new InstantCommand(() -> {
+      //   elevator_Subsystem.setHeight(90.0);
+      // }));
+      opp.povDown().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(46.0);
+      }));
+      opp.povLeft().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(86.0);
+      }));
+      opp.povRight().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(0.0);
+      }));
+      // opp.rightTrigger().onTrue(new InstantCommand(() -> {
+      //   elevator_Subsystem.setHeight(75.0);
+      // }));
+      opp.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")); //reverse
+      opp.rightTrigger().whileTrue(new EndEffectorPercent(.3, "rightTrigger"));
+      //for end effector
+      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
+      
+      // opp.x().whileTrue(new backupEE_Move(1000.0));
+
+      // TODO add once liner actuator is added
+      // opp.x().onTrue(new WristToPos(1.0, "x"));
+      // opp.y().onTrue(new WristToPos(0.0, "y"));
+      // opp.a().onTrue(new WristToPos(0.5, "a"));
+    }
+
+    
+
+    // FOR BOT ON BOARD you can configure bindings directly here
+    // and avoid messing with BindingsOther or Comp.
+
+    //BindingsOther.ConfigureOther(dc);
+  }
+
+
 
   @Override
   public SendableChooser<Command> getRegisteredCommands() {

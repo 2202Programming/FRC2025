@@ -74,17 +74,17 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final double stagesRatio = 1.0;   // [out/in] 
   // cf_spec - TODO not used yet, should workout to what was measured/corrected
   public final double cf_spec = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI * sprocket_circumference ;
-  public final double cf = 8.9026;  //[cm/mtr-rot]  // ad-hoc measured 2/17/25, 12.627857 bfre
+  public final double cf = 8.75;  // 8.9026[cm/mtr-rot]  // ad-hoc measured 2/17/25, 12.627857 bfre
  
   
   public Elevator_Subsystem() {
     //init pid constant holders
     //software position pid - run in servo's periodic to control elevator position
-    positionPid = new PIDController(9.0, 0.1, 0.0);
-    positionPid.setIZone(500.0);
+    positionPid = new PIDController(7.0, 0.0005, 0.004);
+    positionPid.setIZone(3.0);
     //hardware velocity pidf - holds values to send to hw, not actually run825
-    velocityPid = new PIDFController(0.001, 0.000001, 0.0000, 1.0/1000.0); //1.0/800 before, 565 is vortex Kv
-    velocityPid.setIZone(500.0); //TODO: set this once value has been found, if KI is used
+    velocityPid = new PIDFController(0.0008, 0.00001, 0.0000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
+    velocityPid.setIZone(20.0); //TODO: set this once value has been found, if KI is used
     
     //devices 
     servo = new NeoServo(CAN.ELEVATOR_MAIN, positionPid, velocityPid, motors_inverted, SparkFlex.class);
@@ -156,6 +156,13 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
 
   public void setHeight (double height) {
+    if (height > getPosition()) {
+      servo.setMaxVelocity(100.0);
+      servo.setArbFeedforward(0.02);
+    }
+    else {  
+      servo.setMaxVelocity(80.0);
+    }
     servo.setSetpoint(height); 
   }
 
@@ -175,7 +182,7 @@ public class Elevator_Subsystem extends SubsystemBase {
       servo.setArbFeedforward(0.02);
     }
     else {  
-      servo.setArbFeedforward(0.005);
+      servo.setArbFeedforward(0.001);
     }
     servo.setVelocityCmd(vel);
   }

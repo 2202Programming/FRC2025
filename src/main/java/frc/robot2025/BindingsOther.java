@@ -3,6 +3,7 @@ package frc.robot2025;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
@@ -11,7 +12,12 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorMove;
 import frc.robot2025.commands.testElevatorVelComd;
+import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.commands.ElevatorCalibrate;
+import frc.robot2025.commands.testElevatorVelComd;
+import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.Sensors_Subsystem;
 
 /**
  * NOAH COMMENTS ON TESTING ELEVATOR AND END EFFECTOR FOR 2/22
@@ -37,7 +43,7 @@ public class BindingsOther {
         DriveTest, ElevatorTesting
     }
 
-    static Bindings bindings = Bindings.DriveTest;
+    static Bindings bindings = Bindings.ElevatorTesting;
 
     public static void ConfigureOther(HID_Subsystem dc) {
         DriverBinding(dc);
@@ -78,11 +84,27 @@ public class BindingsOther {
 
         switch (bindings) {
             case ElevatorTesting:
-                ((CommandXboxController) operator).x().whileTrue(new testElevatorVelComd(2430.0));
-                ((CommandXboxController) operator).a().whileTrue(new testElevatorVelComd(100.0));
-                ((CommandXboxController) operator).y().whileTrue(new testElevatorVelComd(-2430.0));
-                ((CommandXboxController) operator).b().onTrue(new ElevatorMove(Levels.Ground));
-                ((CommandXboxController) operator).rightTrigger().onTrue(new ElevatorMove(Levels.LCoral));
+                final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+      operator.x().whileTrue(new testElevatorVelComd(30.0));
+      operator.rightBumper().onTrue(new ElevatorCalibrate(-70.0));
+      operator.y().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(0.0);
+      }));
+      operator.b().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(50.0);
+      }));
+      operator.a().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(90.0);
+      }));
+      operator.leftBumper().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(110.0);
+      }));
+      operator.leftTrigger().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(148.0);
+      }));
+      operator.rightTrigger().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(75.0);
+      }));
             default:
                 break;
         }

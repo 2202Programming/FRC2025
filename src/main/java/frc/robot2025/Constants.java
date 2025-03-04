@@ -42,7 +42,7 @@ public final class Constants {
     public static final int ELEVATOR_MAIN = 40; //placeholder
     public static final int ELEVATOR_FOLLOW = 41; //placeholder
     public static final int WRIST = 38; //placeholder
-    public static final int END_EFFECTOR = 39; //placeholder
+    public static final int END_EFFECTOR = 43; //placeholder
 
     // DT
     // synced as of 1/25/25 

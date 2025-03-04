@@ -4,6 +4,7 @@
 
 package frc.robot2025.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Wrist;
@@ -14,15 +15,22 @@ import frc.robot2025.subsystems.Wrist;
 public class WristToPos extends InstantCommand {
   Wrist servo = RobotContainer.getSubsystem(Wrist.class);
   double pos;
+  String label;
 
   public WristToPos(double pos) {
+    this(pos, "");
+  }
+  public WristToPos(double pos, String label) {
     this.pos = pos;
+    this.label = label;
+    SmartDashboard.putNumber("WristToPos button "+ label, pos);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    servo.setPos(pos);
+    //servo.setPos(pos);
+    servo.setPos(SmartDashboard.getNumber("WristToPos button "+ label, pos));
   }
 }

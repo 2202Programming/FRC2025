@@ -9,9 +9,12 @@ import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
+import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
+import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
+import frc.robot2025.subsystems.Wrist;
 
 /*
  * Please don't edit this without leads/mentor/driveteam review
@@ -55,8 +58,7 @@ public final class BindingsCompetition {
         var generic_opr = dc.Operator();
 
         //buttons depend on what controller is plugged in
-        if (generic_opr instanceof CommandXboxController) {
-            CommandXboxController operator = (CommandXboxController)generic_opr;
+        if (generic_opr instanceof CommandXboxController operator) {
 
             if(RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 operator.a().whileTrue(new PickupSequence("coral"));
@@ -64,7 +66,23 @@ public final class BindingsCompetition {
                 operator.x().whileTrue(new PickupSequence("algae"));
                 operator.y().whileTrue(new PlaceSequence("algae"));
             }
+            if(RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
+                /* From drive team
+                operator.povUp().onTrue();//high
+                operator.povLeft().onTrue();//mid
+                operator.povDown().onTrue();//low
+                operator.povRight().onTrue();//intake height
+                */
+            }
+            if(RobotContainer.getSubsystemOrNull("endEffectorSubsystem") != null) {
+                operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+                operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
+            }
+            if(RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
+
+            }
         }
+
         else {
             DriverStation.reportWarning("Bindings: No operator bindings set, check controllers.", false);
         }
