@@ -91,8 +91,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Command.class, "endEffectorWatcher", () -> {
         return ((EndEffector_Subsystem)RobotContainer.getSubsystem("endEffectorSubsystem")).getWatcher();
       })
+      //.add(Wrist.class) TODO add once liner actuator is added
       ;
-      // .add(Wrist.class);
 
   boolean swerve = true;
 
@@ -240,7 +240,12 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
       //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
       
-      // opp.x().whileTrue(new backupEE_Move(1000.0)); 
+      // opp.x().whileTrue(new backupEE_Move(1000.0));
+
+      // TODO add once liner actuator is added
+      // opp.x().onTrue(new WristToPos(1.0, "x"));
+      // opp.y().onTrue(new WristToPos(0.0, "y"));
+      // opp.a().onTrue(new WristToPos(0.5, "a"));
     }
 
     
