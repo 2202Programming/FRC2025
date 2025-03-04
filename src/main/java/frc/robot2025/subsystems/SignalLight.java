@@ -15,13 +15,13 @@ public class SignalLight {
 
     public enum Color {   //TODO name these to match what we get.
         OFF(0),
-        C1(1),
-        C2(2),
-        C3(3),
-        C4(4),
-        C5(5),
-        C6(6),
-        C7(7);
+        GREEN(1),
+        BLUE(2),
+        TURQUOISE(3),
+        RED(4),
+        YELLOW(5),
+        MAGENTA(6),
+        WHITE(7);
 
         final private int color;
         Color(int b) {

@@ -42,7 +42,7 @@ public final class DPLPathBindings {
             Pose2d target = new Pose2d(currentPose.getX() + 1.0,
                     currentPose.getY(), currentPose.getRotation());
             //force a color
-            if (signal != null) signal.setLight(SignalLight.Color.C1);
+            if (signal != null) signal.setLight(SignalLight.Color.BLUE);
              // calc path
             Command cmd =  new MoveToPose(target);
             // turn signal off after our move, if we have a signal object
