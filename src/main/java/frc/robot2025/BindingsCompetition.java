@@ -1,6 +1,8 @@
 package frc.robot2025;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
@@ -10,8 +12,10 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.EndEffectorPercent;
+import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
+import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Wrist;
@@ -19,6 +23,7 @@ import frc.robot2025.subsystems.Wrist;
 /*
  * Please don't edit this without leads/mentor/driveteam review
  */
+
 public final class BindingsCompetition {
 
     public static void ConfigureCompetition(HID_Subsystem dc) {
@@ -45,6 +50,12 @@ public final class BindingsCompetition {
             driver.rightTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
            // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
+
+           // Driver will wants precision/ throttle drive on left trigger, end effector centric drive on right trigger
+           // also wants y to be field centric on true? couldnt tell you why
+            driver.leftTrigger().whileTrue(new ParallelCommandGroup(
+                    new ScaleDriver(0.3),
+                    new RobotCentricDrive(drivetrain, dc)) );
         }
         else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
@@ -56,10 +67,30 @@ public final class BindingsCompetition {
         @SuppressWarnings("unused")
         var sideboard = dc.SwitchBoard();
         var generic_opr = dc.Operator();
+        final Elevator_Subsystem elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
 
         //buttons depend on what controller is plugged in
-        if (generic_opr instanceof CommandXboxController operator) {
+        if (generic_opr instanceof CommandXboxController) {
 
+            CommandXboxController operator = (CommandXboxController)generic_opr;
+
+            operator.a().whileTrue(new PickupSequence("coral"));
+            operator.b().whileTrue(new PlaceSequence("coral")); // l1 place
+            operator.x().whileTrue(new PickupSequence("algae"));
+            operator.y().whileTrue(new PlaceSequence("algae"));
+
+            //TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready. 
+            operator.povDown().onTrue(new InstantCommand(() -> {elevator.setHeight(46.25); // l2
+            })); // seriously, tell me once its changed
+            operator.povLeft().onTrue(new InstantCommand(() -> {elevator.setHeight(87.25); // l3
+            }));
+            //TODO change value once mechanical adds more height
+            operator.povUp().onTrue(new InstantCommand(() -> {elevator.setHeight(152.0);
+            }));
+
+            //TODO change to rpm, i just plucked these values off so i have no clue if they're viable -er
+            operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+            operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
             if(RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 operator.a().whileTrue(new PickupSequence("coral"));
                 operator.b().whileTrue(new PlaceSequence("coral"));
