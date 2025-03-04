@@ -114,11 +114,13 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
         CommandXboxController operator = (CommandXboxController) dc.Operator();
         // keep for testing purposes -er
+
         operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
         operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
         operator.povRight().whileTrue(new TopArmFwd(30.0));
         operator.povLeft().whileTrue(new TopArmFwd(-30.0));
         operator.a().onTrue(new BtmArmRelPos(0.0));
+        
         operator.b().onTrue(new SetZero());
         operator.rightTrigger().whileTrue(new TopHold(5.0));
         // testing real commands -er

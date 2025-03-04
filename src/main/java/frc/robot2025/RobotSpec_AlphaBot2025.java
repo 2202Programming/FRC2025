@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
@@ -31,6 +32,13 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.GroundIntake.PickupSequence;
+import frc.robot2025.commands.GroundIntake.PlaceSequence;
+import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
+import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
+import frc.robot2025.commands.GroundIntake.Debug.SetZero;
+import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
+import frc.robot2025.commands.GroundIntake.Debug.TopHold;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
@@ -57,14 +65,15 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       })
       .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
-      // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
+      // Sensors, limelight and drivetrain all use interfaces, so make sure their
+      // alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight")
-      .add(SwerveDrivetrain.class, "drivetrain", () ->{
-          return new SwerveDrivetrain(SparkFlex.class);
+      .add(SwerveDrivetrain.class, "drivetrain", () -> {
+        return new SwerveDrivetrain(SparkFlex.class);
       })
-      .add(OdometryInterface.class, "odometry", () ->{
+      .add(OdometryInterface.class, "odometry", () -> {
         var obj = new Odometry();
         obj.new OdometryWatcher();
         return obj;
@@ -153,12 +162,27 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public void setBindings() {
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
+    CommandXboxController operator = (CommandXboxController) dc.Operator();
 
-    // TODO - figure better way to handle bindings
-    
     // Select either comp or other for testing
-    BindingsCompetition.ConfigureCompetition(dc);
-    //BindingsOther.ConfigureOther(dc);
+    // BindingsCompetition.ConfigureCompetition(dc);
+    // BindingsOther.ConfigureOther(dc);
+
+    // velocity commands for calibration
+    operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
+    operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
+    operator.povRight().whileTrue(new TopArmFwd(30.0));
+    operator.povLeft().whileTrue(new TopArmFwd(-30.0));
+
+    operator.povUp().onTrue(new BtmArmRelPos(0.0));
+    operator.povDown().onTrue(new SetZero()); // should be bound to an actual button but we dont have room rn -er
+    operator.rightTrigger().whileTrue(new TopHold(5.0));
+
+    // real pickup and place sequences
+    operator.x().whileTrue(new PickupSequence("a"));
+    operator.y().whileTrue(new PlaceSequence("a", -15.0)); //speed is slower than expected??
+    operator.a().whileTrue(new PickupSequence("c"));
+    operator.b().whileTrue(new PlaceSequence("c", -10.0));
 
     // Initialize PathPlanner
     OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");

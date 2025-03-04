@@ -26,7 +26,7 @@ public class PlaceSequence extends Command {
   final GroundIntake groundIntake;
   final Position place;
   final Position rest;
-  final BooleanSupplier  hasPiece;
+  final BooleanSupplier hasPiece;
   final double WheelSpeed;
   
   
@@ -51,7 +51,7 @@ public class PlaceSequence extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-     count = ejectingFrameCount;
+     count = ejectingFrameCount; // count to wait after eject
     if (hasPiece.getAsBoolean() ) {  // goes to position without ejecting
       groundIntake.setSetpoint(place);
       //groundIntake.setWheelSpeed(0.0);  should alrady be 0 or a hold cmd
@@ -68,8 +68,8 @@ public class PlaceSequence extends Command {
 
       case WaitForPlacePos:
         if (groundIntake.isAtSetpoint()) {
-          state = State.Eject; 
-          groundIntake.setWheelSpeed(WheelSpeed);      
+          groundIntake.setWheelSpeed(WheelSpeed);
+          state = State.Eject;       
         }
         break;
 

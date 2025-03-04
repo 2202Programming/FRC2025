@@ -73,6 +73,7 @@ public final class Constants {
   }
 
   public static final class AnalogIn {
+    
   }
 
   // pnumatics control module 1
@@ -84,6 +85,9 @@ public final class Constants {
   }
 
   public final class DigitalIO {
+    public static final int EndEffector_Lightgate = 2;
+    public static final int GroundIntakeHasCoral = 0; // limitswitch
+    public static final int GroundIntakeHasAlgae = 1; // lightgate
     //TODO - fix these values once wired TODO update/check with google docs
     public static final int GroundIntakeHasCoral = 0; 
     public static final int GroundIntakeHasAlgae = 1;
