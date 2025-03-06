@@ -223,10 +223,10 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       //   elevator_Subsystem.setHeight(90.0);
       // }));
       opp.povDown().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(46.0);
+        elevator_Subsystem.setHeight(42.0);
       }));
       opp.povLeft().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(86.0);
+        elevator_Subsystem.setHeight(83.0);
       }));
       opp.povRight().onTrue(new InstantCommand(() -> {
         elevator_Subsystem.setHeight(0.0);
