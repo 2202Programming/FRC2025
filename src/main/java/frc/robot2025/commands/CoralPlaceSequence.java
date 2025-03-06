@@ -11,20 +11,22 @@ import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Wrist;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class EE_Release extends Command {
+public class CoralPlaceSequence extends Command {
   /** Creates a new EE_Release. */
     final EndEffector_Subsystem ee_Subsystem;
     final Wrist wrist;
     final Elevator_Subsystem elevator_Subsystem;
+    double pos;
     enum Phase {
-      wristSet, Drop, wristReset, pickupPos, finished
+      moveElev, wristSet, Drop, wristReset, pickupPos, finished
     }
     Phase phase;
-  public EE_Release() {
+  public CoralPlaceSequence(double pos) {
     ee_Subsystem = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     wrist = RobotContainer.getSubsystem(Wrist.class);
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    phase = Phase.wristSet;
+    phase = Phase.moveElev;
+    this.pos = pos;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -41,6 +43,12 @@ public class EE_Release extends Command {
   @Override
   public void execute() {
     switch (phase){
+      case moveElev:
+      elevator_Subsystem.setHeight(pos);
+      if(elevator_Subsystem.atSetpoint()){
+        phase = Phase.wristSet;
+      }
+      break;
       case wristSet:
         wrist.setPos(wrist.drop);
         if(wrist.atSetpoint()){

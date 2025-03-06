@@ -7,10 +7,10 @@ import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
-import frc.robot2025.commands.ClimberPosition;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
+import frc.robot2025.commands.CoralPlaceSequence;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 
 public class ElevTest {
@@ -27,7 +27,9 @@ public class ElevTest {
         driver.y().onTrue(new AllianceAwareGyroReset(true));
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
-
+        opr.b().onTrue(new CoralPlaceSequence(42.0));
+        opr.b().onTrue(new CoralPlaceSequence(83.0));
+        
         // opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(50.0);

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
 import frc.robot2025.Constants.Tag_Pose;
-import frc.robot2025.commands.EE_Release;
+import frc.robot2025.commands.CoralPlaceSequence;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 
 /*
@@ -47,7 +47,7 @@ public class RegisteredCommands {
             elevator_Subsystem.setHeight(50.0);
         }));
         NamedCommands.registerCommand("Release", 
-            new EE_Release()
+            new CoralPlaceSequence(83.0)
         );
 
 
