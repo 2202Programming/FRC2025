@@ -149,30 +149,34 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   public ChassisConfig getChassisConfig() {
     return chassisConfig;
   }
-
-  //TODO rotate the chassis 90 so intake is front and pickup on back.
-  //(currently set to battery on back...)
   @Override
   public ModuleConfig[] getModuleConfigs() {
     ModuleConfig[] modules = new ModuleConfig[4];
-    modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle,
-        43.41759375)
+        // the rotation below was done and that's why the CAN IDs don't match what's in constants
+        //A rotation was done below and CAN IDs don't match other names - THIS IS OKAY, DO NOT CHANGE THEM -- DPL + BG
+        //FL -> BL
+        //FR -> FL
+        //BL -> BR
+        //BR -> FR
+
+        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
+        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,
+        -155.390531)
         .setInversions(false, true, false);
 
-    modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,
-        -66.2694375)
+        modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
+        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle,
+        24.873296)
         .setInversions(true, true, false);
 
-    modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,
-        49.482265625)
+        modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
+        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle,
+        133.153921)
         .setInversions(false, true, false);
 
-    modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle,
-        -66.005609375)
+        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
+        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,
+        -40.605625)
         .setInversions(true, true, false);
 
     return modules;

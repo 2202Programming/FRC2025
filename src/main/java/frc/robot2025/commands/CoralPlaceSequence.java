@@ -11,20 +11,22 @@ import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Wrist;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class EE_Release extends Command {
+public class CoralPlaceSequence extends Command {
   /** Creates a new EE_Release. */
     final EndEffector_Subsystem ee_Subsystem;
     final Wrist wrist;
     final Elevator_Subsystem elevator_Subsystem;
+    double pos;
     enum Phase {
-      wristSet, Drop, wristReset, pickupPos, finished
+      moveElev, wristSet, Drop, wristReset, pickupPos, finished
     }
     Phase phase;
-  public EE_Release() {
+  public CoralPlaceSequence(double pos) {
     ee_Subsystem = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     wrist = RobotContainer.getSubsystem(Wrist.class);
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    phase = Phase.wristSet;
+    phase = Phase.moveElev;
+    this.pos = pos;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -41,25 +43,36 @@ public class EE_Release extends Command {
   @Override
   public void execute() {
     switch (phase){
+      case moveElev:
+      System.out.println("phase1");
+      elevator_Subsystem.setHeight(pos);
+      if(elevator_Subsystem.atSetpoint()){
+        phase = Phase.wristSet;
+      }
+      break;
       case wristSet:
+      System.out.println("phase2");
         wrist.setPos(wrist.drop);
         if(wrist.atSetpoint()){
           phase = Phase.Drop;
         }
         break;
       case Drop:
+      System.out.println("phase3");
         ee_Subsystem.setPercent(-0.6);
         if(!ee_Subsystem.pieceReady()){
           phase = Phase.wristReset;
         }
         break;
       case wristReset:
+      System.out.println("phase4");
         wrist.setPos(wrist.pickup);
         if(wrist.atSetpoint()){
           phase = Phase.pickupPos;
         }
         break;
       case pickupPos:
+      System.out.println("phase5");
         elevator_Subsystem.setHeight(50.0);
         if(elevator_Subsystem.atSetpoint()){
           phase = Phase.finished;
