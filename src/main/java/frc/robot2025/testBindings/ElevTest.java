@@ -1,6 +1,7 @@
 package frc.robot2025.testBindings;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
@@ -10,6 +11,9 @@ import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
+import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
+import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
+import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.commands.CoralPlaceSequence;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 
@@ -27,8 +31,13 @@ public class ElevTest {
         driver.y().onTrue(new AllianceAwareGyroReset(true));
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
-        opr.b().onTrue(new CoralPlaceSequence(42.0));
-        opr.leftBumper().onTrue(new CoralPlaceSequence(83.0));
+        opr.b().onTrue(new SequentialCommandGroup (
+            new setElevatorSetpoint(83.0),
+            new setWristPos(true),
+            new ReleaseCoral(),
+            new setWristPos(false),
+            new setElevatorSetpoint(42.0)
+        ));
         
         // opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {
