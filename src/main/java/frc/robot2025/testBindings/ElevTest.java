@@ -28,7 +28,7 @@ public class ElevTest {
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
         opr.b().onTrue(new CoralPlaceSequence(42.0));
-        opr.b().onTrue(new CoralPlaceSequence(83.0));
+        opr.leftBumper().onTrue(new CoralPlaceSequence(83.0));
         
         // opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {

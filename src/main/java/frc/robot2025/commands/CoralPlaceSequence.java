@@ -44,30 +44,35 @@ public class CoralPlaceSequence extends Command {
   public void execute() {
     switch (phase){
       case moveElev:
+      System.out.println("phase1");
       elevator_Subsystem.setHeight(pos);
       if(elevator_Subsystem.atSetpoint()){
         phase = Phase.wristSet;
       }
       break;
       case wristSet:
+      System.out.println("phase2");
         wrist.setPos(wrist.drop);
         if(wrist.atSetpoint()){
           phase = Phase.Drop;
         }
         break;
       case Drop:
+      System.out.println("phase3");
         ee_Subsystem.setPercent(-0.6);
         if(!ee_Subsystem.pieceReady()){
           phase = Phase.wristReset;
         }
         break;
       case wristReset:
+      System.out.println("phase4");
         wrist.setPos(wrist.pickup);
         if(wrist.atSetpoint()){
           phase = Phase.pickupPos;
         }
         break;
       case pickupPos:
+      System.out.println("phase5");
         elevator_Subsystem.setHeight(50.0);
         if(elevator_Subsystem.atSetpoint()){
           phase = Phase.finished;
