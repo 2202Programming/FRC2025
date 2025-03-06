@@ -3,7 +3,10 @@ package frc.robot2025.testBindings;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
+import frc.lib2202.command.swerve.AllianceAwareGyroReset;
+import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ClimberPosition;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
@@ -13,15 +16,19 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 public class ElevTest {
     public static void myBindings(HID_Subsystem dc) {
         Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+        var generic_driver = dc.Driver();
+        DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
         // get an xbox controller for the operator, or null
         CommandXboxController opr = (dc.Operator() instanceof CommandXboxController)
                 ? (CommandXboxController) dc.Operator()
                 : null;
-
+        CommandXboxController driver = (CommandXboxController) generic_driver;
+        driver.rightTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
+        driver.y().onTrue(new AllianceAwareGyroReset(true));
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
 
-        opr.y().onTrue(new ClimberPosition(0.0));
+        // opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(50.0);
         // }));
@@ -29,10 +36,10 @@ public class ElevTest {
         // elevator_Subsystem.setHeight(90.0);
         // }));
         opr.povDown().onTrue(new InstantCommand(() -> {
-            elevator_Subsystem.setHeight(46.0);
+            elevator_Subsystem.setHeight(42.0);
         }));
         opr.povLeft().onTrue(new InstantCommand(() -> {
-            elevator_Subsystem.setHeight(86.0);
+            elevator_Subsystem.setHeight(83.0);
         }));
         opr.povRight().onTrue(new InstantCommand(() -> {
             elevator_Subsystem.setHeight(0.0);

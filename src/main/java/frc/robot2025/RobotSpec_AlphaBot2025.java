@@ -42,6 +42,7 @@ import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.testBindings.ElevTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -73,7 +74,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight", ()-> {
         // Limelight position in robot coords - this has LL in the front of bot
-        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
+        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, -0.21, .23,
           new Rotation3d(0.0, 30.0/DEGperRAD, 0.0));
         return new Limelight("limelight", LimelightPosition );
       })
@@ -192,14 +193,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     }
     
     // Competition bindings
-    BindingsCompetition.ConfigureCompetition(dc);
+    // BindingsCompetition.ConfigureCompetition(dc);
     //BindingsOther.ConfigureOther(dc);  TODO - are these set yet, please review
 
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
     //DPLPathTest.myBindings(dc); 
-    //ElevTest.myBindings(dc);
+    ElevTest.myBindings(dc);
     //EndEffectorTest.myBindings(dc);
     //GITest.myBindings(dc);
 
