@@ -160,23 +160,19 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         //BR -> FR
 
         modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,
-        -155.390531)
+        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle, -155.390531)
         .setInversions(false, true, false);
 
         modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle,
-        24.873296)
+        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle, 24.873296)
         .setInversions(true, true, false);
 
         modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle,
-        133.153921)
+        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle, 133.153921)
         .setInversions(false, true, false);
 
         modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,
-        -40.605625)
+        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,  -40.605625)
         .setInversions(true, true, false);
 
     return modules;
@@ -195,13 +191,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       PathfindingCommand.warmupCommand().schedule();
     }
     
-    // Competition bindings
+    // Competition bindings -  NOTE: OPR portion of comp binding disabled 
+    // until done with integration.
     BindingsCompetition.ConfigureCompetition(dc);
-    //BindingsOther.ConfigureOther(dc);  TODO - are these set yet, please review
-
+    
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
+    
     //DPLPathTest.myBindings(dc); 
     //ElevTest.myBindings(dc);
     //EndEffectorTest.myBindings(dc);
@@ -209,7 +206,6 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // or create a binding file in ./testBindings/BotOnBoard<N>.java
-
   }
 
   @Override

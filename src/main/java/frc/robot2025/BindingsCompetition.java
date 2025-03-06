@@ -28,7 +28,7 @@ public final class BindingsCompetition {
 
     public static void ConfigureCompetition(HID_Subsystem dc) {
         DriverBinding(dc);
-        OperatorBindings(dc);
+       // OperatorBindings(dc);  TODO Eable when done testing
     }
 
     private static void DriverBinding(HID_Subsystem dc) {
@@ -51,9 +51,7 @@ public final class BindingsCompetition {
             // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4,
             // Tag_Pose.ID7));
 
-            // Driver will wants precision/ throttle drive on left trigger, end effector
-            // centric drive on right trigger
-            // also wants y to be field centric on true? couldnt tell you why
+            // Driver will wants precision robot-centric throttle drive on left trigger
             driver.leftTrigger().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.3),
                     new RobotCentricDrive(drivetrain, dc)));
@@ -62,6 +60,8 @@ public final class BindingsCompetition {
         }
     }
 
+    //TODO enable this when done integrating test commands
+    // for now, disabled (above) because of test bindings
     static void OperatorBindings(HID_Subsystem dc) {
         @SuppressWarnings("unused")
         var sideboard = dc.SwitchBoard();
@@ -72,11 +72,6 @@ public final class BindingsCompetition {
         if (generic_opr instanceof CommandXboxController) {
 
             CommandXboxController operator = (CommandXboxController) generic_opr;
-
-            operator.a().whileTrue(new PickupSequence("coral"));
-            operator.b().whileTrue(new PlaceSequence("coral")); // l1 place
-            operator.x().whileTrue(new PickupSequence("algae"));
-            operator.y().whileTrue(new PlaceSequence("algae"));
 
             // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
             operator.povDown().onTrue(new InstantCommand(() -> {
