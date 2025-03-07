@@ -206,6 +206,11 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // or create a binding file in ./testBindings/BotOnBoard<N>.java
+
+    // Anything else that needs to run after binding/commands are created
+    VisionPoseEstimator vpe = RobotContainer.getSubsystemOrNull(VisionPoseEstimator.class);
+    if (vpe != null) 
+      vpe.configureGyroCallback();
   }
 
   @Override
