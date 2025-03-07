@@ -148,29 +148,30 @@ public class RobotSpec_test2024 implements IRobotSpec {
 
     @Override
     /// swapped corner Ids for matching 2025 Limelight placement.
+    /// LL is on Front Left corner
     public ModuleConfig[] getModuleConfigs() {
         ModuleConfig[] modules = new ModuleConfig[4];
 
-        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-                29, 24, 25,
-                -125.595)
-                .setInversions(false, true, false);
-
-        modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
+        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
                 30, 26, 27,
-                -114.785)
+                -114.785 - 90.0)
                 .setInversions(true, true, false);
 
         modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-                28, 22, 23,
-                28.125)
-                .setInversions(false, true, false);
-                
-        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
                 31, 20, 21,
-                -115.752)
+                -115.752 - 90.0)
                 .setInversions(true, true, false);
         
+        modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
+                29, 24, 25,
+                -125.595 - 90.0)
+                .setInversions(false, true, false);
+
+        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
+                28, 22, 23,
+                28.125 - 90.0)
+                .setInversions(false, true, false);
+                
         return modules;
     }
 
