@@ -34,6 +34,11 @@ public class ReleaseCoral extends Command {
     }
   }
 
+  @Override
+  public void end(boolean interrupted){
+    ee_Subsystem.setPercent(0.0);
+  }
+
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

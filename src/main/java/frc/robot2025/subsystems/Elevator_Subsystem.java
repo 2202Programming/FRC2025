@@ -83,7 +83,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     positionPid = new PIDController(7.0, 0.0005, 0.004);
     positionPid.setIZone(3.0);
     //hardware velocity pidf - holds values to send to hw, not actually run825
-    velocityPid = new PIDFController(0.0008, 0.00001, 0.0000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
+    velocityPid = new PIDFController(0.0008, 0.000015, 0.0000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
     velocityPid.setIZone(20.0); //TODO: set this once value has been found, if KI is used
     
     //devices 
