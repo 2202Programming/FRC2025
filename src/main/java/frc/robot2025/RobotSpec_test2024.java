@@ -1,8 +1,12 @@
 package frc.robot2025;
+
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -34,13 +38,13 @@ import frc.robot2025.commands.DriveToReefTag;
 // 2024 robot has a pigeon, so use its sensors, add LL4
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-
+import frc.robot2025.testBindings.DPLPathTest;
 
 public class RobotSpec_test2024 implements IRobotSpec {
 
     /*
      * This is a stripped down spec to allow driving 2024 comp bot on
-     * only the 2025 or library softare.  
+     * only the 2025 or library softare.
      * 
      * THis is so we can use it for drive practice or testing 2025 pathing
      * while the 2025 bot is being worked ont
@@ -51,22 +55,22 @@ public class RobotSpec_test2024 implements IRobotSpec {
         public static final int ROBORIO = 0;
         public static final int PDP = 1; // for rev
         public static final int PCM1 = 2; // for rev
-    
+
         // lights
         public static final int CANDLE1 = 3;
         public static final int CANDLE2 = 4;
 
-        //PIGEON is on 60 here too, picked up from 2025 constants.
+        // PIGEON is on 60 here too, picked up from 2025 constants.
     }
 
     boolean teleOpRunOnce = true;
 
     final SubsystemConfig config = new SubsystemConfig(
-        // Subsystems and other hardware for testing with 2024 comp-bot
-        // $env:serialnum = "032D2062"
-        "CompetitionBot2024 as testing platform.", "032D2062")
-        // deferred construction via Supplier<Object> lambda
-        .add(PowerDistribution.class, "PDP", () -> {
+            // Subsystems and other hardware for testing with 2024 comp-bot
+            // $env:serialnum = "032D2062"
+            "CompetitionBot2024 as testing platform.", "032D2062")
+            // deferred construction via Supplier<Object> lambda
+            .add(PowerDistribution.class, "PDP", () -> {
                 var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
                 pdp.clearStickyFaults();
                 return pdp;
@@ -79,10 +83,15 @@ public class RobotSpec_test2024 implements IRobotSpec {
             })
 
             // using same setup as 2025 comp, not same as orginal 2024
-            .add(Sensors_Subsystem.class, "sensors")     //2025
-            .add(Limelight.class, "limelight")           //2025  - added LL4 for testing
+            .add(Sensors_Subsystem.class, "sensors") // 2025
+            .add(Limelight.class, "limelight", () -> {
+                // Limelight position in robot coords - this has LL in the front of bot
+                Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
+                        new Rotation3d(0.0, 30.0 / DEGperRAD, 0.0));
+                return new Limelight("limelight", LimelightPosition);
+            }) // 2025 - added LL4 for testing
             .add(SwerveDrivetrain.class, "drivetrain", () -> {
-                return new SwerveDrivetrain();  //2024 sdt, no sparkflex
+                return new SwerveDrivetrain(); // 2024 sdt, no sparkflex
             })
             .add(OdometryInterface.class, "odometry", () -> {
                 var obj = new Odometry();
@@ -100,10 +109,10 @@ public class RobotSpec_test2024 implements IRobotSpec {
     boolean swerve = true;
 
     // Robot Speed Limits
-    double maxSpeedFPS = 15.0; // [ft/s] 
+    double maxSpeedFPS = 15.0; // [ft/s]
     double maxRotationRateDPS = 360.0; // [deg/s]
     RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
-    
+
     // Chassis
     double kWheelCorrectionFactor = .987;
     double kSteeringGR = 21.428;
@@ -151,27 +160,27 @@ public class RobotSpec_test2024 implements IRobotSpec {
     /// LL is on Front Left corner
     public ModuleConfig[] getModuleConfigs() {
         ModuleConfig[] modules = new ModuleConfig[4];
-        
-        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        28, 22, 23,
-        28.125 + 90.0)
-        .setInversions(false, true, false);
 
-        modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        29, 24, 25,
-        -125.595 + 90.0)
-        .setInversions(false, true, false);
-        
-        modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        31, 20, 21,
-        -115.752 + 90.0)
-        .setInversions(true, true, false);
+        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
+                28, 22, 23,
+                28.125 + 90.0)
+                .setInversions(false, true, false);
 
-        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        30, 26, 27,
-        -114.785 + 90.0)
-        .setInversions(true, true, false);
-                
+        modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
+                29, 24, 25,
+                -125.595 + 90.0)
+                .setInversions(false, true, false);
+
+        modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
+                31, 20, 21,
+                -115.752 + 90.0)
+                .setInversions(true, true, false);
+
+        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
+                30, 26, 27,
+                -114.785 + 90.0)
+                .setInversions(true, true, false);
+
         return modules;
     }
 
@@ -186,52 +195,52 @@ public class RobotSpec_test2024 implements IRobotSpec {
 
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
 
-
         var generic_driver = dc.Driver();
 
         if (generic_driver instanceof CommandXboxController) {
             // XBox
-            CommandXboxController driver = (CommandXboxController)generic_driver;
+            CommandXboxController driver = (CommandXboxController) generic_driver;
             driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
 
-           // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4, Tag_Pose.ID7));
-        }
-        else {
+            DPLPathTest.myBindings(dc);
+        } else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
         }
 
-        // Keep binding in this file please - this bot is only for driver or path testing.
-        @SuppressWarnings("unused")  //wip
-        Command  test = new DriveToReefTag("l");
+        // Keep binding in this file please - this bot is only for driver or path
+        // testing.
+        @SuppressWarnings("unused") // wip
+        Command test = new DriveToReefTag("l");
 
     }
-
 
     @Override
     public SendableChooser<Command> getRegisteredCommands() {
         // configure pathplanner and the Registered commands
-        // ConfigureAutobuilder uses default pids and looks up SwereveDrivetrain from RobotContainer
-        ///AutoPPConfig.ConfigureAutoBuilder();
-        /// 
-        return null; //RegisteredCommands.RegisterCommands();
+        // ConfigureAutobuilder uses default pids and looks up SwereveDrivetrain from
+        // RobotContainer
+        /// AutoPPConfig.ConfigureAutoBuilder();
+        ///
+        return null; // RegisteredCommands.RegisterCommands();
     }
 
     @Override
     public void setDefaultCommands() {
         DriveTrainInterface drivetrain = RobotContainer.getSubsystemOrNull("drivetrain");
         if (drivetrain != null) {
-            drivetrain.setDefaultCommand(new FieldCentricDrive());        
+            drivetrain.setDefaultCommand(new FieldCentricDrive());
         }
     }
+
     @Override
-    public void teleopInit(){
-         // Temp command for compbot2024 to calibrate shooter's servo
+    public void teleopInit() {
+        // Temp command for compbot2024 to calibrate shooter's servo
         if (teleOpRunOnce) {
             // ensure shooter is calibrated on power up - note for a competition this
             // should not be needed and the bot should be calibrated in the pit
-            //var cmd = new CalibrateWithLS();
-            //cmd.schedule();
+            // var cmd = new CalibrateWithLS();
+            // cmd.schedule();
             teleOpRunOnce = false;
         }
     }
