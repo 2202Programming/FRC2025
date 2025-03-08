@@ -22,16 +22,16 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
   EndEffector_Subsystem endEffector;
   Sensors_Subsystem sensors;
   Wrist wrist;
-  Levels setPoint;
+  double height;
 
-  /** Creates a new ElevatorPlaceAndMoveDown2. */
+  /** Creates a new ElevatorPlaceAndMoveDown. */
   public ElevatorPlaceAndMoveDown(Levels setPoint) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
     sensors = RobotContainer.getSubsystem("sensors");
     wrist = RobotContainer.getSubsystem(Wrist.class);
 
-    this.setPoint = setPoint;
+    this.height = setPoint.height;
 
     if (!endEffector.pieceReady()) {
       System.out.println("No piece found");
@@ -40,6 +40,43 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
       addCommands(new 
         WristToPos(1.0)
         .andThen(new ElevatorMove(setPoint))
+        .andThen(new EndEffectorRPM(1000))
+        .andThen(new WaitCommand(0.5))
+        );
+
+      if (!endEffector.pieceReady()) {
+        addCommands(new
+        EndEffectorRPM(0)
+        .andThen(new ElevatorMove(Levels.Ground))
+        .andThen(new WristToPos(0.0))
+        );
+      } else {
+        System.out.println("******ERROR: Piece still found");
+        end(true);
+        //TODO: HANDLE THIS BETTER!!
+      }
+    }
+
+
+    addRequirements(this.elevator);
+    addRequirements(this.endEffector);
+  }
+
+  public ElevatorPlaceAndMoveDown(double height) {
+    elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+    endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
+    sensors = RobotContainer.getSubsystem("sensors");
+    wrist = RobotContainer.getSubsystem(Wrist.class);
+
+    this.height = height;
+
+    if (!endEffector.pieceReady()) {
+      System.out.println("No piece found");
+      end(true);
+    } else {
+      addCommands(new 
+        WristToPos(1.0)
+        .andThen(new ElevatorMove(height))
         .andThen(new EndEffectorRPM(1000))
         .andThen(new WaitCommand(0.5))
         );

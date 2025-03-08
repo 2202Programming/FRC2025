@@ -14,12 +14,20 @@ public class ElevatorMove extends Command {
   
   final Elevator_Subsystem elevator_Subsystem;
   double intendedPoint;
-  Levels setPoint;
+  double setPoint;
+
+  public ElevatorMove(double setPoint) {
+    this.elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+    this.setPoint = setPoint;
+    intendedPoint = setPoint;
+    // this command require full ownership of SS, use the requirements
+    addRequirements(this.elevator_Subsystem);
+  }
 
   public ElevatorMove(Levels setPoint) {
     this.elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    this.setPoint = setPoint;
-    intendedPoint = setPoint.height;
+    this.setPoint = setPoint.height;
+    intendedPoint = this.setPoint;
     // this command require full ownership of SS, use the requirements
     addRequirements(this.elevator_Subsystem);
   }

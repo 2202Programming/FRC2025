@@ -19,6 +19,7 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /*
  * Please don't edit this without leads/mentor/driveteam review
@@ -73,18 +74,6 @@ public final class BindingsCompetition {
 
             CommandXboxController operator = (CommandXboxController) generic_opr;
 
-            // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
-            operator.povDown().onTrue(new InstantCommand(() -> {
-                elevator.setHeight(46.25); // l2
-            })); // seriously, tell me once its changed
-            operator.povLeft().onTrue(new InstantCommand(() -> {
-                elevator.setHeight(87.25); // l3
-            }));
-            // TODO change value once mechanical adds more height
-            operator.povUp().onTrue(new InstantCommand(() -> {
-                elevator.setHeight(152.0);
-            }));
-
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 operator.a().whileTrue(new PickupSequence("coral"));
                 operator.b().whileTrue(new PlaceSequence("coral"));
@@ -92,22 +81,39 @@ public final class BindingsCompetition {
                 operator.y().whileTrue(new PlaceSequence("algae"));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
+                    // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
+                operator.povDown().onTrue(new InstantCommand(() -> {
+                    elevator.setHeight(46.25); // l2 //level 1
+                })); // seriously, tell me once its changed
+                operator.povLeft().onTrue(new InstantCommand(() -> {
+                    elevator.setHeight(87.25); // l3 //level 2
+                }));
+                // TODO change value once mechanical adds more height
+                operator.povUp().onTrue(new InstantCommand(() -> {
+                    elevator.setHeight(152.0); // level 3
+                }));
+                operator.povRight().onTrue(new InstantCommand(() -> {
+                    elevator.setHeight(Levels.LCoral);
+                }));
+
                 /*
-                 * From drive team
-                 * operator.povUp().onTrue(); //high
-                 * operator.povLeft().onTrue(); //mid
-                 * operator.povDown().onTrue(); //low
-                 * operator.povRight().onTrue(); //intake height
+                 * operator.povDown().onTrue(new ElevatorPlaceAndMoveDown(LOne));
+                 * operator.povLeft().onTrue(new ElevaorPlaceAndMoveDown(LTwo));
+                 * operator.povUp().onTrue(new ElevaorPlaceAndMoveDown(LThree));
+                 * operator.povRight().onTrue(new InstantCommand(() -> {
+                    elevator.setHeight(Levels.LCoral);
+                }));
+                 * operator.leftBumper().onTrue(new IntsantCommand(() -> {
+                 *  elevator.setHeight(0.0);
+                 * }))
                  */
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
-                // TODO change to rpm, i just plucked these values off so i have no clue if
-                // they're viable -er
                 operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
-                operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
+                operator.rightTrigger().whileTrue(new EndEffectorPercent(.7, "rightTrigger")); //
             }
             if (RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
-
+                //will not need this, as far as I know. These commands are exclusivly in command sequences. Double check with drive team
             }
         }
 
