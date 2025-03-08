@@ -20,6 +20,7 @@ import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
+import frc.lib2202.command.TargetWatcherCmd;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.command.swerve.RobotCentricDrive;
@@ -37,7 +38,9 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
+import frc.robot2025.Constants.TheField;
 import frc.robot2025.commands.ScaleDriver;
+import frc.robot2025.commands.distanceWatcher;
 // 2024 robot has a pigeon, so use its sensors, add LL4
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
@@ -89,8 +92,8 @@ public class RobotSpec_test2024 implements IRobotSpec {
             .add(Sensors_Subsystem.class, "sensors") // 2025
             .add(Limelight.class, "limelight", () -> {
                 // Limelight position in robot coords - this has LL in the front of bot
-                Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
-                        new Rotation3d(0.0, 12.0 / DEGperRAD, 0.0));
+                Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, -0.21, .23,
+                        new Rotation3d(0.0, 15.0 / DEGperRAD, 0.0));
                 return new Limelight("limelight", LimelightPosition);
             }) // 2025 - added LL4 for testing
             .add(SwerveDrivetrain.class, "drivetrain", () -> {
@@ -221,6 +224,10 @@ public class RobotSpec_test2024 implements IRobotSpec {
          // Anything else that needs to run after binding/commands are created
         if (vpe != null) 
               vpe.configureGyroCallback();  // connect VPE to gyro reset
+        
+        var t21 = TheField.fieldLayout.getTagPose(21).get();
+        var t212d = t21.toPose2d();
+        new distanceWatcher(t212d);
     }
 
     @Override
