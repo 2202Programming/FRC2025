@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
@@ -34,7 +37,7 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
-import frc.robot2025.commands.DriveToReefTag;
+import frc.robot2025.commands.ScaleDriver;
 // 2024 robot has a pigeon, so use its sensors, add LL4
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
@@ -87,7 +90,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
             .add(Limelight.class, "limelight", () -> {
                 // Limelight position in robot coords - this has LL in the front of bot
                 Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
-                        new Rotation3d(0.0, 30.0 / DEGperRAD, 0.0));
+                        new Rotation3d(0.0, 12.0 / DEGperRAD, 0.0));
                 return new Limelight("limelight", LimelightPosition);
             }) // 2025 - added LL4 for testing
             .add(SwerveDrivetrain.class, "drivetrain", () -> {
@@ -189,39 +192,39 @@ public class RobotSpec_test2024 implements IRobotSpec {
         // Initialize PathPlanner
         OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
         DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
+        VisionPoseEstimator vpe = RobotContainer.getSubsystemOrNull(VisionPoseEstimator.class);
+        HID_Subsystem dc = RobotContainer.getSubsystem("DC");
+        
         if (odo != null && sdt != null) {
             AutoPPConfigure.configureAutoBuilder(sdt, odo);
+            PathfindingCommand.warmupCommand().schedule();
         }
 
-        HID_Subsystem dc = RobotContainer.getSubsystem("DC");
-
         var generic_driver = dc.Driver();
-
         if (generic_driver instanceof CommandXboxController) {
             // XBox
             CommandXboxController driver = (CommandXboxController) generic_driver;
+            // copy basic drive cmd from compBindings
             driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
-
-            DPLPathTest.myBindings(dc);
+            // Driver will wants precision robot-centric throttle drive on left trigger
+            driver.leftTrigger().whileTrue(new ParallelCommandGroup(
+                    new ScaleDriver(0.25),
+                    new RobotCentricDrive(sdt, dc)));           
         } else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
         }
 
-        // Keep binding in this file please - this bot is only for driver or path
-        // testing.
-        @SuppressWarnings("unused") // wip
-        Command test = new DriveToReefTag("l");
-
+         //setup test bindings
+         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
+         
+         // Anything else that needs to run after binding/commands are created
+        if (vpe != null) 
+              vpe.configureGyroCallback();  // connect VPE to gyro reset
     }
 
     @Override
-    public SendableChooser<Command> getRegisteredCommands() {
-        // configure pathplanner and the Registered commands
-        // ConfigureAutobuilder uses default pids and looks up SwereveDrivetrain from
-        // RobotContainer
-        /// AutoPPConfig.ConfigureAutoBuilder();
-        ///
+    public SendableChooser<Command> getRegisteredCommands() {    
         return null; // RegisteredCommands.RegisterCommands();
     }
 
@@ -235,12 +238,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
 
     @Override
     public void teleopInit() {
-        // Temp command for compbot2024 to calibrate shooter's servo
-        if (teleOpRunOnce) {
-            // ensure shooter is calibrated on power up - note for a competition this
-            // should not be needed and the bot should be calibrated in the pit
-            // var cmd = new CalibrateWithLS();
-            // cmd.schedule();
+        if (teleOpRunOnce) {           
             teleOpRunOnce = false;
         }
     }
