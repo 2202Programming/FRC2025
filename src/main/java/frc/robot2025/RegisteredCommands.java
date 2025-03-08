@@ -7,11 +7,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
 import frc.robot2025.Constants.Tag_Pose;
-import frc.robot2025.commands.CoralPlaceSequence;
+import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
+import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 
 /*
  * Place commands named in PathPlaner autos here.
@@ -47,8 +50,14 @@ public class RegisteredCommands {
             elevator_Subsystem.setHeight(50.0);
         }));
         NamedCommands.registerCommand("Release", 
-            new CoralPlaceSequence(83.0)
-        );
+            new SequentialCommandGroup (
+            new setElevatorSetpoint(83.0),
+            new setWristPos(true),
+            new ReleaseCoral(),
+            new setWristPos(false),
+            new setElevatorSetpoint(42.0)
+        ));
+        
 
 
         autoChooser = AutoBuilder.buildAutoChooser();
