@@ -14,10 +14,12 @@ import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.subsystems.Wrist;
 
 public class ElevTest {
     public static void myBindings(HID_Subsystem dc) {
         Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+        Wrist wrist = RobotContainer.getSubsystem(Wrist.class);
         // get an xbox controller for the operator, or null
         CommandXboxController opr = (dc.Operator() instanceof CommandXboxController)
                 ? (CommandXboxController) dc.Operator()
@@ -34,6 +36,13 @@ public class ElevTest {
             new setWristPos(false),
             new setElevatorSetpoint(Levels.PickUp)
         ));
+        opr.leftBumper().onTrue(new InstantCommand(() -> {
+            wrist.setPos(wrist.drop);
+        }));
+        opr.leftTrigger().onTrue(new InstantCommand(() -> {
+            wrist.setPos(wrist.pickup);
+        }));
+
         
         // opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {
