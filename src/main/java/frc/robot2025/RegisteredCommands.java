@@ -15,18 +15,29 @@ import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /*
  * Place commands named in PathPlaner autos here.
  */
 public class RegisteredCommands {
-
+    
+    private static SequentialCommandGroup place(Levels level){
+        return new SequentialCommandGroup (
+            new setElevatorSetpoint(level),
+            new setWristPos(true),
+            new ReleaseCoral(),
+            new setWristPos(false),
+            new setElevatorSetpoint(42.0)
+        );
+    }
     //Timeouts allow paths to continue in auto even if we miss a Note.   
     static final double ShooterTimeOut = 3.0;
 
     public static SendableChooser<Command> RegisterCommands() {
         SendableChooser<Command> autoChooser;
         final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+
         NamedCommands.registerCommand("RotateTo", 
                 new RotateUntilSeeTags(Tag_Pose.ID4, Tag_Pose.ID7));
         NamedCommands.registerCommand("L1Place",
@@ -49,15 +60,14 @@ public class RegisteredCommands {
             new InstantCommand(() -> {
             elevator_Subsystem.setHeight(50.0);
         }));
-        NamedCommands.registerCommand("Release", 
-            new SequentialCommandGroup (
-            new setElevatorSetpoint(83.0),
-            new setWristPos(true),
-            new ReleaseCoral(),
-            new setWristPos(false),
-            new setElevatorSetpoint(42.0)
-        ));
-        
+        NamedCommands.registerCommand("PlaceL4", 
+           place(Levels.LFour));
+        NamedCommands.registerCommand("PlaceL3", 
+           place(Levels.LFour));
+        NamedCommands.registerCommand("PlaceL2", 
+           place(Levels.LFour));
+        NamedCommands.registerCommand("PlaceL1", 
+           place(Levels.LFour));
 
 
         autoChooser = AutoBuilder.buildAutoChooser();
