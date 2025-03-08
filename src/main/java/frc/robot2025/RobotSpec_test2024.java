@@ -20,7 +20,6 @@ import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
-import frc.lib2202.command.TargetWatcherCmd;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.command.swerve.RobotCentricDrive;
@@ -126,8 +125,8 @@ public class RobotSpec_test2024 implements IRobotSpec {
     double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
     final ChassisConfig comp2024BotBetaChassisConfig = new ChassisConfig(
-            MperFT * (24.875 / 12.0) / 2.0, // x
-            MperFT * (20.5 / 12.0) / 2.0, // y
+            (.655 / 2.0), // x
+            (.755 / 2.0), // y
             kWheelCorrectionFactor, // scale [] <= 1.0
             kWheelDiameter,
             kSteeringGR,

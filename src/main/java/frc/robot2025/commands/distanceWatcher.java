@@ -8,8 +8,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.TargetWatcherCmd;
 import frc.lib2202.subsystem.BaseLimelight;
-import frc.lib2202.subsystem.Limelight;
-import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.util.PoseMath;
 
 /** Add your docs here. */
