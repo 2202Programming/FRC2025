@@ -26,7 +26,6 @@ import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
-import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.AutoPPConfigure;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
@@ -43,6 +42,7 @@ import frc.robot2025.commands.distanceWatcher;
 // 2024 robot has a pigeon, so use its sensors, add LL4
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.testBindings.DPLPathTest;
 
 public class RobotSpec_test2024 implements IRobotSpec {

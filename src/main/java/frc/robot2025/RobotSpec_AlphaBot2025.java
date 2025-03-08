@@ -23,7 +23,6 @@ import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
-import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.AutoPPConfigure;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
@@ -41,6 +40,7 @@ import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
+import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.Wrist;
 import frc.robot2025.utils.UXTrim;
 
