@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Wrist extends SubsystemBase {
-  final static double PowerUpPosition = 0.0;  //TODO - confirm this.
+  final static double PowerUpPosition = 1.0;  //TODO - confirm this.
 
   /** Creates a new linearServo. */
   PWM servo;
@@ -18,8 +18,8 @@ public class Wrist extends SubsystemBase {
   double prevPos;
   double lastCommandTime;
   double timeToFinish;
-  public final double pickup = 0.0;
-  public final double drop = 0.5;
+  public final double pickup = 1.0;
+  public final double drop = 0.3;
 
   public Wrist() {
     this(PowerUpPosition);
@@ -34,9 +34,11 @@ public class Wrist extends SubsystemBase {
 
   public void setPos(double pos) {
     timeToFinish = EtoETime * Math.abs(pos - prevPos) + Timer.getFPGATimestamp();
+    System.out.println(pos + "SETTING");
     servo.setPosition(pos);
   } 
   
+
 
   public double getEstimatedTime() {
     return timeToFinish;
@@ -45,4 +47,5 @@ public class Wrist extends SubsystemBase {
   public boolean atSetpoint() {
     return Timer.getFPGATimestamp() >= timeToFinish;
   }
+   
 }
