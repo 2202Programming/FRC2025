@@ -4,14 +4,8 @@
 
 package frc.robot2025.subsystems;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
@@ -51,8 +45,6 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final PIDController positionPid;   //software on rio
   private final PIDFController velocityPid;  //values copied to spark, done on hw controller
   private NeoServo servo; 
-  private SparkFlex followMotor;
-  private SparkFlexConfig followMotorConfig;
   private SparkClosedLoopController cl_ctrl; 
 
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
@@ -88,8 +80,6 @@ public class Elevator_Subsystem extends SubsystemBase {
     
     //devices 
     servo = new NeoServo(CAN.ELEVATOR_MAIN, positionPid, velocityPid, motors_inverted, SparkFlex.class);
-    followMotor = new SparkFlex(CAN.ELEVATOR_FOLLOW, MotorType.kBrushless); 
-
     //get closed-loop controller so we can monitor iAccum
     cl_ctrl = servo.getController().getClosedLoopController();
     cl_ctrl.setIAccum(0.0);
@@ -106,19 +96,6 @@ public class Elevator_Subsystem extends SubsystemBase {
       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
       .setMaxVelocity(125.0)
       .setClamp(minPos, maxPos);
-    
-    //setup follower motor
-    followMotorConfig = new SparkFlexConfig();
-    followMotorConfig
-      .inverted(motors_inverted)
-      .idleMode(IdleMode.kBrake)
-      .follow(CAN.ELEVATOR_MAIN) //motor 2 follows the servo's behavior
-      .closedLoop
-          .feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
-          .outputRange(-1.0, 1.0);          
-    //write the followMotor's config to hardware
-    followMotor.configure(followMotorConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    
     // power up starting position of servo
     servo.setPosition(Levels.PowerUp.height);
     servo.getWatcher();
@@ -145,10 +122,6 @@ public class Elevator_Subsystem extends SubsystemBase {
 
   public double getAccumI(){
     return cl_ctrl.getIAccum();
-  }
-
-  double getFollowCurrent() {
-    return followMotor.getOutputCurrent();
   }
 
   public void setHeight (Levels level) {
@@ -240,7 +213,6 @@ public class Elevator_Subsystem extends SubsystemBase {
       nt_currentHeight.setDouble(getPosition());
       nt_atHeight.setBoolean(atSetpoint());
       nt_mainCurrent.setDouble(getMainCurrent());
-      nt_followCurrent.setDouble(getFollowCurrent());
       nt_zeroLimitSwitch.setBoolean(atZeroLimit());
       nt_iAccum.setDouble(getAccumI());
     }
