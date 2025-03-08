@@ -104,9 +104,6 @@ public class Elevator_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     servo.periodic();
-    //positionPid.calculate(FREE_CURRENT);   //this amounts to a position change
-    //-- DPL what are you trying to do here? This class is used internal to servo
-    // either way, this is wrong - see me.
   }
 
   
@@ -129,6 +126,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   }
 
   public void setHeight (double height) {
+    // use some arbFF if we are going up, and a larger max vel
     if (height > getPosition()) {
       servo.setMaxVelocity(100.0);
       servo.setArbFeedforward(0.02);
@@ -139,6 +137,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     servo.setSetpoint(height); 
   }
 
+  //sets the position, used for calibration or power up. Doesn't move
   public void setPosition(double pos){
     servo.setPosition(pos);
   }
@@ -150,6 +149,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     return servo.getVelocity();
   }
 
+  // velocity mode for calibration and testing
   public void setVelocity(double vel) {
     if (vel > 0) {
       servo.setArbFeedforward(0.02);
@@ -172,6 +172,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     return this.new ElevatorWatcherCmd();
   }
 
+  // returns true when at the bottom, calibration point.
   public boolean atZeroLimit(){
     return !zeroLimitSwitch.get();
   }
