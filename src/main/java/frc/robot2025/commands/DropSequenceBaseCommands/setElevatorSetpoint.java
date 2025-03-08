@@ -7,12 +7,20 @@ package frc.robot2025.commands.DropSequenceBaseCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class setElevatorSetpoint extends Command {
   Elevator_Subsystem elevator_Subsystem;
+  Levels level;
   double setpoint;
   /** Creates a new setElevatorSetpoint. */
+  public setElevatorSetpoint(Levels level) {
+    elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+    this.level = level;
+    setpoint = level.height;
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
   public setElevatorSetpoint(double setpoint) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.setpoint = setpoint;

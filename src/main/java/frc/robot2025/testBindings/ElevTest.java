@@ -13,6 +13,7 @@ import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 public class ElevTest {
     public static void myBindings(HID_Subsystem dc) {
@@ -27,11 +28,11 @@ public class ElevTest {
 
         opr.y().onTrue(new ClimberPosition(0.0));
         opr.b().onTrue(new SequentialCommandGroup (
-            new setElevatorSetpoint(83.0),
+            new setElevatorSetpoint(Levels.LThree),
             new setWristPos(true),
             new ReleaseCoral(),
             new setWristPos(false),
-            new setElevatorSetpoint(42.0)
+            new setElevatorSetpoint(Levels.PickUp)
         ));
         
         // opr.y().onTrue(new ClimberPosition(0.0));

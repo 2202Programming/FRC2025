@@ -33,14 +33,11 @@ public class Elevator_Subsystem extends SubsystemBase {
    *  maybe add algae level
    */
   public enum Levels {
-    LCoral(75.5), 
-    LOne(30.0), 
-    LTwo(75.5), 
-    LThree(116.0), 
-    LFour(176.0),
-    Ground(0.0),
-    PowerUp(0.0); //change to accurate heights (in CM) THESE ARE NOT ACCURATE
-
+    LOne(0.0), 
+    LTwo(42.0), 
+    LThree(83.0), 
+    LFour(150.0),
+    PowerUp(0.0);
     public double height;
 
     private Levels(double height) {
