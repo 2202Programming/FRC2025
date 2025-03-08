@@ -1,11 +1,11 @@
 package frc.robot2025.testBindings;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
-import frc.robot2025.commands.ClimberPosition;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
@@ -28,12 +28,30 @@ public class ElevTest {
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
 
-        opr.y().onTrue(new ClimberPosition(0.0));
         opr.b().onTrue(new SequentialCommandGroup (
-            new setElevatorSetpoint(Levels.LThree),
-            new setWristPos(true),
+            new ParallelCommandGroup(
+                new setElevatorSetpoint(Levels.LTwo).withTimeout(5.0),
+                new setWristPos(true)),
+                new ReleaseCoral(),
+                new ParallelCommandGroup(
+                new setWristPos(false).withTimeout(0.5)),
+                new setElevatorSetpoint(Levels.PickUp)
+        ));
+        opr.y().onTrue(new SequentialCommandGroup (
+            new ParallelCommandGroup(
+            new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
+            new setWristPos(true)),
             new ReleaseCoral(),
-            new setWristPos(false),
+            new ParallelCommandGroup(
+            new setWristPos(false).withTimeout(0.5)),
+            new setElevatorSetpoint(Levels.PickUp)
+        ));
+        opr.leftBumper().onTrue(new SequentialCommandGroup (
+            new ParallelCommandGroup(
+            new setElevatorSetpoint(Levels.LFour).withTimeout(3.0),
+            new setWristPos(0.05)),
+            new ReleaseCoral(),
+            new setWristPos(1.0).withTimeout(1.0),
             new setElevatorSetpoint(Levels.PickUp)
         ));
         opr.leftBumper().onTrue(new InstantCommand(() -> {
@@ -52,13 +70,14 @@ public class ElevTest {
         // elevator_Subsystem.setHeight(90.0);
         // }));
         opr.povDown().onTrue(new InstantCommand(() -> {
-            elevator_Subsystem.setHeight(46.0);
+            wrist.setPos(0.3);
         }));
         opr.povLeft().onTrue(new InstantCommand(() -> {
-            elevator_Subsystem.setHeight(86.0);
+            wrist.setPos(0.05);
         }));
         opr.povRight().onTrue(new InstantCommand(() -> {
-            elevator_Subsystem.setHeight(0.0);
+            elevator_Subsystem.setHeight(0.6);
+
         }));
         // opr.rightTrigger().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(75.0);

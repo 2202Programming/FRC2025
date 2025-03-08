@@ -17,17 +17,23 @@ public class setWristPos extends Command {
   public setWristPos(boolean drop) {
     wrist = RobotContainer.getSubsystem(Wrist.class);
     this.drop = drop;
+    if(drop){
+      setpoint = wrist.drop;
+    } else {
+      setpoint = wrist.pickup;
+    }
+    // Use addRequirements() here to declare subsystem dependencies.
+  }
+  public setWristPos(double setpoint) {
+    wrist = RobotContainer.getSubsystem(Wrist.class);
+    this.setpoint = setpoint;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(drop){
-    wrist.setPos(wrist.drop);
-    } else {
-      wrist.setPos(wrist.pickup);
-    }
+    wrist.setPos(setpoint);
   }
   // Returns true when the command should end.
   @Override
