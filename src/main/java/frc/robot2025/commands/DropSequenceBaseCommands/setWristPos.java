@@ -12,13 +12,11 @@ import frc.robot2025.subsystems.Wrist;
 public class setWristPos extends Command {
   Wrist wrist;
   double setpoint;
-  boolean finished;
   boolean drop;
   /** Creates a new setWristPos. */
   public setWristPos(boolean drop) {
     wrist = RobotContainer.getSubsystem(Wrist.class);
     this.drop = drop;
-    finished = false;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -31,22 +29,9 @@ public class setWristPos extends Command {
       wrist.setPos(wrist.pickup);
     }
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    if(wrist.atSetpoint()){
-      finished = true;
-    }
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return finished;
+    return wrist.atSetpoint();
   }
 }
