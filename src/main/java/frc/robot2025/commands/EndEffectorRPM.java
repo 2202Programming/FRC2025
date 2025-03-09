@@ -4,6 +4,7 @@
 
 package frc.robot2025.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
@@ -13,16 +14,24 @@ public class EndEffectorRPM extends Command {
   /** Creates a new ClimberSetPos. */
   final EndEffector_Subsystem endEffector;
   double RPM;
+  String label;
   public EndEffectorRPM(double RPM) {
-    endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
-    this.RPM = RPM;
+    this(RPM, "default button");
+  }
+  public EndEffectorRPM(double RPM, String label) {
+    endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
+    this.label=label;
+    this.RPM=RPM;
+    SmartDashboard.putNumber("End Effector RPM "+ label, RPM);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    endEffector.setRPM(RPM);
+    if(endEffector.pieceReady()) {
+      endEffector.setRPM(SmartDashboard.getNumber("End Effector RPM "+ label, RPM));
+    }
   }
 
   // Called once the command ends or is interrupted.

@@ -15,39 +15,36 @@ import frc.lib2202.util.PIDFController;
 
 public class Climber extends SubsystemBase {
   NeoServo servo;
-  PIDController climberPID = new PIDController(0, 0, 0);
-  PIDFController hwClimberVel_PID = new PIDFController(0, 0, 0, 0);
+  PIDFController hwClimberVel_PID = new PIDFController(0.01, 0, 0, 1 / 540);
 
-  final double GearRatio = 48.0 * 18.0 * 18.0;
-  final double conversionFactor = 1.0 / GearRatio; // placeholder
+  final double GearRatio = 9.0 * 5.0 * 4.0;
+  final double conversionFactor = 1.0 / GearRatio;
+
+ClimberWatcherCmd watcher;
+
   // Motor settings for Servo
-  final int STALL_CURRENT = 20;
+  final int STALL_CURRENT = 40;
   final int FREE_CURRENT = 40;
   final boolean motor_inverted = true;
   // Servo speed/positions
-  final double maxPos = 100.0; // [unit?] placeholder
-  final double minPos = 0.0; // [unit?] placeholder
-  final double initPos = 0.0; // [unit?] init pos might not be min
-  final double maxVel = 50.0; // [unit?/s] placeholder
-  final double maxAccel = 5.0; // placeholder
-  final double posTol = 1.0; // placeholder
-  final double velTol = 1.0; // placeholder
+  final double maxVel = 0.75;  // [winch rot/s]
+  final double maxAccel = 0.75; // [winch rot/s/s]
+  final double posTol = 0.01; // tol = tolerance [rot]
+  final double velTol = 0.1; // [rot/s]
 
-  double cmdVel; //
+  double cmdVel;
 
   /** Creates a new Climber. */
   public Climber() {
-    servo = new NeoServo(Constants.CAN.CLIMBER, climberPID, hwClimberVel_PID, motor_inverted);
+    servo = new NeoServo(Constants.CAN.CLIMBER, new PIDController(0 ,0, 0), hwClimberVel_PID, motor_inverted);
     servo.setConversionFactor(conversionFactor)
         .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
         .setVelocityHW_PID(maxVel, maxAccel)
         .setTolerance(posTol, velTol)
         .setMaxVelocity(maxVel);
+        this.watcher = new ClimberWatcherCmd();
 
-    servo.setClamp(minPos, maxPos);
-
-    // initial position, unless we have abs encoder
-    servo.setPosition(initPos);
+        watcher.ntcreate();
   }
 
   // velocity control only used for testing, normal cmds will use position
@@ -62,10 +59,6 @@ public class Climber extends SubsystemBase {
 
   public boolean atVelocity() {
     return Math.abs(getVelocity() - cmdVel) < velTol;
-  }
-
-  public void setPosition(double pos) {
-    servo.setPosition(pos);
   }
 
   public double getPosition() {
@@ -92,9 +85,7 @@ public class Climber extends SubsystemBase {
     return cmdVel;
   }
 
-  public boolean atSetpoint() {
-    // return Math.abs(getPosition() - getSetpoint()) < posTol; (this work is done
-    // in the servo already)
+  public boolean atSetpoint(){
     return servo.atSetpoint();
   }
 
@@ -102,6 +93,8 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     this.servo.periodic();
+
+    watcher.ntupdate();
   }
 
   class ClimberWatcherCmd extends WatcherCmd {
@@ -122,9 +115,7 @@ public class Climber extends SubsystemBase {
       nt_cmdVelocity = table.getEntry("cmdVelocity");
       nt_measVelocity = table.getEntry("measVelocity");
       nt_measPosition = table.getEntry("measPosition");
-
       nt_cmdPosition = table.getEntry("cmdPosition");
-      nt_atSetpoint = table.getEntry("atSetpoint");
     }
 
     public void ntupdate() {
@@ -132,7 +123,6 @@ public class Climber extends SubsystemBase {
       nt_measVelocity.setDouble(getVelocity());
       nt_measPosition.setDouble(getPosition());
       nt_cmdPosition.setDouble(getSetpoint());
-      nt_atSetpoint.setBoolean(atSetpoint());
     }
   }
 }

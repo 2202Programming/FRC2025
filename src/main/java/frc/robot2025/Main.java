@@ -13,9 +13,10 @@ public final class Main {
     // create robot specs for supported robots in this binary
     new RobotSpecDefault();
     new RobotSpec_AlphaBot2025();
-    new RobotSpec_CompBot2025();
     new RobotSpec_BotOnBoard();
-
+    new RobotSpec_BotOnBoard2();
+    new RobotSpec_BotOnBoard3();
+    new RobotSpec_test2024();      //2024 platform, 2025 limelight and paths
   }
  
   public static void main(String... args) {

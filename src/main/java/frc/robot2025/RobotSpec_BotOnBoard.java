@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
@@ -16,12 +16,13 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
-import frc.lib2202.subsystem.hid.HID_Xbox_Subsystem;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.ElevatorCalibrate;
+import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
@@ -29,7 +30,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
   // $env:serialnum = "032381BF"
-  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
+  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "temp")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -39,10 +40,13 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
 
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
+
       })
+      
+      // .add(Wrist.class);
       .add(Elevator_Subsystem.class)
       .add(Command.class, "ElevatorWatcher", () -> {
-        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
+       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       });
       // below are optional watchers for shuffeleboard data - disable if need too.
 
@@ -105,19 +109,43 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
   public void setBindings() {
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
     if (dc.Driver() instanceof CommandPS4Controller) {
-      CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
+      // CommandPS4Controller opp = (CommandPS4Controller)dc.Driver();
 
-      opp.square().whileTrue(new testElevatorVelComd(140));
-      opp.triangle().whileTrue(new testElevatorVelComd(0));
-      opp.cross().whileTrue(new testElevatorVelComd(-140));
-      opp.circle().whileTrue(new testElevatorVelComd(300));
+      // opp.square().onTrue(new WristToPos(1.0));
+      // opp.triangle().onTrue(new WristToPos(0.0));
+      // opp.cross().onTrue(new WristToPos(0.5));
     } else {
-      CommandXboxController opp = (CommandXboxController)dc.Driver();
-
-      opp.a().whileTrue(new testElevatorVelComd(140));
-      opp.b().whileTrue(new testElevatorVelComd(0));
-      opp.x().whileTrue(new testElevatorVelComd(-140));
-      opp.y().whileTrue(new testElevatorVelComd(300));
+      @SuppressWarnings("unused")
+      CommandXboxController driver = (CommandXboxController)dc.Driver();
+      CommandXboxController opp = (CommandXboxController)dc.Operator();
+      final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+      opp.x().whileTrue(new testElevatorVelComd(30.0));
+      opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
+      opp.y().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(0.0);
+      }));
+      opp.b().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(50.0);
+      }));
+      opp.a().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(90.0);
+      }));
+      opp.leftBumper().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(110.0);
+      }));
+      opp.leftTrigger().onTrue(new InstantCommand(() -> {
+        elevator_Subsystem.setHeight(148.0);
+      }));
+      // opp.rightTrigger().onTrue(new InstantCommand(() -> {
+      //   elevator_Subsystem.setHeight(75.0);
+      // }));
+      opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
+      //for end effector
+      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
+      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
+      
+      // opp.x().whileTrue(new backupEE_Move(1000.0)); 
     }
 
     

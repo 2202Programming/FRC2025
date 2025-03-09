@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.7842420212765955,
+        "y": 2.3330119680851054
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.035235319302022,
+        "y": 1.7366575872637062
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.3652593085106384,
+        "y": 0.8160571808510633
+      },
+      "prevControl": {
+        "x": 2.084431570363799,
+        "y": 1.2041006868180766
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 144.4623222080255
+  },
+  "reversed": false,
+  "folder": "Reef to Coral Source Paths",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -147.61932229343086
+  },
+  "useDefaultConstraints": true
+}

@@ -13,17 +13,11 @@ import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 public class ElevatorMove extends Command {
   
   final Elevator_Subsystem elevator_Subsystem;
-  boolean hasCoral;
   double intendedPoint;
   Levels setPoint;
 
-  public ElevatorMove(Levels setPoint, boolean hasCoral) {
-
-    // TODO Mr.L wants to know how hasCoral changes anything?
-
-    // Use addRequirements() here to declare subsystem dependencies.
+  public ElevatorMove(Levels setPoint) {
     this.elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    this.hasCoral = hasCoral;
     this.setPoint = setPoint;
     intendedPoint = setPoint.height;
     // this command require full ownership of SS, use the requirements

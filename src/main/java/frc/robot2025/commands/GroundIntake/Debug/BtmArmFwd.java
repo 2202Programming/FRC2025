@@ -13,10 +13,11 @@ public class BtmArmFwd extends Command {
   /** Creates a new BtmArmFwd. */
 
   final GroundIntake groundIntake;
-
-  public BtmArmFwd() {
+  double velCmd;
+  public BtmArmFwd(double velCmd) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
+    this.velCmd = velCmd;
   }
 
   // Called when the command is initially scheduled.
@@ -26,12 +27,14 @@ public class BtmArmFwd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    groundIntake.debugBtmVelocity(-0.1);
+    groundIntake.debugBtmVelocity(velCmd);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    groundIntake.debugBtmVelocity(0.0);
+  }
 
   // Returns true when the command should end.
   @Override

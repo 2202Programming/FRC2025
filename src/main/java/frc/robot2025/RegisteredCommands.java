@@ -6,8 +6,15 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
 import frc.robot2025.Constants.Tag_Pose;
+import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
+import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
+import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 
 /*
  * Place commands named in PathPlaner autos here.
@@ -19,12 +26,38 @@ public class RegisteredCommands {
 
     public static SendableChooser<Command> RegisterCommands() {
         SendableChooser<Command> autoChooser;
-
-
-
-        
+        final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
         NamedCommands.registerCommand("RotateTo", 
                 new RotateUntilSeeTags(Tag_Pose.ID4, Tag_Pose.ID7));
+        NamedCommands.registerCommand("L1Place",
+                new InstantCommand(() -> {
+                elevator_Subsystem.setHeight(0.0);
+            }));
+        NamedCommands.registerCommand("L2Place",
+            new InstantCommand(() -> {
+            elevator_Subsystem.setHeight(46.0);
+        }));
+        NamedCommands.registerCommand("L3Place",
+            new InstantCommand(() -> {
+            elevator_Subsystem.setHeight(86.0);
+        }));
+        NamedCommands.registerCommand("L4Place",
+            new InstantCommand(() -> {
+            elevator_Subsystem.setHeight(150.0);
+        }));
+        NamedCommands.registerCommand("Pickup",
+            new InstantCommand(() -> {
+            elevator_Subsystem.setHeight(50.0);
+        }));
+        NamedCommands.registerCommand("Release", 
+            new SequentialCommandGroup (
+            new setElevatorSetpoint(83.0),
+            new setWristPos(true),
+            new ReleaseCoral(),
+            new setWristPos(false),
+            new setElevatorSetpoint(42.0)
+        ));
+        
 
 
         autoChooser = AutoBuilder.buildAutoChooser();

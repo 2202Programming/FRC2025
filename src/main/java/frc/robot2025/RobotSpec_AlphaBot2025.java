@@ -2,10 +2,14 @@ package frc.robot2025;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.revrobotics.spark.SparkFlex;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,6 +25,7 @@ import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
+import frc.lib2202.subsystem.swerve.AutoPPConfigure;
 import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
@@ -31,12 +36,18 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.EndEffector_Subsystem;
+import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.SignalLight;
+import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
+
   // Subsystems and other hardware on 2025 Robot rev Alpha
-  // $env:serialnum = "032381BF"
+  // $env:serialnum = "03282B65"
   final SubsystemConfig ssconfig = new SubsystemConfig("AlphaBot2025", "03282B65")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
@@ -46,21 +57,30 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       })
       // .add(PneumaticsControl.class)
       .add(BlinkyLights.class, "LIGHTS", () -> {
-        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE2, CAN.CANDLE4);
+        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE3, CAN.CANDLE4);
       })
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
-      //.add(GroundIntake.class)
+      .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
+      .add(Command.class, "ElevatorWatcher", () -> {
+       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
+      })
+
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
-      .add(Limelight.class, "limelight")
+      .add(Limelight.class, "limelight", ()-> {
+        // Limelight position in robot coords - this has LL in the front of bot
+        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
+          new Rotation3d(0.0, 30.0/DEGperRAD, 0.0));
+        return new Limelight("limelight", LimelightPosition );
+      })
       .add(SwerveDrivetrain.class, "drivetrain", () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       })
-      .add(OdometryInterface.class, "odometry", () ->{
+      .add(OdometryInterface.class, "odometry", () -> {
         var obj = new Odometry();
         obj.new OdometryWatcher();
         return obj;
@@ -70,9 +90,15 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(Command.class, "DT_Monitor", () -> {
         return new DTMonitorCmd();
-      });
-
-  boolean swerve = true;
+      })
+      .add(Wrist.class)
+      .add(SignalLight.class, "signal")
+      .add(EndEffector_Subsystem.class)
+      .add(Command.class, "endEffectorWatcher", () -> {
+        return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
+      })
+      .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
+      ;
 
   // Robot Speed Limits
   RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
@@ -83,9 +109,13 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   double kDriveGR = 6.12;
   double kWheelDiameter = MperFT * 4.0 / 12.0; // [m]
 
+
   final ChassisConfig chassisConfig = new ChassisConfig(
-      0.57785 / 2.0, // x, based on direct measurements
-      0.57785 / 2.0, // y, based on direct measurements
+      //0.57785 / 2.0, 
+      //0.57785 / 2.0,  
+      //dpl - 28" x 28"
+      0.7112 / 2.0,  // x,  
+      0.7112 / 2.0,  // y, 
       kWheelCorrectionFactor, // scale [] <= 1.0
       kWheelDiameter,
       kSteeringGR,
@@ -93,6 +123,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       new PIDFController(0.085, 0.00055, 0.0, 0.21292), // drive
       new PIDFController(0.01, 0.0, 0.0, 0.0) // angle
   );
+
+   
 
   public RobotSpec_AlphaBot2025() {
     // finish BetaBot's drivePIDF
@@ -117,28 +149,30 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   public ChassisConfig getChassisConfig() {
     return chassisConfig;
   }
-
   @Override
   public ModuleConfig[] getModuleConfigs() {
     ModuleConfig[] modules = new ModuleConfig[4];
-    modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle,
-        43.41759375)
+        // the rotation below was done and that's why the CAN IDs don't match what's in constants
+        //A rotation was done below and CAN IDs don't match other names - THIS IS OKAY, DO NOT CHANGE THEM -- DPL + BG
+        //FL -> BL
+        //FR -> FL
+        //BL -> BR
+        //BR -> FR
+
+        modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
+        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle, -155.390531)
         .setInversions(false, true, false);
 
-    modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,
-        -66.2694375)
+        modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
+        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle, 24.873296)
         .setInversions(true, true, false);
 
-    modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,
-        49.482265625)
+        modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
+        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle, 133.153921)
         .setInversions(false, true, false);
 
-    modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle,
-        -66.005609375)
+        modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
+        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,  -40.605625)
         .setInversions(true, true, false);
 
     return modules;
@@ -146,16 +180,32 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
   @Override
   public void setBindings() {
+    // SS we need to test
+    OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
+    DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
 
-    // TODO - figure better way to handle bindings
+    // Initialize PathPlanner, if we have needed Subsystems
+    if (odo != null && sdt != null) {
+      AutoPPConfigure.configureAutoBuilder(sdt, odo);
+      PathfindingCommand.warmupCommand().schedule();
+    }
     
-    // Select either comp or other for testing
+    // Competition bindings -  NOTE: OPR portion of comp binding disabled 
+    // until done with integration.
     BindingsCompetition.ConfigureCompetition(dc);
-    //BindingsOther.ConfigureOther(dc);
+    
+    // Place your test binding in ./testBinding/<yourFile>.java and call it here
+    // comment out any conflicting bindings. Try not to push with your bindings
+    // active. Just comment them out.
+    
+    //DPLPathTest.myBindings(dc); 
+    //ElevTest.myBindings(dc);
+    //EndEffectorTest.myBindings(dc);
+    //GITest.myBindings(dc);
 
-    // start anyting else
-    new PDPMonitorCmd(); // auto scheduled, runs when disabled, moved from bindings
+    // FOR BOT ON BOARD you can configure bindings directly here
+    // or create a binding file in ./testBindings/BotOnBoard<N>.java
   }
 
   @Override
@@ -166,8 +216,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public SendableChooser<Command> getRegisteredCommands() {
     // no robot parts to support thse now
-    // return RegisteredCommands.RegisterCommands();
-    return null;
+    return RegisteredCommands.RegisterCommands();
   }
 
   @Override
@@ -177,5 +226,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       drivetrain.setDefaultCommand(new FieldCentricDrive());
     }
   }
+
+  /*
+   * Add additional calls to the robotPeriodic loop
+   */
+  @Override
+  public void periodic() {
+    UXTrim.periodic();
+  }
+
 
 }
