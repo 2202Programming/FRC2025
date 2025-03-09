@@ -7,7 +7,11 @@
 
 package frc.robot2025.subsystems;
 
+import static frc.lib2202.Constants.DEGperRAD;
+import static frc.lib2202.Constants.DT;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.sim.Pigeon2SimState;
 
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
@@ -16,9 +20,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.RobotBase;
 //import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib2202.builder.RobotContainer;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.util.ModMath;
 import frc.robot2025.Constants.CAN;
@@ -58,6 +65,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   CANStatus m_canStatus;
 
   // Simulation TBD
+  boolean simInit = false;
+  Pigeon2SimState simPigeon;
   
   // measured angles and rates, in degrees
   double m_roll;
@@ -168,18 +177,37 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_Xaccel = m_pigeon.getAccelerationX(false).getValueAsDouble();
     m_Yaccel = m_pigeon.getAccelerationY(false).getValueAsDouble();
     m_Zaccel = m_pigeon.getAccelerationZ(false).getValueAsDouble();
+
+    if(RobotBase.isSimulation()) {
+      // right now we use Z axis, but that is not handled by simPigeon
+      // so use the getYaw() - TODO confirm sign
+      m_yaw = ModMath.fmod360_2(-m_pigeon.getYaw(true).getValueAsDouble() 
+      + m_yaw_offset); 
+    }
     log();
   }
 
+  // use sdt to fake gryo
+  DriveTrainInterface sdt = null;
+
   void setupSimulation() {
-    // m_gyroSim_ahrs = new AHRS_GyroSim(m_ahrs);
-    // m_gyroSim SimDevice
+    sdt = RobotContainer.getSubsystemOrNull("drivetrain");
+    simPigeon = m_pigeon.getSimState();
+    simPigeon.setSupplyVoltage(12.0);
+    simInit = true;
   }
 
   @Override
   public void simulationPeriodic() {
-    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    if (!simInit) setupSimulation();    
+    if (sdt == null) return;
+    var field_speeds = sdt.getFieldRelativeSpeeds();
+    var yaw_rate = field_speeds.omegaRadiansPerSecond * DT * DEGperRAD;
+    //add our yaw rate to the sim  //TODO check sign
+    simPigeon.addYaw(yaw_rate);
+    
   }
+
 
   public void log() {
     if ((log_counter++ % NT_UPDATE_FRAME) == 0) {

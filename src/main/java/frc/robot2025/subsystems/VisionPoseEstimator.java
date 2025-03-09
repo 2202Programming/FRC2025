@@ -46,20 +46,12 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     final VisionWatchdog watchdog;
     final BaseLimelight limelight;
-
-    Matrix<N3, N1> visionMeasurementStdDevs = new Matrix<N3, N1>(N3.instance, N1.instance);
-
-    // Bearing calcs (TBD)
-    // private double currentBearing = 0;
-    //private double filteredBearing = 0;
-    //private double filteredVelocity = 0;
-
-    // Creates a new Single-Pole IIR filter
-    // Filter Time constant is 0.1 seconds
-    // Period is 0.02 seconds - this is the standard FRC main loop period
-    //private LinearFilter bearingFilter = LinearFilter.singlePoleIIR(0.1, Constants.DT);
-    //private LinearFilter velocityFilter = LinearFilter.singlePoleIIR(0.1, Constants.DT);
-
+    
+    // stddev based on distance/quality of tag
+    final Matrix<N3, N1> closeStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
+    final Matrix<N3, N1> medStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
+    final Matrix<N3, N1> farStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
+    
     boolean visionPoseUsingRotation = true; // read from drivetrain.useVisionRotation()
     boolean visionPoseEnabled = true;
 
@@ -74,7 +66,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     private Pose2d prev_llPose;
 
     // field estimate based on vision estimate llPose
-    public final Field2d m_field;
+    final Field2d m_field;
     final FieldObject2d m_field_obj;
     final String m_ll_name;
     String altName;
@@ -92,7 +84,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         watchdog = new VisionWatchdog(watchdog_interval);
         m_field = new Field2d();
         m_ll_name = limelightName;
-        m_field_obj = m_field.getObject("VPE_" + m_ll_name);
+        m_field_obj = m_field.getObject("VPE_odo" + m_ll_name);
 
         // other subsystems
         drivetrain = RobotContainer.getSubsystemOrNull("drivetrain");
@@ -129,7 +121,10 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         else {
             m_estimator = null;
         }
+
+        SmartDashboard.putData("FieldVPE", m_field );
     } // ctor
+
 
     @Override
     public void periodic() {
@@ -138,12 +133,13 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         m_odoPose = m_odometry.getPose();
         meas_pos = drivetrain.getSwerveModulePositions();
         llPose = updateEstimator();
-        m_field_obj.setPose(llPose);
+        m_field.setRobotPose(llPose);
+        m_field_obj.setPose(m_odoPose);
 
         // compare llPose and odometry pose for reporting       
-        x_diff = Math.abs(llPose.getX() - m_odoPose.getX());
-        y_diff = Math.abs(llPose.getY() - m_odoPose.getY());
-        yaw_diff = Math.abs(llPose.getRotation().getDegrees() - m_odoPose.getRotation().getDegrees());
+        x_diff = (llPose.getX() - m_odoPose.getX());
+        y_diff = (llPose.getY() - m_odoPose.getY());
+        yaw_diff = (llPose.getRotation().getDegrees() - m_odoPose.getRotation().getDegrees());
     }
 
     // helper functions
@@ -174,16 +170,13 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
             var pose = limelight.getBluePose();
             var ts = limelight.getVisionTimestamp();
             
-            //wip use ll stddevs to adjust vision measurments
-            double[] stddevs = getStddevs();
-            visionMeasurementStdDevs.set(0, 0, stddevs[6]);   //mt2 x
-            visionMeasurementStdDevs.set(0, 0, stddevs[7]);   //mt2 y
-            visionMeasurementStdDevs.set(0, 0, stddevs[8]);   //mt2 deg
-
+            m_estimator.setVisionMeasurementStdDevs(farStdDevs);
             m_estimator.addVisionMeasurement(pose, ts);
             if (watchdog != null)
                 watchdog.update(pose, prev_llPose);
         }
+
+        //llPose calc - adds heading and drivetrain measurements
         return m_estimator.update(gyro.getRotation2d(), meas_pos);       
     }
 
@@ -240,21 +233,22 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     
     @Override
     public void setPose(Pose2d newPose) {
+        // reset gyro, llPose, and odo_pose to the given newPose
         m_odoPose = newPose;
-        // set everything to new pose
+        // set everything to new pose, gyro & odometry
         gyro.setHeading(m_odoPose.getRotation()); 
         m_odometry.setPose(m_odoPose);
         
-        // drive positions could be cleare, re-read them
+        // drive positions could be cleared, re-read them
         meas_pos = drivetrain.getSwerveModulePositions();
-        // set our estimators new pose with current drivetrains wheel meas_pos
+        // set our estimator's newPose with current drivetrains wheel meas_pos
         m_estimator.resetPosition(gyro.getHeading(), meas_pos, m_odoPose);
-        llPose = m_estimator.getEstimatedPosition();  //note - llpose should be same 
+        llPose = m_estimator.getEstimatedPosition(); 
     }
     
     @Override
     public void setAnglePose(Rotation2d rot) {
-        setPose(new Pose2d(m_odoPose.getTranslation(), rot));
+        setPose(new Pose2d(llPose.getTranslation(), rot));
     }
     @Override
     public Pose2d getPose() {
@@ -262,9 +256,10 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     }
     @Override
     public void printPose() {
-        System.out.println("***VisionPoseEstimator " + m_ll_name + " X:" + llPose.getX() +
-        ", Y:" + llPose.getY() +
-        ", Rot:" + llPose.getRotation().getDegrees());
+        System.out.println("***VisionPoseEstimator " + m_ll_name + 
+        "\n   X: " + llPose.getX() +
+        "\n   Y: " + llPose.getY() +
+        "\n Rot: " + llPose.getRotation().getDegrees());
     }
     @Override
     public SwerveDriveKinematics getKinematics() {
@@ -292,8 +287,6 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         NetworkTableEntry est_pv_pose_y;
         NetworkTableEntry est_pv_pose_h;
 
-        Pose2d ll_pose;
-        Pose2d pv_pose;
 
         public VisionPoseEstimatorMonitorCmd() {
         }
@@ -306,34 +299,27 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         @Override
         public void ntcreate() {
             NetworkTable MonitorTable = getTable();
-            est_ll_pose_x = MonitorTable.getEntry("/LL/X");
-            est_ll_pose_y = MonitorTable.getEntry("/LL/Y");
-            est_ll_pose_h = MonitorTable.getEntry("/LL/Heading");
+            est_ll_pose_x = MonitorTable.getEntry("LL/X");
+            est_ll_pose_y = MonitorTable.getEntry("LL/Y");
+            est_ll_pose_h = MonitorTable.getEntry("LL/Heading");
 
             //est_pv_pose_x = MonitorTable.getEntry("/PV/X");
             //est_pv_pose_y = MonitorTable.getEntry("/PV/Y");
             //est_pv_pose_h = MonitorTable.getEntry("/PV/Heading");
 
             // Network Table setup
-            nt_x_diff = MonitorTable.getEntry("/compareLLOdo/diffX");
-            nt_y_diff = MonitorTable.getEntry("/compareLLOdo/diffY");
-            nt_yaw_diff = MonitorTable.getEntry("/compareLLOdo/diffHeading");
+            nt_x_diff = MonitorTable.getEntry("compareLLOdo/diffX");
+            nt_y_diff = MonitorTable.getEntry("compareLLOdo/diffY");
+            nt_yaw_diff = MonitorTable.getEntry("compareLLOdo/diffHeading");
         }
 
         // Network Table Monitoring
         @Override
-        public void ntupdate() {
-            SmartDashboard.putData("Field_vision", m_field);
-
-            if (ll_pose != null) {
-                est_ll_pose_x.setDouble(ll_pose.getX());
-                est_ll_pose_y.setDouble(ll_pose.getY());
-                est_ll_pose_h.setDouble(ll_pose.getRotation().getDegrees());
-            }
-            if (pv_pose != null) {
-            //    est_pv_pose_x.setDouble(pv_pose.getX());
-            //    est_pv_pose_y.setDouble(pv_pose.getY());
-            //    est_pv_pose_h.setDouble(pv_pose.getRotation().getDegrees());
+        public void ntupdate() {           
+            if (llPose != null) {
+                est_ll_pose_x.setDouble(llPose.getX());
+                est_ll_pose_y.setDouble(llPose.getY());
+                est_ll_pose_h.setDouble(llPose.getRotation().getDegrees());
             }
 
             // vision pose updating NTs
@@ -343,6 +329,11 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         }
 
     } // monitor cmd class
+
+    Matrix<N3, N1> getStdDev() {
+        // use TBD to pick the stddev to log the vision estimate with
+        return medStdDevs;
+    }
 
     // https://www.chiefdelphi.com/t/limelight-odometry-question/433311/6
 // public void updatePoseEstimatorWithVisionBotPose() {
@@ -374,16 +365,5 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 //         xyStds = 2.0;
 //         degStds = 30;
 //       }
-//       // conditions don't match to add a vision measurement
-//       else {
-//         return;
-//       }
-
-//       m_poseEstimator.setVisionMeasurementStdDevs(
-//           VecBuilder.fill(xyStds, xyStds, Units.degreesToRadians(degStds)));
-//       m_poseEstimator.addVisionMeasurement(visionBotPose.pose2d,
-//           Timer.getFPGATimestamp() - visionBotPose.latencySeconds);
-//     }
-//   }
 
 }

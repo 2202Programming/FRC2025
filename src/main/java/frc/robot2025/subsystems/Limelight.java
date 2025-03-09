@@ -61,28 +61,33 @@ public class Limelight extends BaseLimelight {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    pipeline = pipelineNTE.getInteger(0);
+    pipeline = nt_pipelineNTE.getInteger(0);
 
     LimelightHelpers.SetRobotOrientation(name, gyro.getHeading().getDegrees(), 0, 0, 0, 0, 0);
     // LimelightHelpers.PoseEstimate mt1 =
     // LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-    rejectUpdate = false;
+    
+    //outputs 
+    targetValid = false;
+    rejectUpdate = true;
     numAprilTags = 0; // gets changed if mt2 is valid
     // in sim, mt2 is null, need to protect so we can debug
-    if (mt2 == null) 
+    if (mt2 == null){
+      log();  //update NT with values
       return;
+    }
 
     // rejectUpdate on poor conditions @Dr.J ?? what does [0] refer too???
     rejectUpdate = 
         //(mt2.rawFiducials[0].ambiguity > 0.7) ||     //mt1 only
         //(mt2.rawFiducials[0].distToCamera > 3.0) ||  //mt1 only
         (mt2.tagCount == 0) ||
+        (mt2.pose.getX() == 0.0) ||            // rejest if 0,0,0 pose - chief delphi rec
         (Math.abs(gyro.getYawRate()) > 720.0); // reject if spining fast
 
     if (!rejectUpdate) {
       bluePose = mt2.pose;
-      // bluePose2 = mt2.pose;
     }
     numAprilTags = mt2.tagCount;
 
@@ -92,8 +97,6 @@ public class Limelight extends BaseLimelight {
         - (LimelightHelpers.getLatency_Pipeline(this.name) / 1000.0)
         - (LimelightHelpers.getLatency_Capture(this.name) / 1000.0);
 
-    // update a few NT entries every frame
-    nt_numApriltags.setInteger(numAprilTags);
     log(); // do logging at end
   }
   
