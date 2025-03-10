@@ -58,7 +58,7 @@ public class PickupSequence extends Command {
       if(station){
         elevator.setHeight(Levels.LTwo);
       } else{
-        elevator.setHeight(Levels.Ground);
+        elevator.setHeight(Levels.LOne);
       }
         wrist.setPos(wrist.drop);
         if(elevator.atSetpoint() && wrist.atSetpoint()){

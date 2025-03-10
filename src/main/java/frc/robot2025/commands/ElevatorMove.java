@@ -34,7 +34,7 @@ public class ElevatorMove extends Command {
   @Override
   public void end(boolean interrupted) {
     if (interrupted) {
-      elevator_Subsystem.setHeight(Levels.Ground);
+      elevator_Subsystem.setHeight(Levels.PickUp);
     }
   }
 
