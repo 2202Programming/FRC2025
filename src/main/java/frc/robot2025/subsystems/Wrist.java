@@ -18,8 +18,8 @@ public class Wrist extends SubsystemBase {
   double prevPos;
   double lastCommandTime;
   double timeToFinish;
-  public final double pickup = 1.0;
-  public final double drop = 0.3;
+  public final double pickup = 1.0; //pickup position from source
+  public final double drop = 0.3; //drop position for L2/3
 
   public Wrist() {
     this(PowerUpPosition);
