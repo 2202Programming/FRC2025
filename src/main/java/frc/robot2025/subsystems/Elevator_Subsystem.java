@@ -109,8 +109,8 @@ public class Elevator_Subsystem extends SubsystemBase {
     followMotorConfig = new SparkFlexConfig();
     followMotorConfig
       .inverted(motors_inverted)
-      .idleMode(IdleMode.kBrake)
-      .follow(CAN.ELEVATOR_MAIN) //motor 2 follows the servo's behavior
+      .idleMode(IdleMode.kCoast)
+      // .follow(CAN.ELEVATOR_MAIN) //motor 2 follows the servo's behavior
       .closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder) 
           .outputRange(-1.0, 1.0);          
