@@ -54,7 +54,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private SparkClosedLoopController cl_ctrl; 
 
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
-  final int STALL_CURRENT = 60;
+  final int STALL_CURRENT = 60; //80 for one motor 5:1 GR, 15:1 60 should be fine
   final int FREE_CURRENT = 5;
   final double elevatorMaxVel = 50.0; // [cm/s] rpm
   final double elevatorMaxAccel = 50.0; // [cm/s^2]  servo may not enforce yet
@@ -72,7 +72,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   private final double stagesRatio = 1.0;   // [out/in] 
   // cf_spec - TODO not used yet, should workout to what was measured/corrected
   public final double cf_spec = gearRatio * stagesRatio * chainRatio * pitchDiameter * Math.PI * sprocket_circumference ;
-  public final double cf = 8.75;  // 8.9026[cm/mtr-rot]  // ad-hoc measured 2/17/25, 12.627857 bfre
+  public final double cf = 8.75;  // 8.9026[cm/mtr-rot]  // ad-hoc measured 2/17/25, 12.627857 bfre //triple soon for single motor
  
   
   public Elevator_Subsystem() {
