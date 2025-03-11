@@ -51,8 +51,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   // angles
   private NetworkTableEntry nt_yaw;
   private NetworkTableEntry nt_yaw_offset;
-  private NetworkTableEntry nt_yaw_simple;
-  private NetworkTableEntry nt_yaw_quatZ;
+  private NetworkTableEntry nt_yaw_Z;
   private NetworkTableEntry nt_yaw_dot;
   private NetworkTableEntry nt_roll;
   private NetworkTableEntry nt_roll_dot;
@@ -75,8 +74,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   double m_pitch_d;
   double m_yaw;         //includes offset
   double m_yaw_offset;  //avoid CAN io, so track offset on resetting gyro
-  double m_yaw_simple;  //uses pigeon.getYaw, debugging
-  double m_yaw_quatZ;   //debug - might be faster than whole 
+  double m_yaw_Z;  //uses pigeon.getYaw, debugging
   double m_yaw_d;
   
   //accelerations
@@ -114,8 +112,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     nt_roll = table.getEntry("Roll");
     nt_yaw = table.getEntry("Yaw");
     nt_yaw_offset = table.getEntry("yawOffset");
-    nt_yaw_simple = table.getEntry("yawSimpleDBG");
-    nt_yaw_quatZ = table.getEntry("yawZquatDBG");
+    nt_yaw_Z = table.getEntry("yaw_Z");
+
     nt_yaw_dot = table.getEntry("YawDot");
     nt_pitch_dot = table.getEntry("PitchDot");
     nt_roll_dot = table.getEntry("RollDot");
@@ -153,11 +151,11 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   @Override
   public void periodic() {
     // CCW positive, inverting here to match all the NavX code previously written.
-    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
+    m_yaw_Z = ModMath.fmod360_2(m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
             + m_yaw_offset); // quaternian-based works in field centric
     // m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
     // m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
-    m_yaw_quatZ = -m_pigeon.getQuatZ().getValueAsDouble() * 180.0/Math.PI;
+
     // pigeon gets done with (false) so as not to wait, using cached value
 
     // Use the direct r/p/y from pigeon instead of above unpack from 3d ... not sure of difference 
@@ -165,13 +163,13 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_pitch = m_pigeon.getPitch(false).getValueAsDouble() - m_pitch_bias;
 
     // this wasn't working in FieldCentric, had -m_pigeon.getYaw(), could be sign...?
-    m_yaw_simple = ModMath.fmod360_2(m_pigeon.getYaw(false).getValueAsDouble() 
+    m_yaw = ModMath.fmod360_2(m_pigeon.getYaw(true).getValueAsDouble() 
       + m_yaw_offset); 
     
     // Getting the angular velocities [deg/s]
     m_roll_d = m_pigeon.getAngularVelocityXWorld(false).getValueAsDouble();
     m_pitch_d = m_pigeon.getAngularVelocityYWorld(false).getValueAsDouble();
-    m_yaw_d = m_pigeon.getAngularVelocityZWorld(false).getValueAsDouble();
+    m_yaw_d = m_pigeon.getAngularVelocityZWorld(true).getValueAsDouble();
    
     // read accelerations
     m_Xaccel = m_pigeon.getAccelerationX(false).getValueAsDouble();
@@ -181,7 +179,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     if(RobotBase.isSimulation()) {
       // right now we use Z axis, but that is not handled by simPigeon
       // so use the getYaw() - TODO confirm sign
-      m_yaw = ModMath.fmod360_2(-m_pigeon.getYaw(true).getValueAsDouble() 
+      m_yaw = ModMath.fmod360_2(m_pigeon.getYaw(true).getValueAsDouble() 
       + m_yaw_offset); 
     }
     log();
@@ -219,8 +217,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
 
       nt_yaw.setDouble(getYaw());
       nt_yaw_offset.setDouble(m_yaw_offset);
-      nt_yaw_simple.setDouble(m_yaw_simple);
-      nt_yaw_quatZ.setDouble(m_yaw_quatZ);
+      nt_yaw_Z.setDouble(m_yaw_Z);
+  
       //
       nt_rotation.setDouble(getRotation2d().getDegrees());
       nt_roll.setDouble(getRoll());
@@ -349,7 +347,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    */
   // @Override
   public Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(-m_yaw); // note sign
+    return Rotation2d.fromDegrees(m_yaw); // note sign
   }
 
   /*
