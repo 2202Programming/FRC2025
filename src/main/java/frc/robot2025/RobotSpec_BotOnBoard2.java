@@ -18,12 +18,12 @@ import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.GroundIntake.BtmArmGoToPos;
+import frc.robot2025.commands.GroundIntake.BtmArmVel;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
-import frc.robot2025.commands.GroundIntake.Debug.SetZero;
-import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.TopHold;
+import frc.robot2025.commands.GroundIntake.SetZero;
+import frc.robot2025.commands.GroundIntake.TopArmVel;
+import frc.robot2025.commands.GroundIntake.TopHold;
 import frc.robot2025.subsystems.GroundIntake;
 
 //copy or extend this code for your robot - remember to override:
@@ -115,11 +115,11 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
         CommandXboxController operator = (CommandXboxController) dc.Operator();
         // keep for testing purposes -er
 
-        operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
-        operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
-        operator.povRight().whileTrue(new TopArmFwd(30.0));
-        operator.povLeft().whileTrue(new TopArmFwd(-30.0));
-        operator.a().onTrue(new BtmArmRelPos(0.0));
+        operator.rightBumper().whileTrue(new BtmArmVel(30.0));
+        operator.leftBumper().whileTrue(new BtmArmVel(-30.0));
+        operator.povRight().whileTrue(new TopArmVel(30.0));
+        operator.povLeft().whileTrue(new TopArmVel(-30.0));
+        operator.a().onTrue(new BtmArmGoToPos(0.0));
         
         operator.b().onTrue(new SetZero());
         operator.rightTrigger().whileTrue(new TopHold(5.0));

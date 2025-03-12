@@ -32,13 +32,13 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.GroundIntake.BtmArmGoToPos;
+import frc.robot2025.commands.GroundIntake.BtmArmVel;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
-import frc.robot2025.commands.GroundIntake.Debug.SetZero;
-import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.TopHold;
+import frc.robot2025.commands.GroundIntake.SetZero;
+import frc.robot2025.commands.GroundIntake.TopArmVel;
+import frc.robot2025.commands.GroundIntake.TopHold;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
@@ -165,12 +165,12 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // BindingsOther.ConfigureOther(dc);
 
     // velocity commands for calibration
-    operator.rightBumper().whileTrue(new BtmArmFwd(30.0));
-    operator.leftBumper().whileTrue(new BtmArmFwd(-30.0));
-    operator.povRight().whileTrue(new TopArmFwd(30.0));
-    operator.povLeft().whileTrue(new TopArmFwd(-30.0));
+    operator.rightBumper().whileTrue(new BtmArmVel(30.0));
+    operator.leftBumper().whileTrue(new BtmArmVel(-30.0));
+    operator.povRight().whileTrue(new TopArmVel(30.0));
+    operator.povLeft().whileTrue(new TopArmVel(-30.0));
 
-    operator.povUp().onTrue(new BtmArmRelPos(0.0));
+    operator.povUp().onTrue(new BtmArmGoToPos(0.0));
     operator.povDown().onTrue(new SetZero()); // should be bound to an actual button but we dont have room rn -er
     operator.rightTrigger().whileTrue(new TopHold(5.0));
 
