@@ -20,8 +20,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.RobotBase;
-//import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.builder.RobotContainer;
@@ -150,7 +149,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
 
   @Override
   public void periodic() {
-    // CCW positive, inverting here to match all the NavX code previously written.
+    // CCW positive
     m_yaw_Z = ModMath.fmod360_2(m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
             + m_yaw_offset); // quaternian-based works in field centric
     // m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
@@ -175,13 +174,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_Xaccel = m_pigeon.getAccelerationX(false).getValueAsDouble();
     m_Yaccel = m_pigeon.getAccelerationY(false).getValueAsDouble();
     m_Zaccel = m_pigeon.getAccelerationZ(false).getValueAsDouble();
-
-    if(RobotBase.isSimulation()) {
-      // right now we use Z axis, but that is not handled by simPigeon
-      // so use the getYaw() - TODO confirm sign
-      m_yaw = ModMath.fmod360_2(m_pigeon.getYaw(true).getValueAsDouble() 
-      + m_yaw_offset); 
-    }
     log();
   }
 
@@ -201,8 +193,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     if (sdt == null) return;
     var field_speeds = sdt.getFieldRelativeSpeeds();
     var yaw_rate = field_speeds.omegaRadiansPerSecond * DT * DEGperRAD;
-    //add our yaw rate to the sim  //TODO check sign
     simPigeon.addYaw(yaw_rate);
+    simPigeon.setAngularVelocityZ(yaw_rate);
     
   }
 
@@ -317,6 +309,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   public void setYaw(double yawDegrees) {
     m_pigeon.setYaw(yawDegrees);
     m_yaw_offset = 0.0;  //no offset needed, gyro state set
+    DriverStation.reportError("***DEPRECATED setYaw() <== " + yawDegrees, false);
   }
   @Deprecated
   public void setYaw(Rotation2d rotation) {
@@ -367,7 +360,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   public void setAutoStartPose(Pose2d pose) {
     autoStartPose = new Pose2d(pose.getTranslation(), pose.getRotation());
     setYaw(pose.getRotation()); // set gyro to starting heading so it's in field coordinates.
-    System.out.println("***Auto Start Pose set: " + pose);
+    DriverStation.reportError("***DEPRECATED Auto Start Pose set: " + pose, false);
   }
 
   @Deprecated
@@ -398,6 +391,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
      * So with multiple paths this rotation error in pose may accumulate?
      */
     // RobotContainer.RC().drivetrain.resetAnglePose(pose.getRotation().minus(rotError));
-    System.out.println("***Corrected End Pose: " + pose);
+    DriverStation.reportError("***DEPRECATED Auto End Pose set: " + pose, false);
   }
 }

@@ -25,7 +25,6 @@ import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.AutoPPConfigure;
-import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
@@ -89,9 +88,6 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // VisonPoseEstimator needs LL and Odometry
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Command.class, "DT_Monitor", () -> {
-        return new DTMonitorCmd();
-      })
       .add(Wrist.class)
       .add(SignalLight.class, "signal")
       .add(EndEffector_Subsystem.class)

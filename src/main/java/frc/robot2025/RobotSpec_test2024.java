@@ -28,7 +28,6 @@ import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.AutoPPConfigure;
-import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
@@ -105,9 +104,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
             })
             // VisonPoseEstimator needs LL and Odometry
             .add(VisionPoseEstimator.class)
-            .add(Command.class, "DT_Monitor", () -> {
-                return new DTMonitorCmd();
-            });
+            ;
 
     // set this true at least once after robot hw stabilizes
     boolean burnFlash = false;
