@@ -37,9 +37,9 @@ public class GroundIntake extends SubsystemBase {
     ALGAE_PICKUP(-45.0, 125.0),
     ALGAE_PLACE(-45.0, 100.0), // algae place
     ALGAE_REST(-45.0, 100.0),
-    CORAL_PICKUP(-14.0, 125.0),
-    CORAL_PLACE(-18.0, 45.0), // coral place
-    CORAL_REST(-20.0, 45.0),
+    CORAL_PICKUP(-12.0, 125.0),
+    CORAL_PLACE(-12.0, 45.0), // coral place
+    CORAL_REST(-12.0, 45.0),
     FLOOR(0.0, 120.0);
 
     public double topval;
@@ -169,7 +169,7 @@ public class GroundIntake extends SubsystemBase {
       aff = (dir > 0.0) ? 0.003 : -0.02;
     }
     if (dir== 0.0){
-      aff = -0.02;
+      aff = 0.0;
     }
     topServo.setArbFeedforward(aff);
     topServo.setVelocityCmd(dir);
