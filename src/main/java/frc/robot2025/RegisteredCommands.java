@@ -49,8 +49,7 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
-        NamedCommands.registerCommand("pickup station", new PickupSequence(Levels.LOne, true)
-        );
+        NamedCommands.registerCommand("pickup station", new PickupSequence(Levels.LOne, true));
 
         //enable chooser - builds autochooser list
         autoChooser = AutoBuilder.buildAutoChooser();
