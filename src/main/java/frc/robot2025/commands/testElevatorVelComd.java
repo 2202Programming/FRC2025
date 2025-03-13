@@ -16,7 +16,7 @@ public class testElevatorVelComd extends Command {
   double vel;
   
   public testElevatorVelComd(double vel) {
-    SmartDashboard.putNumber("Current Vel", 0.0);
+    SmartDashboard.putNumber("Current Vel", 30.0);
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.vel = vel;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -24,7 +24,7 @@ public class testElevatorVelComd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    vel = SmartDashboard.getNumber("Current Vel", 0.0);
+    vel = SmartDashboard.getNumber("Current Vel", 30.0);
     elevator_Subsystem.setVelocity(vel);
     System.out.println(vel + "CURRENT PRINT");
     System.out.println(elevator_Subsystem.getDesiredVelocity() + "Desired vel");

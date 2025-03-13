@@ -29,9 +29,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Coral Source to Reef Tags 8 or 17"
+            "name": "PlaceL3"
           }
         },
         {
