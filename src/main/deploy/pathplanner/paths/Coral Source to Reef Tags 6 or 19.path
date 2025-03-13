@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 3.6640292553191487,
-        "y": 5.390259308510638
+        "x": 3.709431818181818,
+        "y": 5.416036931818183
       },
       "prevControl": {
-        "x": 2.8951394632037406,
-        "y": 6.044468932597287
+        "x": 2.94054202606641,
+        "y": 6.0702465559048315
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 27.33208337591313
+    "rotation": -60.42216131873873
   },
   "reversed": false,
   "folder": "Coral Source to Reef Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 37.73980430512444
+    "rotation": -53.99705551997023
   },
   "useDefaultConstraints": true
 }

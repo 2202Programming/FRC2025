@@ -5,7 +5,10 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import java.util.logging.Level;
+
 import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -14,6 +17,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
@@ -36,12 +40,15 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.TheField;
+import frc.robot2025.commands.CoralPlaceSequence;
+import frc.robot2025.commands.PickupSequence;
 import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.commands.distanceWatcher;
 // 2024 robot has a pigeon, so use its sensors, add LL4
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.VisionPoseEstimator;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.testBindings.DPLPathTest;
 
 public class RobotSpec_test2024 implements IRobotSpec {
@@ -138,6 +145,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
 
         // finally add this spec to the config
         config.setRobotSpec(this);
+
     }
 
     // Required method that use the specs above

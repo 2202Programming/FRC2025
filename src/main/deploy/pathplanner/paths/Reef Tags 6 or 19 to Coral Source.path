@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 36.869897645843956
+    "rotation": -53.69275429983877
   },
   "reversed": false,
   "folder": "Reef to Coral Source Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 31.689810857615527
+    "rotation": -58.75881917972359
   },
   "useDefaultConstraints": true
 }

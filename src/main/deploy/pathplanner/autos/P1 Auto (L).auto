@@ -5,28 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "P1 to Tags 11 or 20 Left"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L3Place"
-                }
-              }
-            ]
+            "pathName": "P1 to Tags 11 or 20 Left"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Release"
+            "name": "L3Place"
           }
         },
         {
@@ -36,9 +23,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 3.0
+            "name": "pickup station"
           }
         },
         {
@@ -48,9 +35,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 3.0
+            "name": "L3Place"
           }
         }
       ]

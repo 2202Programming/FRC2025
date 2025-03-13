@@ -2,6 +2,7 @@ package frc.robot2025;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,7 +12,9 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
 import frc.robot2025.Constants.Tag_Pose;
 import frc.robot2025.commands.CoralPlaceSequence;
+import frc.robot2025.commands.PickupSequence;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 
 /*
  * Place commands named in PathPlaner autos here.
@@ -49,6 +52,10 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("Release", 
             new CoralPlaceSequence(83.0)
         );
+        NamedCommands.registerCommand("pickup station", 
+        new PickupSequence(Levels.LOne, true)
+        );
+
 
 
         autoChooser = AutoBuilder.buildAutoChooser();

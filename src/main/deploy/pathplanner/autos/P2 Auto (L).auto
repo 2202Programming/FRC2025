@@ -5,28 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Pos2 to Tags 10 or 21 Left"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L3Place"
-                }
-              }
-            ]
+            "pathName": "Pos2 to Tags 10 or 21 Left"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Release"
+            "name": "L3Place"
           }
         }
       ]
