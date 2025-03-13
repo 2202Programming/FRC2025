@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PlaceL3"
+            "name": "L3Place"
           }
         },
         {
@@ -23,28 +23,21 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Coral Source to Reef Tags 8 or 17"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "PickupAdjustment"
-                }
-              }
-            ]
+            "name": "pickup station"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "PlaceL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L3Place"
           }
         }
       ]

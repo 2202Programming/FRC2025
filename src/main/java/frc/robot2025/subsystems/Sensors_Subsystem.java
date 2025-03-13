@@ -7,7 +7,11 @@
 
 package frc.robot2025.subsystems;
 
+import static frc.lib2202.Constants.DEGperRAD;
+import static frc.lib2202.Constants.DT;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.sim.Pigeon2SimState;
 
 import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
@@ -16,9 +20,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-//import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib2202.builder.RobotContainer;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.util.ModMath;
 import frc.robot2025.Constants.CAN;
@@ -44,8 +50,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   // angles
   private NetworkTableEntry nt_yaw;
   private NetworkTableEntry nt_yaw_offset;
-  private NetworkTableEntry nt_yaw_simple;
-  private NetworkTableEntry nt_yaw_quatZ;
+  private NetworkTableEntry nt_yaw_Z;
   private NetworkTableEntry nt_yaw_dot;
   private NetworkTableEntry nt_roll;
   private NetworkTableEntry nt_roll_dot;
@@ -58,6 +63,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   CANStatus m_canStatus;
 
   // Simulation TBD
+  boolean simInit = false;
+  Pigeon2SimState simPigeon;
   
   // measured angles and rates, in degrees
   double m_roll;
@@ -66,8 +73,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   double m_pitch_d;
   double m_yaw;         //includes offset
   double m_yaw_offset;  //avoid CAN io, so track offset on resetting gyro
-  double m_yaw_simple;  //uses pigeon.getYaw, debugging
-  double m_yaw_quatZ;   //debug - might be faster than whole 
+  double m_yaw_Z;  //uses pigeon.getYaw, debugging
   double m_yaw_d;
   
   //accelerations
@@ -105,8 +111,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     nt_roll = table.getEntry("Roll");
     nt_yaw = table.getEntry("Yaw");
     nt_yaw_offset = table.getEntry("yawOffset");
-    nt_yaw_simple = table.getEntry("yawSimpleDBG");
-    nt_yaw_quatZ = table.getEntry("yawZquatDBG");
+    nt_yaw_Z = table.getEntry("yaw_Z");
+
     nt_yaw_dot = table.getEntry("YawDot");
     nt_pitch_dot = table.getEntry("PitchDot");
     nt_roll_dot = table.getEntry("RollDot");
@@ -143,12 +149,12 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
 
   @Override
   public void periodic() {
-    // CCW positive, inverting here to match all the NavX code previously written.
-    m_yaw = ModMath.fmod360_2(-m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
+    // CCW positive
+    m_yaw_Z = ModMath.fmod360_2(m_pigeon.getRotation3d().getZ() * 180.0 / Math.PI
             + m_yaw_offset); // quaternian-based works in field centric
     // m_pitch = (m_pigeon.getRotation3d().getY() * 180.0 / Math.PI) - m_pitch_bias;
     // m_roll = (m_pigeon.getRotation3d().getX() * 180.0 / Math.PI) - m_roll_bias;
-    m_yaw_quatZ = -m_pigeon.getQuatZ().getValueAsDouble() * 180.0/Math.PI;
+
     // pigeon gets done with (false) so as not to wait, using cached value
 
     // Use the direct r/p/y from pigeon instead of above unpack from 3d ... not sure of difference 
@@ -156,13 +162,13 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     m_pitch = m_pigeon.getPitch(false).getValueAsDouble() - m_pitch_bias;
 
     // this wasn't working in FieldCentric, had -m_pigeon.getYaw(), could be sign...?
-    m_yaw_simple = ModMath.fmod360_2(m_pigeon.getYaw(false).getValueAsDouble() 
+    m_yaw = ModMath.fmod360_2(m_pigeon.getYaw(true).getValueAsDouble() 
       + m_yaw_offset); 
     
     // Getting the angular velocities [deg/s]
     m_roll_d = m_pigeon.getAngularVelocityXWorld(false).getValueAsDouble();
     m_pitch_d = m_pigeon.getAngularVelocityYWorld(false).getValueAsDouble();
-    m_yaw_d = m_pigeon.getAngularVelocityZWorld(false).getValueAsDouble();
+    m_yaw_d = m_pigeon.getAngularVelocityZWorld(true).getValueAsDouble();
    
     // read accelerations
     m_Xaccel = m_pigeon.getAccelerationX(false).getValueAsDouble();
@@ -171,15 +177,27 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
     log();
   }
 
+  // use sdt to fake gryo
+  DriveTrainInterface sdt = null;
+
   void setupSimulation() {
-    // m_gyroSim_ahrs = new AHRS_GyroSim(m_ahrs);
-    // m_gyroSim SimDevice
+    sdt = RobotContainer.getSubsystemOrNull("drivetrain");
+    simPigeon = m_pigeon.getSimState();
+    simPigeon.setSupplyVoltage(12.0);
+    simInit = true;
   }
 
   @Override
   public void simulationPeriodic() {
-    // m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
+    if (!simInit) setupSimulation();    
+    if (sdt == null) return;
+    var field_speeds = sdt.getFieldRelativeSpeeds();
+    var yaw_rate = field_speeds.omegaRadiansPerSecond * DT * DEGperRAD;
+    simPigeon.addYaw(yaw_rate);
+    simPigeon.setAngularVelocityZ(yaw_rate);
+    
   }
+
 
   public void log() {
     if ((log_counter++ % NT_UPDATE_FRAME) == 0) {
@@ -191,8 +209,8 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
 
       nt_yaw.setDouble(getYaw());
       nt_yaw_offset.setDouble(m_yaw_offset);
-      nt_yaw_simple.setDouble(m_yaw_simple);
-      nt_yaw_quatZ.setDouble(m_yaw_quatZ);
+      nt_yaw_Z.setDouble(m_yaw_Z);
+  
       //
       nt_rotation.setDouble(getRotation2d().getDegrees());
       nt_roll.setDouble(getRoll());
@@ -291,6 +309,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   public void setYaw(double yawDegrees) {
     m_pigeon.setYaw(yawDegrees);
     m_yaw_offset = 0.0;  //no offset needed, gyro state set
+    DriverStation.reportError("***DEPRECATED setYaw() <== " + yawDegrees, false);
   }
   @Deprecated
   public void setYaw(Rotation2d rotation) {
@@ -321,7 +340,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
    */
   // @Override
   public Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(-m_yaw); // note sign
+    return Rotation2d.fromDegrees(m_yaw); // note sign
   }
 
   /*
@@ -341,7 +360,7 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
   public void setAutoStartPose(Pose2d pose) {
     autoStartPose = new Pose2d(pose.getTranslation(), pose.getRotation());
     setYaw(pose.getRotation()); // set gyro to starting heading so it's in field coordinates.
-    System.out.println("***Auto Start Pose set: " + pose);
+    DriverStation.reportError("***DEPRECATED Auto Start Pose set: " + pose, false);
   }
 
   @Deprecated
@@ -372,6 +391,6 @@ public class Sensors_Subsystem extends SubsystemBase implements IHeadingProvider
      * So with multiple paths this rotation error in pose may accumulate?
      */
     // RobotContainer.RC().drivetrain.resetAnglePose(pose.getRotation().minus(rotError));
-    System.out.println("***Corrected End Pose: " + pose);
+    DriverStation.reportError("***DEPRECATED Auto End Pose set: " + pose, false);
   }
 }

@@ -23,10 +23,8 @@ import frc.lib2202.command.swerve.FieldCentricDrive;
 import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
-import frc.lib2202.subsystem.VisionPoseEstimator;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.AutoPPConfigure;
-import frc.lib2202.subsystem.swerve.DTMonitorCmd;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.SwerveDrivetrain;
@@ -41,8 +39,9 @@ import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
+import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.Wrist;
-import frc.robot2025.testBindings.ElevTest;
+import frc.robot2025.testBindings.DPLPathTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -89,9 +88,6 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // VisonPoseEstimator needs LL and Odometry
       .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Command.class, "DT_Monitor", () -> {
-        return new DTMonitorCmd();
-      })
       .add(Wrist.class)
       .add(SignalLight.class, "signal")
       .add(EndEffector_Subsystem.class)
@@ -194,19 +190,24 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     
     // Competition bindings -  NOTE: OPR portion of comp binding disabled 
     // until done with integration.
-    // BindingsCompetition.ConfigureCompetition(dc);
+    BindingsCompetition.ConfigureCompetition(dc);
     
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
     
-    //DPLPathTest.myBindings(dc); 
-    ElevTest.myBindings(dc);
+    DPLPathTest.myBindings(dc); 
+    //ElevTest.myBindings(dc);
     //EndEffectorTest.myBindings(dc);
     //GITest.myBindings(dc);
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // or create a binding file in ./testBindings/BotOnBoard<N>.java
+
+    // Anything else that needs to run after binding/commands are created
+    VisionPoseEstimator vpe = RobotContainer.getSubsystemOrNull(VisionPoseEstimator.class);
+    if (vpe != null) 
+      vpe.configureGyroCallback();
   }
 
   @Override
