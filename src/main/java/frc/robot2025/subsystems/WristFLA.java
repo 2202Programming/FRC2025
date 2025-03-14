@@ -15,58 +15,65 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib2202.util.PIDFController;
 
 public class WristFLA extends SubsystemBase {
 
-  private static final double kp = 1.0;
-  private static final double ki = 0.0;
-  private static final double kd = 0.0;
-  private static final double k = 6.0/5.0;
+  private static final double TOLERANCE = 0.02;
+  private static final double k = 1.94123305;//.515;//1;// 2.0/5.0;
 
-  final SparkMax motor = new SparkMax(26, MotorType.kBrushed);
-  SparkBaseConfig driveCfg =  new SparkMaxConfig().inverted(false).idleMode(IdleMode.kCoast);
+  private final SparkMax motor = new SparkMax(27, MotorType.kBrushed);
 
-  final AnalogInput vPositionSensor = new AnalogInput(3);
-  BangBangController bbc = new BangBangController();
+  private final AnalogInput vPositionSensor = new AnalogInput(0);
+  private final BangBangController bandBangController = new BangBangController(TOLERANCE);
 
   //final PIDController pid = new PIDController(kp, ki, kd);
   private double distance = 0.0;
   private double distanceCmd = 0.0;
-  static double offset = 0.8305663212;
+  static double offset = .255126927;//.1313;//.255126927;//0.8305663212;
 
   double EtoETime = 3.0; //sec, time from 0 - 1.0 traveled
   double prevPos;
   double lastCommandTime;
   double timeToFinish;
-  public static final double pickup = 6; //pickup position from source
-  public final double drop = 0; //drop position for L2/3
+  public static final double PICKUP_POSITION = 2; //pickup position from source
+  public static final double MID_POSITION = 1; //drop position for L2/3
+  public static final double Q3_POSITION = .5; //drop position for L2/3
+  public static final double DROP_POSITION = 0; //drop position for L2/3
 
   public WristFLA() {
+    SmartDashboard.putData(bandBangController);
+    SparkBaseConfig driveCfg = new SparkMaxConfig().inverted(false).idleMode(IdleMode.kCoast);
     motor.configure(driveCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    setPos(pickup);
+    setPosition(PICKUP_POSITION);
     System.out.println(vPositionSensor.getVoltage()*k);
     //pid.setTolerance(5,10);
   }
-  
 
-  public void setPos(double pos) {
+  public void setPosition(double position) {
     //timeToFinish = EtoETime * Math.abs(pos - prevPos) + Timer.getFPGATimestamp();
     //distance = vPositionSensor.getVoltage()*k - offset;
-    distanceCmd=pos;
-    if(distanceCmd>=distance ) {
-      distance = vPositionSensor.getVoltage()*k + offset;
-      System.out.println(bbc.calculate(distance, distanceCmd) + "bbc.calculate(" + distance+ ", " + distanceCmd + " +)");
-      motor.set(bbc.calculate(distance, distanceCmd));  
-    } else {
-      distance = vPositionSensor.getVoltage()*k - offset;
-      System.out.println(bbc.calculate(distanceCmd, distance) + "bbc.calculate(" + distanceCmd+ ", " + distance + " +)");
-      motor.set(-1*bbc.calculate(distanceCmd, distance));
+    distanceCmd=position;
+    bandBangController.setSetpoint(position);
+
+    distance = (vPositionSensor.getVoltage()-offset)*k;
+
+    System.out.println(bandBangController.calculate(distance, distanceCmd) + "bbc.calculate(" + distance+ ", " + distanceCmd + " +)");
+
+    if(!bandBangController.atSetpoint()) {
+
+      if (distanceCmd >= distance) {
+        //distance = vPositionSensor.getVoltage()*k + offset;
+        //System.out.println(bandBangController.calculate(distance, distanceCmd) + "bbc.calculate(" + distance+ ", " + distanceCmd + " +)");
+        motor.set(bandBangController.calculate(distance, distanceCmd));
+      } else {
+        //distance = vPositionSensor.getVoltage()*k - offset;
+        //System.out.println(bandBangController.calculate(distanceCmd, distance) + "bbc.calculate(" + distanceCmd+ ", " + distance + " +)");
+        motor.set(-1 * bandBangController.calculate(distanceCmd, distance));
+      }
     }
     
   } 
@@ -81,7 +88,8 @@ public class WristFLA extends SubsystemBase {
   }
 
   public boolean atSetpoint() {
-    return Math.abs(distance - distanceCmd) < .01;
+    return bandBangController.atSetpoint();
+    //return Math.abs(distance - distanceCmd) < .01;
     //return Timer.getFPGATimestamp() >= timeToFinish;
   }
    

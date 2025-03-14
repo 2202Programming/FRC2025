@@ -82,10 +82,10 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
             //operator.povDown().whileTrue(new ClimberVelMove(-0.75));
             //operator.rightBumper().onTrue(new ClimberPosition(3.0, 0.75));
         } else if (dc.Operator() instanceof CommandPS4Controller operator) {
-            operator.triangle().onTrue(new WristFLAToPos(WristFLA.pickup,"triangle"));
-            operator.square().onTrue(new WristFLAToPos(3,"square"));
-            operator.circle().onTrue(new WristFLAToPos(2,"circle"));
-            operator.cross().onTrue(new WristFLAToPos(0, "cross"));
+            operator.triangle().onTrue(new WristFLAToPos(WristFLA.PICKUP_POSITION,"triangle"));
+            operator.square().onTrue(new WristFLAToPos(WristFLA.Q3_POSITION,"square"));
+            operator.circle().onTrue(new WristFLAToPos(WristFLA.MID_POSITION,"circle"));
+            operator.cross().onTrue(new WristFLAToPos(WristFLA.DROP_POSITION, "cross"));
         }
     }
 

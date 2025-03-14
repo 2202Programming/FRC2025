@@ -33,12 +33,12 @@ public class WristFLAToPos extends Command {
   public void initialize() {
     //servo.setPos(pos);
     System.out.println("position:" + SmartDashboard.getNumber("WristFLAToPos button "+ label, pos));
-    servo.setPos(SmartDashboard.getNumber("WristFLAToPos button "+ label, pos));
+    servo.setPosition(SmartDashboard.getNumber("WristFLAToPos button "+ label, pos));
   }
 
   @Override
   public void execute() {
-    servo.setPos(SmartDashboard.getNumber("WristFLAToPos button "+ label, pos));
+    servo.setPosition(SmartDashboard.getNumber("WristFLAToPos button "+ label, pos));
   }
 
   @Override
