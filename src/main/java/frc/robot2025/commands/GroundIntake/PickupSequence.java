@@ -84,11 +84,13 @@ public class PickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if(interrupted){
-      groundIntake.setSetpoint(hasPiece.getAsBoolean() ? rest : Position.ZERO);
-      //groundIntake.setWheelSpeed(0.0);  This would break the hold voltage.
-      // remember, last command sent to controller will be what the motor controller does.
-      System.out.println("pickup sequence interrupted");
+    System.out.println("pickup sequence interrupted");
+    groundIntake.setSetpoint(hasPiece.getAsBoolean() ? rest : Position.ZERO);
+    if(hasPiece.getAsBoolean())
+    {
+      groundIntake.setWheelHold(5.0);
+    } else {
+      groundIntake.setWheelSpeed(0.0); 
     }
   }
 
