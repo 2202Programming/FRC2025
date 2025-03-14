@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
@@ -225,6 +227,8 @@ public class RobotSpec_test2024 implements IRobotSpec {
         var t21 = TheField.fieldLayout.getTagPose(21).get();
         var t212d = t21.toPose2d();
         new distanceWatcher(t212d);
+
+        SmartDashboard.putData(CommandScheduler.getInstance());
     }
 
     @Override

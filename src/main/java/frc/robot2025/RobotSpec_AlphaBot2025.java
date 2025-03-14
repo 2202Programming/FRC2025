@@ -13,7 +13,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
@@ -207,6 +209,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     VisionPoseEstimator vpe = RobotContainer.getSubsystemOrNull(VisionPoseEstimator.class);
     if (vpe != null) 
       vpe.configureGyroCallback();
+    
+    SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
   @Override
