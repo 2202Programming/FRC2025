@@ -43,6 +43,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.testBindings.DPLPathTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -197,7 +198,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
     
-    // DPLPathTest.myBindings(dc); 
+    DPLPathTest.myBindings(dc); 
     // ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
