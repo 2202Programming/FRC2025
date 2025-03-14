@@ -44,9 +44,6 @@ import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.Wrist;
 import frc.robot2025.utils.UXTrim;
-import frc.robot2025.testBindings.ElevTest;
-import frc.robot2025.testBindings.EndEffectorTest;
-import frc.robot2025.testBindings.GITest;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
 
