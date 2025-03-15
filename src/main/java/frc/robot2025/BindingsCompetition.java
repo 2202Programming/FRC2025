@@ -22,7 +22,7 @@ import frc.robot2025.commands.GroundIntake.TopArmVel;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
-import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.WristFLA;
 
 /*
  * Please don't edit this without leads/mentor/driveteam review
@@ -112,7 +112,7 @@ public final class BindingsCompetition {
                 operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
                 operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
             }
-            if (RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
+            if (RobotContainer.getSubsystemOrNull(WristFLA.class) != null) {
             }
 
             //Calibration

@@ -19,9 +19,9 @@ import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 // import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.subsystems.WristFLA;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
-import frc.robot2025.subsystems.Wrist;
 
 public class ElevTest {
     static OdometryInterface odo;
@@ -44,8 +44,8 @@ public class ElevTest {
             return cmd;
     }
     public static void myBindings(HID_Subsystem dc) {
-        // Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-        Wrist wrist = RobotContainer.getSubsystem(Wrist.class);
+        Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+        WristFLA wrist = RobotContainer.getSubsystem(WristFLA.class);
         // get an xbox controller for the operator, or null
         CommandXboxController opr = (dc.Operator() instanceof CommandXboxController)
                 ? (CommandXboxController) dc.Operator()
@@ -111,10 +111,10 @@ public class ElevTest {
             new setElevatorSetpoint(Levels.PickUp)
         ));
         opr.leftBumper().onTrue(new InstantCommand(() -> {
-            wrist.setPos(wrist.drop);
+            wrist.setPosition(WristFLA.DROP_POSITION);
         }));
         opr.leftTrigger().onTrue(new InstantCommand(() -> {
-            wrist.setPos(wrist.pickup);
+            wrist.setPosition(WristFLA.PICKUP_POSITION);
         }));
         opr.povUp().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
@@ -141,14 +141,14 @@ public class ElevTest {
         // opr.a().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(90.0);
         // }));
-        // opr.povDown().onTrue(new InstantCommand(() -> {
-        //     wrist.setPos(0.3);
-        // }));
-        // opr.povLeft().onTrue(new InstantCommand(() -> {
-        //     wrist.setPos(0.05);
-        // }));
-        // opr.povRight().onTrue(new InstantCommand(() -> {
-        //     elevator_Subsystem.setHeight(0.6);
+        opr.povDown().onTrue(new InstantCommand(() -> {
+            wrist.setPosition(0.3);
+        }));
+        opr.povLeft().onTrue(new InstantCommand(() -> {
+            wrist.setPosition(0.05);
+        }));
+        opr.povRight().onTrue(new InstantCommand(() -> {
+            elevator_Subsystem.setHeight(0.6);
 
         // }));
         // opr.rightTrigger().onTrue(new InstantCommand(() -> {

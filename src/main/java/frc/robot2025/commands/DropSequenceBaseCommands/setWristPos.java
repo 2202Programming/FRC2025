@@ -6,26 +6,26 @@ package frc.robot2025.commands.DropSequenceBaseCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
-import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.WristFLA;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class setWristPos extends Command {
-  Wrist wrist;
+  WristFLA wrist;
   double setpoint;
   boolean drop;
   /** Creates a new setWristPos. */
   public setWristPos(boolean drop) {
-    wrist = RobotContainer.getSubsystem(Wrist.class);
+    wrist = RobotContainer.getSubsystem(WristFLA.class);
     this.drop = drop;
     if(drop){
-      setpoint = wrist.drop;
+      setpoint = WristFLA.DROP_POSITION;
     } else {
-      setpoint = wrist.pickup;
+      setpoint = WristFLA.PICKUP_POSITION;
     }
     // Use addRequirements() here to declare subsystem dependencies.
   }
   public setWristPos(double setpoint) {
-    wrist = RobotContainer.getSubsystem(Wrist.class);
+    wrist = RobotContainer.getSubsystem(WristFLA.class);
     this.setpoint = setpoint;
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -33,7 +33,7 @@ public class setWristPos extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    wrist.setPos(setpoint);
+    wrist.setPosition(setpoint);
   }
   // Returns true when the command should end.
   @Override
