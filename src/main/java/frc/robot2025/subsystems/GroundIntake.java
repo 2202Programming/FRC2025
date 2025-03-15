@@ -55,7 +55,7 @@ public class GroundIntake extends SubsystemBase {
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
   final int wheelStallLimit = 10;
   final int wheelFreeLimit = 5;
-  final static double Kff = (1.0 / 473.0);
+  final static double Kff = 0.005;
   final PIDFController wheelPIDF = new PIDFController(0.0, 0.0, 0.0, Kff);  // kp was 0.015                                                                         
   final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
 
@@ -258,6 +258,7 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_topVelocity;
     NetworkTableEntry NT_btmVelocity;
     NetworkTableEntry NT_wheelVelocity;
+    NetworkTableEntry NT_cmdWheelVelocity;
     NetworkTableEntry NT_hasCoral;
     NetworkTableEntry NT_hasAlgae;
     NetworkTableEntry NT_topPos;
@@ -295,6 +296,7 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos = MonitorTable.getEntry("bottom cmd position");
       NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
+      NT_cmdWheelVelocity = MonitorTable.getEntry("cmd wheel velocity");
     }
 
     @Override
@@ -312,7 +314,9 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
-
+      var cmdWheelVelocity = NT_cmdWheelVelocity.getDouble(15.0);
+      setWheelSpeed(cmdWheelVelocity);
+      
       //call the pidf update so we can edit pids
       topHwAngleVelPID.NT_update();
       btmHwAngleVelPID.NT_update();  // must setup name - testing no-op 

@@ -18,6 +18,7 @@ import frc.robot2025.commands.GroundIntake.BtmArmVel;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
 import frc.robot2025.commands.GroundIntake.SetZero;
+import frc.robot2025.commands.GroundIntake.SpinRollers;
 import frc.robot2025.commands.GroundIntake.TopArmVel;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
@@ -93,7 +94,7 @@ public final class BindingsCompetition {
             }));
 
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
-                operator.a().whileTrue(new PickupSequence("coral"));
+                NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
                 NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral"));
                 operator.x().whileTrue(new PickupSequence("algae"));
                 operator.y().whileTrue(new PlaceSequence("algae"));
@@ -122,6 +123,7 @@ public final class BindingsCompetition {
             Cal.and(operator.povRight()).whileTrue(new TopArmVel(30.0));
             Cal.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
             Cal.and(operator.b()).onTrue(new SetZero());
+            Cal.and(operator.a()).whileTrue(new SpinRollers(15.0));
             
         }
 
