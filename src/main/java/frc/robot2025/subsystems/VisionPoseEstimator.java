@@ -1,5 +1,7 @@
 package frc.robot2025.subsystems;
 
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -265,8 +267,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     public SwerveDriveKinematics getKinematics() {
         return kinematics;
     }
-
-
+   
     /*
      * Watcher for SwervePoseEstimator and its vision data.
      *
@@ -274,7 +275,6 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
      * the modules.
      */
     public class VisionPoseEstimatorMonitorCmd extends WatcherCmd {
-
         // final private NetworkTable table;
         NetworkTableEntry nt_x_diff;
         NetworkTableEntry nt_y_diff;
@@ -283,12 +283,30 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         NetworkTableEntry est_ll_pose_x;
         NetworkTableEntry est_ll_pose_y;
         NetworkTableEntry est_ll_pose_h;
-        NetworkTableEntry est_pv_pose_x;
-        NetworkTableEntry est_pv_pose_y;
-        NetworkTableEntry est_pv_pose_h;
 
+        private final Field2d field;
 
         public VisionPoseEstimatorMonitorCmd() {
+            field = new Field2d();
+            SmartDashboard.putData("PathWatcher", field);
+    
+            // Logging callback for current robot pose
+            PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
+                // Do whatever you want with the pose here
+                field.setRobotPose(pose);
+            });
+    
+            // Logging callback for target robot pose
+            PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+                // Do whatever you want with the pose here
+                field.getObject("target pose").setPose(pose);
+            });
+    
+            // Logging callback for the active path, this is sent as a list of poses
+            PathPlannerLogging.setLogActivePathCallback((poses) -> {
+                // Do whatever you want with the poses here
+                field.getObject("path").setPoses(poses);
+            });
         }
 
         @Override
@@ -302,10 +320,6 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
             est_ll_pose_x = MonitorTable.getEntry("LL/X");
             est_ll_pose_y = MonitorTable.getEntry("LL/Y");
             est_ll_pose_h = MonitorTable.getEntry("LL/Heading");
-
-            //est_pv_pose_x = MonitorTable.getEntry("/PV/X");
-            //est_pv_pose_y = MonitorTable.getEntry("/PV/Y");
-            //est_pv_pose_h = MonitorTable.getEntry("/PV/Heading");
 
             // Network Table setup
             nt_x_diff = MonitorTable.getEntry("compareLLOdo/diffX");
@@ -334,36 +348,4 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         // use TBD to pick the stddev to log the vision estimate with
         return medStdDevs;
     }
-
-    // https://www.chiefdelphi.com/t/limelight-odometry-question/433311/6
-// public void updatePoseEstimatorWithVisionBotPose() {
-//     PoseLatency visionBotPose = m_visionSystem.getPoseLatency();
-//     // invalid LL data
-//     if (visionBotPose.pose2d.getX() == 0.0) {
-//       return;
-//     }
-
-//     // distance from current pose to vision estimated pose
-//     double poseDifference = m_poseEstimator.getEstimatedPosition().getTranslation()
-//         .getDistance(visionBotPose.pose2d.getTranslation());
-
-//     if (m_visionSystem.areAnyTargetsValid()) {
-//       double xyStds;
-//       double degStds;
-//       // multiple targets detected
-//       if (m_visionSystem.getNumberOfTargetsVisible() >= 2) {
-//         xyStds = 0.5;
-//         degStds = 6;
-//       }
-//       // 1 target with large area and close to estimated pose
-//       else if (m_visionSystem.getBestTargetArea() > 0.8 && poseDifference < 0.5) {
-//         xyStds = 1.0;
-//         degStds = 12;
-//       }
-//       // 1 target farther away and estimated pose is close
-//       else if (m_visionSystem.getBestTargetArea() > 0.1 && poseDifference < 0.3) {
-//         xyStds = 2.0;
-//         degStds = 30;
-//       }
-
 }
