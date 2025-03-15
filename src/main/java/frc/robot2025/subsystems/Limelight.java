@@ -20,7 +20,6 @@ public class Limelight extends BaseLimelight {
   protected Pose2d bluePose2 = new Pose2d();
   protected final IHeadingProvider gyro;
   protected final int[] allTags;
-  int latestTID;  // simple tag id from TID field
 
   public Limelight() {
     this("limelight");
@@ -59,21 +58,16 @@ public class Limelight extends BaseLimelight {
     LimelightHelpers.SetFiducialIDFiltersOverride(name, allTags);
   }
 
-  public int getTID(){
-    return latestTID;
-  }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     pipeline = nt_pipelineNTE.getInteger(0);
-    latestTID = -1;
 
     LimelightHelpers.SetRobotOrientation(name, gyro.getHeading().getDegrees(), 0, 0, 0, 0, 0);
     // LimelightHelpers.PoseEstimate mt1 =
     // LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
     LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
-
+    
     //outputs 
     targetValid = false;
     rejectUpdate = true;
@@ -94,7 +88,6 @@ public class Limelight extends BaseLimelight {
 
     if (!rejectUpdate) {
       bluePose = mt2.pose;
-      latestTID = (int)LimelightHelpers.getFiducialID(name);
     }
     numAprilTags = mt2.tagCount;
 
