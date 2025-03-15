@@ -98,10 +98,10 @@ public class PlaceSequence extends Command {
   public void end(boolean interrupted) {
     if (hasPiece.getAsBoolean()) {
       groundIntake.setSetpoint(rest);
-      groundIntake.setWheelSpeed(0.0);
     } else {
       groundIntake.setSetpoint(Position.ZERO);
       groundIntake.setWheelSpeed(0.0);
+      groundIntake.hold(0.0);
     }
   }
 

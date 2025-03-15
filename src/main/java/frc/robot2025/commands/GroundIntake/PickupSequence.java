@@ -28,6 +28,8 @@ public class PickupSequence extends Command {
   final Position rest;
   final BooleanSupplier hasPiece;
   int pickupFrameCounter;
+  final double holdVolts;
+  final double holdAngle;
 
 
   public PickupSequence(String gp) {
@@ -36,10 +38,14 @@ public class PickupSequence extends Command {
       pickup = Position.ALGAE_PICKUP;
       rest = Position.ALGAE_REST;
       hasPiece = groundIntake::senseAlgae;
+      holdVolts = 1.0;
+      holdAngle = 0.0;
     } else {
       pickup = Position.CORAL_PICKUP;
       rest = Position.CORAL_REST;
       hasPiece = groundIntake::senseCoral;
+      holdVolts = 0.0;
+      holdAngle = 5.0; // pos num closes -er
     }
   }
 
@@ -68,7 +74,8 @@ public class PickupSequence extends Command {
       case Rest:
         groundIntake.setSetpoint(rest);
         //groundIntake.setWheelSpeed(0.0); //Shouldn't need if holding 
-        groundIntake.setWheelHold(5.0);
+        groundIntake.hold(holdAngle);
+        groundIntake.setWheelHold(holdVolts);
         state = State.WaitForMove;
         break;
       
@@ -92,6 +99,11 @@ public class PickupSequence extends Command {
     } else {
       groundIntake.setWheelSpeed(0.0); 
     }
+    else {
+      groundIntake.setWheelSpeed(0.0);
+      groundIntake.setSetpoint(Position.ZERO);
+      groundIntake.hold(0.0);
+    } 
   }
 
   // Returns true when the command should end.
