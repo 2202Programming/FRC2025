@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 //add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
@@ -13,8 +14,11 @@ import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.ScaleDriver;
+import frc.robot2025.commands.GroundIntake.BtmArmVel;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
+import frc.robot2025.commands.GroundIntake.SetZero;
+import frc.robot2025.commands.GroundIntake.TopArmVel;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
@@ -73,6 +77,8 @@ public final class BindingsCompetition {
 
             CommandXboxController operator = (CommandXboxController) generic_opr;
 
+            Trigger GICalibrate = sideboard.sw11();
+
             // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
             operator.povDown().onTrue(new InstantCommand(() -> {
                 elevator.setHeight(46.25); // l2
@@ -107,8 +113,15 @@ public final class BindingsCompetition {
                 operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
             }
             if (RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
-
             }
+
+            //Calibration
+            GICalibrate.and(operator.rightBumper()).whileTrue(new BtmArmVel(30.0));
+            GICalibrate.and(operator.leftBumper()).whileTrue(new BtmArmVel(-30.0));
+            GICalibrate.and(operator.leftBumper()).whileTrue(new TopArmVel(30.0));
+            GICalibrate.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
+            GICalibrate.and(operator.b()).onTrue(new SetZero());
+            
         }
 
         else {
