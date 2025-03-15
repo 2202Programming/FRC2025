@@ -64,7 +64,7 @@ public final class DPLPathTest {
 
         opr.povDown().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
-            // add 1m forward, field not robot.
+            // add 1m backward, field not robot.
             Pose2d target = new Pose2d(currentPose.getX() - 1.0,
                     currentPose.getY(), currentPose.getRotation());
             // calc path
