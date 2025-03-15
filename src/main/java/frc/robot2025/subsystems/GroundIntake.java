@@ -297,6 +297,7 @@ public class GroundIntake extends SubsystemBase {
       NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
       NT_cmdWheelVelocity = MonitorTable.getEntry("cmd wheel velocity");
+      NT_cmdWheelVelocity.setDouble(0.0);
     }
 
     @Override
