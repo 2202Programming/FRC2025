@@ -13,10 +13,13 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
+import frc.robot2025.commands.PickupAdjustment;
+import frc.robot2025.commands.WristFLAToPos;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
+import frc.robot2025.subsystems.Elevator_Subsystem;
 // import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.WristFLA;
@@ -110,12 +113,14 @@ public class ElevTest {
             new setWristPos(false).withTimeout(1.0),
             new setElevatorSetpoint(Levels.PickUp)
         ));
-        opr.leftBumper().onTrue(new InstantCommand(() -> {
+        opr.povDown().onTrue(new InstantCommand(() -> {
             wrist.setPosition(WristFLA.DROP_POSITION);
         }));
+
         opr.leftTrigger().onTrue(new InstantCommand(() -> {
             wrist.setPosition(WristFLA.PICKUP_POSITION);
         }));
+        //just move robot
         opr.povUp().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
             // add 1m forward, field not robot.
@@ -132,8 +137,13 @@ public class ElevTest {
             cmd.setName("moveto-fwd/w signal"); 
             cmd.schedule();
         }));
-        opr.povDown().onTrue(move());
-        
+        opr.povRight().onTrue(new WristFLAToPos(0));
+        opr.povLeft().onTrue(new PickupAdjustment());
+        opr.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")); // reverse
+        opr.rightTrigger().whileTrue(new EndEffectorPercent(.3, "rightTrigger"));
+
+    }
+}
         // opr.y().onTrue(new ClimberPosition(0.0));
         // opr.b().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(50.0);
@@ -141,21 +151,16 @@ public class ElevTest {
         // opr.a().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(90.0);
         // }));
-        opr.povDown().onTrue(new InstantCommand(() -> {
-            wrist.setPosition(0.3);
-        }));
-        opr.povLeft().onTrue(new InstantCommand(() -> {
-            wrist.setPosition(0.05);
-        }));
-        opr.povRight().onTrue(new InstantCommand(() -> {
-            elevator_Subsystem.setHeight(0.6);
-
+        // opr.povDown().onTrue(new InstantCommand(() -> {
+        //     wrist.setPosition(0.3);
+        // }));
+        // opr.povLeft().onTrue(new InstantCommand(() -> {
+        //     wrist.setPosition(0.05);
+        // }));
+        // opr.povRight().onTrue(new InstantCommand(() -> {
+        //     elevator_Subsystem.setHeight(0.6);
+        // }));
         // }));
         // opr.rightTrigger().onTrue(new InstantCommand(() -> {
         // elevator_Subsystem.setHeight(75.0);
         // }));
-        opr.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")); // reverse
-        opr.rightTrigger().whileTrue(new EndEffectorPercent(.3, "rightTrigger"));
-
-    }
-}

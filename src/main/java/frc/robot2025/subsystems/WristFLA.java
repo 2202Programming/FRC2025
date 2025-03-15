@@ -19,15 +19,17 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot2025.Constants.AnalogIn;
+import frc.robot2025.Constants.CAN;
 
 public class WristFLA extends SubsystemBase {
 
-  private static final double TOLERANCE = 0.02;
+  private static final double TOLERANCE = 0.04;
   private static final double k = 1.94123305;//.515;//1;// 2.0/5.0;
 
-  private final SparkMax motor = new SparkMax(27, MotorType.kBrushed);
+  private final SparkMax motor = new SparkMax(CAN.WRIST, MotorType.kBrushed);
 
-  private final AnalogInput vPositionSensor = new AnalogInput(0);
+  private final AnalogInput vPositionSensor = new AnalogInput(AnalogIn.Wrist);
   private final BangBangController bandBangController = new BangBangController(TOLERANCE);
 
   //final PIDController pid = new PIDController(kp, ki, kd);
@@ -46,7 +48,7 @@ public class WristFLA extends SubsystemBase {
 
   public WristFLA() {
     SmartDashboard.putData(bandBangController);
-    SparkBaseConfig driveCfg = new SparkMaxConfig().inverted(false).idleMode(IdleMode.kCoast);
+    SparkBaseConfig driveCfg = new SparkMaxConfig().inverted(false).idleMode(IdleMode.kCoast); //TODO: coast??
     motor.configure(driveCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     setPosition(PICKUP_POSITION);
     System.out.println(vPositionSensor.getVoltage()*k);
