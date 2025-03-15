@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.BtmArmRelPos;
-import frc.robot2025.commands.GroundIntake.Debug.SetZero;
-import frc.robot2025.commands.GroundIntake.Debug.TopArmFwd;
-import frc.robot2025.commands.GroundIntake.Debug.TopHold;
+import frc.robot2025.commands.GroundIntake.BtmArmVel;
+import frc.robot2025.commands.GroundIntake.BtmArmGoToPos;
+import frc.robot2025.commands.GroundIntake.SetZero;
+import frc.robot2025.commands.GroundIntake.TopArmVel;
+import frc.robot2025.commands.GroundIntake.TopHold;
 
 public class GITest {
     public static void myBindings(HID_Subsystem dc) {
@@ -20,12 +20,12 @@ public class GITest {
 
         // Initialize PathPlanner, if we have the needed SS.
         // velocity commands for calibration
-        opr.rightBumper().whileTrue(new BtmArmFwd(30.0));
-        opr.leftBumper().whileTrue(new BtmArmFwd(-30.0));
-        opr.povRight().whileTrue(new TopArmFwd(30.0));
-        opr.povLeft().whileTrue(new TopArmFwd(-30.0));
+        opr.rightBumper().whileTrue(new BtmArmVel(30.0));
+        opr.leftBumper().whileTrue(new BtmArmVel(-30.0));
+        opr.povRight().whileTrue(new TopArmVel(30.0));
+        opr.povLeft().whileTrue(new TopArmVel(-30.0));
 
-        opr.povUp().onTrue(new BtmArmRelPos(0.0));
+        opr.povUp().onTrue(new BtmArmGoToPos(0.0));
         opr.povDown().onTrue(new SetZero()); // should be bound to an actual button but we dont have room rn -er
         opr.rightTrigger().whileTrue(new TopHold(5.0));
 

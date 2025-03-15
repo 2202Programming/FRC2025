@@ -56,8 +56,7 @@ public class GroundIntake extends SubsystemBase {
   final int wheelStallLimit = 40;
   final int wheelFreeLimit = 5;
   final static double Kff = (1.0 / 43.2);
-  final PIDFController wheelPIDF = new PIDFController(0.015, 0.0, 0.0, Kff); // TODO configure for velocity control.
-                                                                             // current vals are placeholders -er
+  final PIDFController wheelPIDF = new PIDFController(0.015, 0.0, 0.0, Kff);                                                                            
   final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
 
   final int StallCurrent = 40;

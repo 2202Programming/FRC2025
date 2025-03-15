@@ -93,17 +93,12 @@ public class PickupSequence extends Command {
   public void end(boolean interrupted) {
     System.out.println("pickup sequence interrupted");
     groundIntake.setSetpoint(hasPiece.getAsBoolean() ? rest : Position.ZERO);
-    if(hasPiece.getAsBoolean())
+    if (hasPiece.getAsBoolean())
     {
-      groundIntake.setWheelHold(5.0);
+      groundIntake.setWheelHold(holdVolts);
     } else {
       groundIntake.setWheelSpeed(0.0); 
     }
-    else {
-      groundIntake.setWheelSpeed(0.0);
-      groundIntake.setSetpoint(Position.ZERO);
-      groundIntake.hold(0.0);
-    } 
   }
 
   // Returns true when the command should end.
