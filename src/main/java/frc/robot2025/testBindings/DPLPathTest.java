@@ -11,15 +11,17 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.subsystems.SignalLight;
+import frc.robot2025.subsystems.VisionPoseEstimator;
 
 public final class DPLPathTest {
 
     static OdometryInterface odo;
+    static String OdometryName = VisionPoseEstimator.class.getSimpleName();
     static DriveTrainInterface sdt;
     static SignalLight signal;
 
     public static void myBindings(HID_Subsystem dc) {
-        odo = RobotContainer.getObjectOrNull("odometry");
+        odo = RobotContainer.getObjectOrNull(VisionPoseEstimator.class.getSimpleName());  // or "odometry"
         sdt = RobotContainer.getObjectOrNull("drivetrain");
         signal = RobotContainer.getObjectOrNull("signal");
         // get an xbox controller for the operator, or null
@@ -35,6 +37,13 @@ public final class DPLPathTest {
     }
 
     static void xboxOperator(CommandXboxController opr) {
+        opr.a().onTrue(new InstantCommand( () ->{
+            //reset position to blue corner, near 0,0
+            Pose2d newPose = new Pose2d(0.45, 1.70, odo.getPose().getRotation());
+            odo.setPose(newPose);
+        }));
+
+
         // test moveToPose
         opr.povUp().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
@@ -45,7 +54,7 @@ public final class DPLPathTest {
             if (signal != null)
                 signal.setLight(SignalLight.Color.BLUE);
             // calc path
-            Command cmd = new MoveToPose(target);
+            Command cmd = new MoveToPose(OdometryName, target);
             // turn signal off after our move, if we have a signal object
             if (signal != null)
                 cmd = cmd.andThen(signal.getColorCommand(SignalLight.Color.OFF));
@@ -59,7 +68,7 @@ public final class DPLPathTest {
             Pose2d target = new Pose2d(currentPose.getX() - 1.0,
                     currentPose.getY(), currentPose.getRotation());
             // calc path
-            Command cmd = new MoveToPose(target);      
+            Command cmd = new MoveToPose(OdometryName, target);      
             cmd.setName("moveto-backup");     
             cmd.schedule();
         }));

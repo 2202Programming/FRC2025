@@ -289,7 +289,9 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         public VisionPoseEstimatorMonitorCmd() {
             field = new Field2d();
             SmartDashboard.putData("PathWatcher", field);
-    
+            field.setRobotPose(llPose);
+            field.getObject("target pose").setPose(llPose);
+
             // Logging callback for current robot pose
             PathPlannerLogging.setLogCurrentPoseCallback((pose) -> {
                 // Do whatever you want with the pose here

@@ -180,7 +180,8 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
   @Override
   public void setBindings() {
     // SS we need to test
-    OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
+    String odometryName = VisionPoseEstimator.class.getSimpleName(); // or novision "odometry"
+    OdometryInterface odo = RobotContainer.getSubsystemOrNull(odometryName);
     DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
     HID_Subsystem dc = RobotContainer.getSubsystem("DC");
 
