@@ -32,7 +32,7 @@ public final class BindingsCompetition {
 
     public static void ConfigureCompetition(HID_Subsystem dc) {
         DriverBinding(dc);
-       // OperatorBindings(dc);  TODO Eable when done testing
+       OperatorBindings(dc);  //TODO Enable when done testing
     }
 
     private static void DriverBinding(HID_Subsystem dc) {
@@ -77,13 +77,14 @@ public final class BindingsCompetition {
 
             CommandXboxController operator = (CommandXboxController) generic_opr;
 
-            Trigger GICalibrate = sideboard.sw11();
+            Trigger Cal = sideboard.sw11();
+            Trigger NotCal = Cal.negate(); // regular competition mode
 
             // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
             operator.povDown().onTrue(new InstantCommand(() -> {
                 elevator.setHeight(46.25); // l2
             })); // seriously, tell me once its changed
-            operator.povLeft().onTrue(new InstantCommand(() -> {
+            NotCal.and(operator.povLeft()).onTrue(new InstantCommand(() -> {
                 elevator.setHeight(87.25); // l3
             }));
             // TODO change value once mechanical adds more height
@@ -93,7 +94,7 @@ public final class BindingsCompetition {
 
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 operator.a().whileTrue(new PickupSequence("coral"));
-                operator.b().whileTrue(new PlaceSequence("coral"));
+                NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral"));
                 operator.x().whileTrue(new PickupSequence("algae"));
                 operator.y().whileTrue(new PlaceSequence("algae"));
             }
@@ -101,26 +102,26 @@ public final class BindingsCompetition {
                 /*
                  * From drive team
                  * operator.povUp().onTrue(); //high
-                 * operator.povLeft().onTrue(); //mid
+                 * NotCal.and(operator.povLeft()).onTrue(); //mid
                  * operator.povDown().onTrue(); //low
-                 * operator.povRight().onTrue(); //intake height
+                 * NotCal.and(operator.povRight()).onTrue(); //intake height
                  */
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
                 // they're viable -er
-                operator.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
+                NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
                 operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
             }
             if (RobotContainer.getSubsystemOrNull(Wrist.class) != null) {
             }
 
             //Calibration
-            GICalibrate.and(operator.rightBumper()).whileTrue(new BtmArmVel(30.0));
-            GICalibrate.and(operator.leftBumper()).whileTrue(new BtmArmVel(-30.0));
-            GICalibrate.and(operator.leftBumper()).whileTrue(new TopArmVel(30.0));
-            GICalibrate.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
-            GICalibrate.and(operator.b()).onTrue(new SetZero());
+            Cal.and(operator.rightBumper()).whileTrue(new BtmArmVel(30.0));
+            Cal.and(operator.leftBumper()).whileTrue(new BtmArmVel(-30.0));
+            Cal.and(operator.povRight()).whileTrue(new TopArmVel(30.0));
+            Cal.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
+            Cal.and(operator.b()).onTrue(new SetZero());
             
         }
 
