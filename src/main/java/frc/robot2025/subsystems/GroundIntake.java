@@ -55,8 +55,8 @@ public class GroundIntake extends SubsystemBase {
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
   final int wheelStallLimit = 10;
   final int wheelFreeLimit = 5;
-  final static double Kff = (1.0 / 43.2);
-  final PIDFController wheelPIDF = new PIDFController(0.015, 0.0, 0.0, Kff);                                                                            
+  final static double Kff = (1.0 / 473.0);
+  final PIDFController wheelPIDF = new PIDFController(0.0, 0.0, 0.0, Kff);  // kp was 0.015                                                                         
   final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
 
   final int StallCurrent = 40;
