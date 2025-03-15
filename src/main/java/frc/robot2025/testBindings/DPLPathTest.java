@@ -44,7 +44,7 @@ public final class DPLPathTest {
         opr.povUp().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
             // add 1m forward, field not robot.
-            Pose2d target = new Pose2d(currentPose.getX() + 3.0,
+            Pose2d target = new Pose2d(currentPose.getX() + 1.0,
                     currentPose.getY(), currentPose.getRotation());
             // force a color
             if (signal != null)
@@ -61,7 +61,7 @@ public final class DPLPathTest {
         opr.povDown().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
             // add 1m forward, field not robot.
-            Pose2d target = new Pose2d(currentPose.getX() - 3.0,
+            Pose2d target = new Pose2d(currentPose.getX() - 1.0,
                     currentPose.getY(), currentPose.getRotation());
             // calc path
             Command cmd = new MoveToPose(target);      
