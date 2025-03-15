@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "L3Place"
+            "name": "PlaceL3"
           }
         },
         {
@@ -37,7 +37,7 @@
         {
           "type": "named",
           "data": {
-            "name": "L3Place"
+            "name": "PlaceL3"
           }
         }
       ]
