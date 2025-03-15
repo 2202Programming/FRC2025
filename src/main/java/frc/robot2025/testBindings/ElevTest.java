@@ -59,37 +59,37 @@ public class ElevTest {
 
         opr.b().onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
-                new InstantCommand(() -> {
-                    Pose2d currentPose = odo.getPose(); // field coords
-                    // add 1m forward, field not robot.
-                    Pose2d target = new Pose2d(currentPose.getX(),
-                            currentPose.getY() + 0.127, currentPose.getRotation());
-                    // calc path
-                    Command cmd = new MoveToPose(OdometryName, target);      
-                    cmd.setName("moveto-backup");     
-                    cmd.schedule();
-                }),
+                // new InstantCommand(() -> {
+                //     Pose2d currentPose = odo.getPose(); // field coords
+                //     // add 1m forward, field not robot.
+                //     Pose2d target = new Pose2d(currentPose.getX(),
+                //             currentPose.getY() + 0.127, currentPose.getRotation());
+                //     // calc path
+                //     Command cmd = new MoveToPose(OdometryName, target);      
+                //     cmd.setName("moveto-backup");     
+                //     cmd.schedule();
+                // }),
                 new setElevatorSetpoint(Levels.LTwo).withTimeout(5.0),
-                new setWristPos(true)),
+                new setWristPos(false)),
                 new ReleaseCoral(),
                 new ParallelCommandGroup(
                 new setWristPos(false).withTimeout(0.5)),
                 new setElevatorSetpoint(Levels.PickUp)
         ));
         opr.y().onTrue(new SequentialCommandGroup (
-            new InstantCommand(() -> {
-                Pose2d currentPose = odo.getPose(); // field coords
-                // add 1m forward, field not robot.
-                Pose2d target = new Pose2d(currentPose.getX(),
-                        currentPose.getY() + 0.127, currentPose.getRotation());
-                // calc path
-                Command cmd = new MoveToPose(OdometryName, target);      
-                cmd.setName("moveto-backup");     
-                cmd.schedule();
-            }),
+            // new InstantCommand(() -> {
+            //     Pose2d currentPose = odo.getPose(); // field coords
+            //     // add 1m forward, field not robot.
+            //     Pose2d target = new Pose2d(currentPose.getX(),
+            //             currentPose.getY() + 0.127, currentPose.getRotation());
+            //     // calc path
+            //     Command cmd = new MoveToPose(OdometryName, target);      
+            //     cmd.setName("moveto-backup");     
+            //     cmd.schedule();
+            // }),
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
-            new setWristPos(true)),
+            new setWristPos(false)),
             new ReleaseCoral(),
             new ParallelCommandGroup(
             new setWristPos(false).withTimeout(0.5)),
@@ -97,48 +97,44 @@ public class ElevTest {
         ));
         opr.leftBumper().onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
-                new InstantCommand(() -> {
-                    Pose2d currentPose = odo.getPose(); // field coords
-                    // add 1m forward, field not robot.
-                    Pose2d target = new Pose2d(currentPose.getX(),
-                            currentPose.getY() + 0.127, currentPose.getRotation());
-                    // calc path
-                    Command cmd = new MoveToPose(OdometryName, target);      
-                    cmd.setName("moveto-backup");     
-                    cmd.schedule();
-                }),
+                // new InstantCommand(() -> {
+                //     Pose2d currentPose = odo.getPose(); // field coords
+                //     // add 1m forward, field not robot.
+                //     Pose2d target = new Pose2d(currentPose.getX(),
+                //             currentPose.getY() + 0.127, currentPose.getRotation());
+                //     // calc path
+                //     Command cmd = new MoveToPose(OdometryName, target);      
+                //     cmd.setName("moveto-backup");     
+                //     cmd.schedule();
+                // }),
             new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
-            new setWristPos(0.05), //position for L4 drop
+            new setWristPos(0.2), //position for L4 drop
             new ReleaseCoral(),
             new setWristPos(false).withTimeout(1.0),
             new setElevatorSetpoint(Levels.PickUp)
         ));
-        opr.povDown().onTrue(new InstantCommand(() -> {
-            wrist.setPosition(WristFLA.DROP_POSITION);
-        }));
+        opr.povDown().onTrue(new WristFLAToPos(0, "povDown"));
 
-        opr.leftTrigger().onTrue(new InstantCommand(() -> {
-            wrist.setPosition(WristFLA.PICKUP_POSITION);
-        }));
+        opr.leftTrigger().onTrue(new WristFLAToPos(2.0, "leftTrigger"));
         //just move robot
-        opr.povUp().onTrue(new InstantCommand(() -> {
-            Pose2d currentPose = odo.getPose(); // field coords
-            // add 1m forward, field not robot.
-            Pose2d target = new Pose2d(currentPose.getX(),
-                    currentPose.getY() + 0.127, currentPose.getRotation());
-            // force a color
-            if (signal != null)
-                signal.setLight(SignalLight.Color.BLUE);
-            // calc path
-            Command cmd = new MoveToPose(OdometryName, target);
-            // turn signal off after our move, if we have a signal object
-            if (signal != null)
-                cmd = cmd.andThen(signal.getColorCommand(SignalLight.Color.OFF));
-            cmd.setName("moveto-fwd/w signal"); 
-            cmd.schedule();
-        }));
+        // opr.povUp().onTrue(new InstantCommand(() -> {
+        //     Pose2d currentPose = odo.getPose(); // field coords
+        //     // add 1m forward, field not robot.
+        //     Pose2d target = new Pose2d(currentPose.getX(),
+        //             currentPose.getY() + 0.127, currentPose.getRotation());
+        //     // force a color
+        //     if (signal != null)
+        //         signal.setLight(SignalLight.Color.BLUE);
+        //     // calc path
+        //     Command cmd = new MoveToPose(OdometryName, target);
+        //     // turn signal off after our move, if we have a signal object
+        //     if (signal != null)
+        //         cmd = cmd.andThen(signal.getColorCommand(SignalLight.Color.OFF));
+        //     cmd.setName("moveto-fwd/w signal"); 
+        //     cmd.schedule();
+        // }));
         opr.povRight().onTrue(new WristFLAToPos(0));
-        opr.povLeft().onTrue(new PickupAdjustment());
+        // opr.povLeft().onTrue(new PickupAdjustment());
         opr.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")); // reverse
         opr.rightTrigger().whileTrue(new EndEffectorPercent(.3, "rightTrigger"));
 
