@@ -164,7 +164,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     
     // Competition bindings -  NOTE: OPR portion of comp binding disabled 
     // until done with integration.
-    BindingsCompetition.ConfigureCompetition(dc);
+    BindingsCompetition.ConfigureCompetition(dc, true);
     
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings

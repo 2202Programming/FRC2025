@@ -7,22 +7,29 @@ import java.util.Map;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.pathing.MoveToPose;
+import frc.lib2202.util.ModMath;
 import frc.robot2025.Constants.TheField;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.LimelightHelpers;
 
 
-public class DriveToReefTag extends Command {    
+public class DriveToReefTag extends Command { 
     //Robot left/right offsets for aligning with reef - TODO fix L/R values
-    static double LeftOffset = -0.3;  //[m]
-    static double RightOffset = 0.2;  //[m]
-    static double BackupOffset = 0.4; //[m]
-    static Rotation2d LLRot = Rotation2d.kCW_90deg; // ll on side, need to add this for final pose
+    static double LeftOffset = -1.0;  //[m]
+    static double RightOffset = 1.0;  //[m]
+    static double BackupOffset = 0.5; //[m]
+    static Rotation2d LLRot = Rotation2d.k180deg;
+                //Rotation2d.kZero;
+                //Rotation2d.kCW_90deg; // ll on side, need to add this for final pose
 
     static Map<Integer, Pose2d> blueReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> blueReefRight = new HashMap<Integer, Pose2d>();
@@ -30,7 +37,7 @@ public class DriveToReefTag extends Command {
     static Map<Integer, Pose2d> redReefRight = new HashMap<Integer, Pose2d>();
 
     @SuppressWarnings("unused")
-    static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double lr_offset) {
+    static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double lr_offset, boolean isRed) {
         // loop over given tags and build the 2d targets
         double x, y, rot;
         for (int tagId : tags) {
@@ -39,15 +46,24 @@ public class DriveToReefTag extends Command {
             y = tagPose.getY();
             rot = tagPose.getRotation().getAngle();
             var rotdeg = rot*DEGperRAD; //debug assist
+            var rotdegmod = ModMath.fmod360_2(rotdeg);
             var rot2d = new Rotation2d(rot);
 
             // Backup robot along tag face
             double dx = rot2d.getCos()*BackupOffset;
             double dy = rot2d.getSin()*BackupOffset;
 
-            // adjust L/R
-            double lr_dx = rot2d.getSin()*lr_offset;
-            double lr_dy = rot2d.getCos()*lr_offset;
+            // rotate based on side of reef
+            boolean rotDirFlip = (Math.abs(rotdegmod) >=90.0);
+             //use correct driver perspective by alliance
+            rotDirFlip = (isRed) ? !rotDirFlip : rotDirFlip;
+
+            // adjust L/R - rotate based on which side the tags are on
+            var lrRot =(rotDirFlip) ? 
+                rot2d.plus(Rotation2d.kCCW_90deg) : 
+                rot2d.plus(Rotation2d.kCW_90deg);
+            double lr_dx = lrRot.getCos()*lr_offset;
+            double lr_dy = lrRot.getSin()*lr_offset;
 
             Pose2d targetPose = new Pose2d(x +dx + lr_dx,
                                            y + dy + lr_dy, rot2d.plus(LLRot));
@@ -58,10 +74,10 @@ public class DriveToReefTag extends Command {
 
     // setup our targets
     static {
-        buildPositions(blueReefLeft, TheField.ReefIdsBlue, LeftOffset);
-        buildPositions(blueReefRight, TheField.ReefIdsBlue, RightOffset);
-        buildPositions(redReefLeft, TheField.ReefIdsRed, LeftOffset);
-        buildPositions(redReefRight, TheField.ReefIdsRed, RightOffset);
+        buildPositions(blueReefLeft, TheField.ReefIdsBlue, LeftOffset, false);
+        buildPositions(blueReefRight, TheField.ReefIdsBlue, RightOffset, false);
+        buildPositions(redReefLeft, TheField.ReefIdsRed, LeftOffset, true);
+        buildPositions(redReefRight, TheField.ReefIdsRed, RightOffset, true);
     }
     
     final boolean leftSide;  //side of reef to deliver to
@@ -86,6 +102,8 @@ public class DriveToReefTag extends Command {
         // setup red/blue for this commands side
         redPoses = leftSide ? redReefLeft : redReefRight;
         bluePoses = leftSide ? blueReefLeft : blueReefRight;
+
+        SimTesting.initSimTesting();
     }
     
     @Override
@@ -122,10 +140,17 @@ public class DriveToReefTag extends Command {
              // read LL for tag
             foundTag = (int)LimelightHelpers.getFiducialID(LLName);
         }
+
+        if (RobotBase.isSimulation()) {
+            foundTag = SimTesting.simGetTarget();
+        }
+        
         // found a tag in our set, nearest I hope, build a path
         if (foundTag > 0 ) {
             Pose2d targetPose = alliancePoses.get(foundTag);
             // build path to target
+            if (targetPose == null) return;   // not a reff target on our side
+
             moveComand = new MoveToPose(targetPose);
             moveComand.schedule();           
         }
@@ -159,6 +184,22 @@ public class DriveToReefTag extends Command {
             ints[i++] = v;
         }
         return ints;
+    }
+
+    static final class SimTesting  {
+        static NetworkTable table;
+        static NetworkTableEntry nt_lltag;
+
+        static void initSimTesting() {
+            table = NetworkTableInstance.getDefault().getTable("Test/CmdMoveToReef");
+            nt_lltag = table.getEntry("LLTag");
+            nt_lltag.setInteger(-1);
+        }
+
+        static int simGetTarget() {
+            return (int)nt_lltag.getInteger(-1);
+        } 
+
     }
 
 }
