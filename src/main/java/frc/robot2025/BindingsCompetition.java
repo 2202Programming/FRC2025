@@ -32,8 +32,13 @@ import frc.robot2025.subsystems.Wrist;
 public final class BindingsCompetition {
 
     public static void ConfigureCompetition(HID_Subsystem dc) {
+        ConfigureCompetition(dc, true);
+    }
+
+    // optional disable opr binding for testing
+    public static void ConfigureCompetition(HID_Subsystem dc, boolean initOpr) {
         DriverBinding(dc);
-       OperatorBindings(dc);  //TODO Enable when done testing
+        if (initOpr) OperatorBindings(dc);
     }
 
     private static void DriverBinding(HID_Subsystem dc) {
@@ -53,22 +58,17 @@ public final class BindingsCompetition {
             CommandXboxController driver = (CommandXboxController) generic_driver;
             driver.rightTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
-            // driver.rightTrigger().whileTrue(new TargetCentricDrive(Tag_Pose.ID4,
-            // Tag_Pose.ID7));
 
             // Driver will wants precision robot-centric throttle drive on left trigger
             driver.leftTrigger().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.3),
                     new RobotCentricDrive(drivetrain, dc)));
         } else {
-            DriverStation.reportWarning("Comp Bindings: No driver bindings set, check controllers.", false);
+            DriverStation.reportError("Comp Bindings: No driver bindings set, check controllers.", false);
         }
     }
 
-    //TODO enable this when done integrating test commands
-    // for now, disabled (above) because of test bindings
     static void OperatorBindings(HID_Subsystem dc) {
-        @SuppressWarnings("unused")
         var sideboard = dc.SwitchBoard();
         var generic_opr = dc.Operator();
         final Elevator_Subsystem elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
