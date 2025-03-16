@@ -62,6 +62,10 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
         obj.new OdometryWatcher();
         return obj;
       })
+
+      // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
+      .addAlias(VisionPoseEstimator.class, "vision_odo")
+
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
       ;
