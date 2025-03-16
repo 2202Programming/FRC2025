@@ -24,9 +24,9 @@ import frc.robot2025.subsystems.LimelightHelpers;
 
 public class DriveToReefTag extends Command { 
     //Robot left/right offsets for aligning with reef - TODO fix L/R values
-    static double LeftOffset = -0.50;  //[m]
-    static double RightOffset = 1.0;  //[m]
-    static double BackupOffset = 0.5; //[m]
+    static double LeftOffset =  0.18;  //[m]
+    static double RightOffset = -0.22;  //[m]
+    static double BackupOffset = 0.55; //[m]
     static Rotation2d LLRot = Rotation2d.k180deg;
                 //Rotation2d.kZero;
                 //Rotation2d.kCW_90deg; // ll on side, need to add this for final pose
@@ -36,8 +36,9 @@ public class DriveToReefTag extends Command {
     static Map<Integer, Pose2d> redReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefRight = new HashMap<Integer, Pose2d>();
 
+    //
     @SuppressWarnings("unused")
-    static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double lr_offset, boolean isRed) {
+    static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double l_offset, double r_offset, boolean isLeft, boolean isRed) {
         // loop over given tags and build the 2d targets
         double x, y, rot;
         for (int tagId : tags) {
@@ -54,14 +55,26 @@ public class DriveToReefTag extends Command {
             double dy = rot2d.getSin()*BackupOffset;
 
             // rotate based on side of reef
-            boolean rotDirFlip = (Math.abs(rotdegmod) >=90.0);
+            boolean rotDirFlip = (Math.abs(rotdegmod) >=90.0);           
+
              //use correct driver perspective by alliance
             rotDirFlip = (isRed) ? !rotDirFlip : rotDirFlip;
 
+            // figure out why way to shift for reef pole
+            double lr_offset;
+            if (!isRed) {
+                //blue
+                lr_offset = (isLeft) ?  l_offset : r_offset;
+            }
+            else {
+                //red
+                lr_offset = (isLeft) ? r_offset : l_offset;
+            }
+
             // adjust L/R - rotate based on which side the tags are on
             var lrRot =(rotDirFlip) ? 
-                rot2d.plus(Rotation2d.kCCW_90deg) : 
-                rot2d.plus(Rotation2d.kCW_90deg);
+                rot2d.plus(Rotation2d.kCW_90deg) : 
+                rot2d.plus(Rotation2d.kCCW_90deg);
             double lr_dx = lrRot.getCos()*lr_offset;
             double lr_dy = lrRot.getSin()*lr_offset;
 
@@ -74,10 +87,10 @@ public class DriveToReefTag extends Command {
 
     // setup our targets
     static {
-        buildPositions(blueReefLeft, TheField.ReefIdsBlue, LeftOffset, false);
-        buildPositions(blueReefRight, TheField.ReefIdsBlue, RightOffset, false);
-        buildPositions(redReefLeft, TheField.ReefIdsRed, LeftOffset, true);
-        buildPositions(redReefRight, TheField.ReefIdsRed, RightOffset, true);
+        buildPositions(blueReefLeft,  TheField.ReefIdsBlue, LeftOffset, RightOffset, true, false);
+        buildPositions(blueReefRight, TheField.ReefIdsBlue, LeftOffset, RightOffset, false, false);
+        buildPositions(redReefLeft,   TheField.ReefIdsRed, LeftOffset, RightOffset, true, true);
+        buildPositions(redReefRight,  TheField.ReefIdsRed, LeftOffset, RightOffset, false, true);
     }
     
     final boolean leftSide;  //side of reef to deliver to
