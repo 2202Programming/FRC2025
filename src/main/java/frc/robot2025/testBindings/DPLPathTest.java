@@ -11,17 +11,16 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.subsystems.SignalLight;
-import frc.robot2025.subsystems.VisionPoseEstimator;
 
 public final class DPLPathTest {
 
     static OdometryInterface odo;
-    static String OdometryName = VisionPoseEstimator.class.getSimpleName();
+    static String OdometryName = "vision_odo"; //VisionPoseEstimator.class.getSimpleName();
     static DriveTrainInterface sdt;
     static SignalLight signal;
 
     public static void myBindings(HID_Subsystem dc) {
-        odo = RobotContainer.getObjectOrNull(VisionPoseEstimator.class.getSimpleName());  // or "odometry"
+        odo = RobotContainer.getObjectOrNull(OdometryName);  // or "odometry"
         sdt = RobotContainer.getObjectOrNull("drivetrain");
         signal = RobotContainer.getObjectOrNull("signal");
         // get an xbox controller for the operator, or null
@@ -72,7 +71,8 @@ public final class DPLPathTest {
             cmd.setName("moveto-backup");     
             cmd.schedule();
         }));
-
+        
+        // l/r determined by view from driver's station
         opr.leftStick().whileTrue(new DriveToReefTag("l"));
         opr.rightStick().whileTrue(new DriveToReefTag("r"));
     }
