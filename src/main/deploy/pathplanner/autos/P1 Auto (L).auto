@@ -5,28 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "P1 to Tags 11 or 20 Left"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "L3Place"
-                }
-              }
-            ]
+            "pathName": "P1 to Tags 11 or 20 Left"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Release"
+            "name": "PlaceL3"
           }
         },
         {
@@ -36,21 +23,21 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 3.0
+            "name": "pickup station"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Coral Source to Reef Tags 6 or 19"
+            "name": "PlaceL3"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 3.0
+            "name": "PlaceL3"
           }
         }
       ]

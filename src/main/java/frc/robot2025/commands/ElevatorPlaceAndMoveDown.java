@@ -47,7 +47,7 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
       if (!endEffector.pieceReady()) {
         addCommands(new
         EndEffectorRPM(0)
-        .andThen(new ElevatorMove(Levels.Ground))
+        .andThen(new ElevatorMove(Levels.PickUp))
         .andThen(new WristToPos(0.0))
         );
       } else {

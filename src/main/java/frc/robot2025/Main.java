@@ -12,6 +12,7 @@ public final class Main {
   private Main() {
     // create robot specs for supported robots in this binary
     new RobotSpecDefault();
+    new RobotSpec_BetaBot2025();
     new RobotSpec_AlphaBot2025();
     new RobotSpec_BotOnBoard();
     new RobotSpec_BotOnBoard2();
