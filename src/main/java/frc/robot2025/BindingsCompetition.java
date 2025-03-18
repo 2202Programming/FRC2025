@@ -56,11 +56,11 @@ public final class BindingsCompetition {
         } else if (generic_driver instanceof CommandXboxController) {
             // XBox
             CommandXboxController driver = (CommandXboxController) generic_driver;
-            driver.rightTrigger().whileTrue(new RobotCentricDrive(drivetrain, dc));
+            driver.rightBumper().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
 
             // Driver will wants precision robot-centric throttle drive on left trigger
-            driver.leftTrigger().whileTrue(new ParallelCommandGroup(
+            driver.leftBumper().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.3),
                     new RobotCentricDrive(drivetrain, dc)));
         } else {
