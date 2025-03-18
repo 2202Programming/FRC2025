@@ -104,8 +104,8 @@ public class RobotSpec_test2024 implements IRobotSpec {
                 obj.new OdometryWatcher();
                 return obj;
             })
-            // VisonPoseEstimator needs LL and Odometry
-            .add(VisionPoseEstimator.class)
+            // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
+            .addAlias(VisionPoseEstimator.class, "vision_odo")
             ;
 
     // set this true at least once after robot hw stabilizes
@@ -192,7 +192,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
     @Override
     public void setBindings() {
         // Initialize PathPlanner
-        OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
+        OdometryInterface odo = RobotContainer.getSubsystemOrNull("vision_odo");
         DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
         VisionPoseEstimator vpe = RobotContainer.getSubsystemOrNull(VisionPoseEstimator.class);
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
