@@ -28,10 +28,15 @@ public final class DPLPathTest {
                 ? (CommandXboxController) dc.Operator()
                 : null;
 
+        CommandXboxController driver = (dc.Driver() instanceof CommandXboxController)
+                ? (CommandXboxController) dc.Driver()
+                : null;
+
         // if we have what we need, create our commands
         // signal is protected in the bound command
-        if (odo != null && sdt != null && opr != null) {
+        if (odo != null && sdt != null && opr != null && driver != null) {
             xboxOperator(opr);
+            xboxDriver(driver);
         }
     }
 
@@ -71,10 +76,12 @@ public final class DPLPathTest {
             cmd.setName("moveto-backup");     
             cmd.schedule();
         }));
-        
+    }
+
+    static void xboxDriver(CommandXboxController driver) {
         // l/r determined by view from driver's station
-        opr.leftStick().whileTrue(new DriveToReefTag("l"));
-        opr.rightStick().whileTrue(new DriveToReefTag("r"));
+        driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
+        driver.rightTrigger().whileTrue(new DriveToReefTag("r"));
     }
 
    
