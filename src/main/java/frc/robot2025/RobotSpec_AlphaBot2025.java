@@ -42,8 +42,9 @@ import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
-import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.WristFLA;
 import frc.robot2025.testBindings.DPLPathTest;
+import frc.robot2025.testBindings.ElevTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -87,10 +88,10 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         obj.new OdometryWatcher();
         return obj;
       })
-      // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
-      .addAlias(VisionPoseEstimator.class, "vision_odo")
+      // VisonPoseEstimator needs LL and Odometry
+      .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Wrist.class)
+      .add(WristFLA.class)
       .add(SignalLight.class, "signal")
       .add(EndEffector_Subsystem.class)
       .add(Command.class, "endEffectorWatcher", () -> {
@@ -193,14 +194,14 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     
     // Competition bindings -  NOTE: OPR portion of comp binding disabled 
     // until done with integration.
-    BindingsCompetition.ConfigureCompetition(dc, false);  // TESTING TODO - true for comp
+     BindingsCompetition.ConfigureCompetition(dc);
     
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
     
-    DPLPathTest.myBindings(dc); 
-    // ElevTest.myBindings(dc);
+    // DPLPathTest.myBindings(dc); 
+    ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
 

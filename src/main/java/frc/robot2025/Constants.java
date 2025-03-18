@@ -46,7 +46,7 @@ public final class Constants {
     public static final int CLIMBER = 26; //placeholder | Changed to 26 for testing by BG
     public static final int ELEVATOR_MAIN = 40; //placeholder
     public static final int ELEVATOR_FOLLOW = 41; //placeholder
-    public static final int WRIST = 38; //placeholder
+    public static final int WRIST = 44; //placeholder
     public static final int END_EFFECTOR = 43; //placeholder
 
     // DT
@@ -78,7 +78,7 @@ public final class Constants {
   }
 
   public static final class AnalogIn {
-    
+    public static final int Wrist = 0;
   }
 
   // pnumatics control module 1
