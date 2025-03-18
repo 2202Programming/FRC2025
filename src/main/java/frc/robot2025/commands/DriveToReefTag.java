@@ -4,6 +4,8 @@ import static frc.lib2202.Constants.DEGperRAD;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,8 +26,8 @@ import frc.robot2025.subsystems.LimelightHelpers;
 
 public class DriveToReefTag extends Command { 
     //Robot left/right offsets for aligning with reef - TODO fix L/R values
-    static double LeftOffset =  0.18;  //[m]
-    static double RightOffset = -0.22;  //[m]
+    static double LeftOffset =  -0.04;  //[m]
+    static double RightOffset = -0.39;  //[m]
     static double BackupOffset = 0.55; //[m]
     static Rotation2d LLRot = Rotation2d.k180deg;
                 //Rotation2d.kZero;
@@ -35,6 +37,8 @@ public class DriveToReefTag extends Command {
     static Map<Integer, Pose2d> blueReefRight = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefRight = new HashMap<Integer, Pose2d>();
+
+    static PathConstraints constraints = new PathConstraints(2.5, 1.75, Math.PI, Math.PI / 2.0);
 
     //
     @SuppressWarnings("unused")
@@ -74,7 +78,7 @@ public class DriveToReefTag extends Command {
             // adjust L/R - rotate based on which side the tags are on
             var lrRot =(rotDirFlip) ? 
                 rot2d.plus(Rotation2d.kCW_90deg) : 
-                rot2d.plus(Rotation2d.kCCW_90deg);
+                rot2d.plus(Rotation2d.kCW_90deg); // was CCW
             double lr_dx = lrRot.getCos()*lr_offset;
             double lr_dy = lrRot.getSin()*lr_offset;
 
@@ -103,7 +107,7 @@ public class DriveToReefTag extends Command {
     boolean done;
     Command moveComand;
     Map<Integer, Pose2d> alliancePoses;
-    double TA_MIN = 0.3;  
+    double TA_MIN = 0.28;  
 
     public DriveToReefTag(String reefSide) {
         LL = RobotContainer.getObjectOrNull("limelight");
@@ -164,7 +168,7 @@ public class DriveToReefTag extends Command {
             // build path to target
             if (targetPose == null) return;   // not a reff target on our side
 
-            moveComand = new MoveToPose(targetPose);
+            moveComand = new MoveToPose("vision_odo", constraints, targetPose);
             moveComand.schedule();           
         }
     }

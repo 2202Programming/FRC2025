@@ -192,7 +192,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
     @Override
     public void setBindings() {
         // Initialize PathPlanner
-        OdometryInterface odo = RobotContainer.getSubsystemOrNull("odometry");
+        OdometryInterface odo = RobotContainer.getSubsystemOrNull("vision_odo");
         DriveTrainInterface sdt = RobotContainer.getSubsystemOrNull("drivetrain");
         VisionPoseEstimator vpe = RobotContainer.getSubsystemOrNull(VisionPoseEstimator.class);
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
