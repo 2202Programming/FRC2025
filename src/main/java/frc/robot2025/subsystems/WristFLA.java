@@ -44,7 +44,7 @@ public class WristFLA extends SubsystemBase {
   public static final double PICKUP_POSITION = 2; //pickup position from source
   public static final double MID_POSITION = 1; //drop position for L2/3
   public static final double Q3_POSITION = .5; //drop position for L2/3
-  public static final double DROP_POSITION = 0; //drop position for L2/3
+  public static final double DROP_POSITION = 1.3; //drop position for L2/3
 
   public WristFLA() {
     SmartDashboard.putData(bandBangController);
