@@ -54,7 +54,7 @@ public class PickupSequence extends Command {
   public void initialize() {
     pickupFrameCounter = 0; 
     groundIntake.setSetpoint(pickup);
-    groundIntake.setWheelSpeed(15.0); 
+    groundIntake.setWheelSpeed(50.0); 
     state = State.WaitForPickupPos;
   }
 
