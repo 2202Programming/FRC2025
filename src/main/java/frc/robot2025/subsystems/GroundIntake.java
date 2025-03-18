@@ -220,8 +220,6 @@ public class GroundIntake extends SubsystemBase {
   public void setWheelHold(double voltage){
     double clampVoltage = Math.abs(voltage) <= WheelMaxVolts ? voltage : WheelMaxVolts;
     clampVoltage = Math.copySign(clampVoltage, voltage);
-    // MathUtil.clamp(voltage, -1.0 * WheelMaxVolts, WheelMaxVolts);
-    // wheelMtr_ctrl.setReference(MathUtil.clamp(voltage, -1.0 * WheelMaxVolts, WheelMaxVolts);, ControlType.kVoltage);
     wheelMtr_ctrl.setReference(clampVoltage, ControlType.kVoltage);
   }
   public double getTopPosition() {
@@ -315,8 +313,6 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
-      var cmdWheelVelocity = NT_cmdWheelVelocity.getDouble(15.0);
-      setWheelSpeed(cmdWheelVelocity);
       
       //call the pidf update so we can edit pids
       topHwAngleVelPID.NT_update();
