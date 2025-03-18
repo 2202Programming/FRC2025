@@ -69,8 +69,8 @@ public class ElevTest {
                 //     cmd.setName("moveto-backup");     
                 //     cmd.schedule();
                 // }),
-                new setElevatorSetpoint(Levels.LTwo).withTimeout(5.0),
-                new setWristPos(false)),
+                new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
+                new setWristPos(true)),
                 new ReleaseCoral(),
                 new ParallelCommandGroup(
                 new setWristPos(false).withTimeout(0.5)),
@@ -89,7 +89,7 @@ public class ElevTest {
             // }),
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
-            new setWristPos(false)),
+            new setWristPos(true)),
             new ReleaseCoral(),
             new ParallelCommandGroup(
             new setWristPos(false).withTimeout(0.5)),
@@ -113,7 +113,25 @@ public class ElevTest {
             new setWristPos(false).withTimeout(1.0),
             new setElevatorSetpoint(Levels.PickUp)
         ));
-        opr.povDown().onTrue(new WristFLAToPos(0, "povDown"));
+        opr.povDown().onTrue(new SequentialCommandGroup (
+            new ParallelCommandGroup(
+                // new InstantCommand(() -> {
+                //     Pose2d currentPose = odo.getPose(); // field coords
+                //     // add 1m forward, field not robot.
+                //     Pose2d target = new Pose2d(currentPose.getX(),
+                //             currentPose.getY() + 0.127, currentPose.getRotation());
+                //     // calc path
+                //     Command cmd = new MoveToPose(OdometryName, target);      
+                //     cmd.setName("moveto-backup");     
+                //     cmd.schedule();
+                // }),
+                new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
+                new setWristPos(1.7)),
+                new ReleaseCoral(),
+                new ParallelCommandGroup(
+                new setWristPos(false).withTimeout(0.5)),
+                new setElevatorSetpoint(Levels.PickUp)
+        ));
 
         opr.leftTrigger().onTrue(new WristFLAToPos(2.0, "leftTrigger"));
         //just move robot

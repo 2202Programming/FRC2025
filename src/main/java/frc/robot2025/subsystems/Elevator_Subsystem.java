@@ -34,8 +34,8 @@ public class Elevator_Subsystem extends SubsystemBase {
    */
   public enum Levels {
     LOne(0.0), 
-    LTwo(39.0), 
-    LThree(76.0), 
+    LTwo(28.5), 
+    LThree(68.5), 
     LFour(147.5),
     PickUp(3.0),
     PowerUp(0.0);
@@ -119,7 +119,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     
     // power up starting position of servo
     servo.setPosition(Levels.PowerUp.height);
-    servo.getWatcher();
+   // servo.getWatcher();
   }
 
   @Override

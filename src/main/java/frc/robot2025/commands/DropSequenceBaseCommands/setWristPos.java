@@ -18,7 +18,7 @@ public class setWristPos extends Command {
     wrist = RobotContainer.getSubsystem(WristFLA.class);
     this.drop = drop;
     if(drop){
-      setpoint = WristFLA.DROP_POSITION;
+      setpoint = WristFLA.MID_POSITION;
     } else {
       setpoint = WristFLA.PICKUP_POSITION;
     }
@@ -33,7 +33,16 @@ public class setWristPos extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.println(setpoint);
     wrist.setPosition(setpoint);
+  }
+  @Override
+  public void execute(){
+    wrist.setPosition(setpoint);
+  }
+  @Override
+  public void end(boolean interrupted){
+    wrist.stop();
   }
   // Returns true when the command should end.
   @Override
