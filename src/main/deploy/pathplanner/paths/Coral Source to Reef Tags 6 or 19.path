@@ -48,7 +48,7 @@
   "folder": "Coral Source to Reef Paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 127.74
+    "rotation": -50.28371632106256
   },
   "useDefaultConstraints": true
 }
