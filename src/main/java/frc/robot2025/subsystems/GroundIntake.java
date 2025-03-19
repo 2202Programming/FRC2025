@@ -263,7 +263,7 @@ public class GroundIntake extends SubsystemBase {
     wheel_speed = wheelMtr_encoder.getVelocity();
 
     //count stalled wheel frames
-    if (wheel_cmd > 1.0 && Math.abs(wheel_cmd - wheel_speed) < 0.1){
+    if (wheel_cmd > 1.0 && Math.abs(wheel_cmd - wheel_speed) > 0.1){
       // wheel is stalled 
       wheel_stall++;
     } else {
