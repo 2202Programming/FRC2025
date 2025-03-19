@@ -69,15 +69,16 @@ public class PlaceSequence extends Command {
       case WaitForPlacePos:
         if (groundIntake.isAtSetpoint()) {
           groundIntake.setWheelSpeed(WheelSpeed);
-          state = State.Eject;       
+          state = State.Eject;
         }
         break;
 
       case Eject:
-         
-        if (count <= 0 && !hasPiece.getAsBoolean()) { 
+        // just rely on count down for eject timing
+        if (count <= 0 /* && !hasPiece.getAsBoolean() */) { 
           groundIntake.setSetpoint(Position.ZERO);
           groundIntake.setWheelSpeed(0.0);
+          groundIntake.clearGamePiece();  //this makes the hasPiece latch go false    
           state = State.DefaultPos;
         }
         break;
