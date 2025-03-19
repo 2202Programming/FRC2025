@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
+import frc.lib2202.subsystem.swerve.AutoPPConfigure;
 import frc.robot2025.Constants.Tag_Pose;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.commands.PickupAdjustment;
@@ -49,7 +50,6 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
-        NamedCommands.registerCommand("pickup station", new PickupSequence(Levels.LOne, true));
 
         //enable chooser - builds autochooser list
         autoChooser = AutoBuilder.buildAutoChooser();

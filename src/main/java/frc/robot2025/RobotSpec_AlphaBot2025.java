@@ -89,7 +89,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return obj;
       })
       // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
-      .addAlias(VisionPoseEstimator.class, "vision_odo")
+      .add(VisionPoseEstimator.class)
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(WristFLA.class)
       .add(SignalLight.class, "signal")
@@ -201,7 +201,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // active. Just comment them out.
     
     //DPLPathTest.myBindings(dc); 
-    // ElevTest.myBindings(dc);
+    ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
 

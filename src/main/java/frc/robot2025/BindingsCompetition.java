@@ -82,9 +82,9 @@ public final class BindingsCompetition {
             Trigger NotCal = Cal.negate(); // regular competition mode
 
             // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
-            operator.povDown().onTrue(new InstantCommand(() -> {
-                elevator.setHeight(46.25); // l2
-            })); // seriously, tell me once its changed
+            // operator.povDown().onTrue(new InstantCommand(() -> {
+            //     elevator.setHeight(46.25); // l2
+            // })); // seriously, tell me once its changed
             NotCal.and(operator.povLeft()).onTrue(new InstantCommand(() -> {
                 elevator.setHeight(87.25); // l3
             }));
@@ -96,8 +96,8 @@ public final class BindingsCompetition {
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
                 NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral"));
-                operator.x().whileTrue(new PickupSequence("algae"));
-                operator.y().whileTrue(new PlaceSequence("algae"));
+                // operator.x().whileTrue(new PickupSequence("algae"));
+                // operator.y().whileTrue(new PlaceSequence("algae"));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
                 /*
