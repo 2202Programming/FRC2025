@@ -21,13 +21,13 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.ClimberVelMove;
+import frc.robot2025.commands.Climber.ClimberVelMove;
 import frc.robot2025.subsystems.Climber;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
-  // $env:serialnum = "032381BF"
+  // $env:serialnum = "0312db1a"
   final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
