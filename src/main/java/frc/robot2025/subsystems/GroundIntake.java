@@ -69,7 +69,7 @@ public class GroundIntake extends SubsystemBase {
   final RelativeEncoder wheelMtr_encoder;
   double wheel_current; //[amps]
   final double WheelCurrentTrip = 8.0;  //[amps] TBD
-  double wheel_cmd;   //requested speed, to compare for game piece detect
+  double wheel_cmd=0.0;   //requested speed, to compare for game piece detect
   double wheel_speed; //measured speed
   int wheel_stall = 0;
   final int StallCountTrip = 5;
