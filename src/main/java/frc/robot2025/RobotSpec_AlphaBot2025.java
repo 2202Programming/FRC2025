@@ -43,8 +43,6 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.WristFLA;
-import frc.robot2025.testBindings.DPLPathTest;
-import frc.robot2025.testBindings.ElevTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -89,7 +87,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return obj;
       })
       // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
-      .add(VisionPoseEstimator.class)
+      .addAlias(VisionPoseEstimator.class, "vision_odo")
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(WristFLA.class)
       .add(SignalLight.class, "signal")
