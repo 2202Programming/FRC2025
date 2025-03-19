@@ -102,8 +102,8 @@ public final class BindingsCompetition {
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
                 NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral"));
-                operator.x().whileTrue(new PickupSequence("algae"));
-                operator.y().whileTrue(new PlaceSequence("algae"));
+                NotCal.and(operator.x()).whileTrue(new PickupSequence("algae"));
+                NotCal.and(operator.y()).whileTrue(new PlaceSequence("algae"));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
                 /*
@@ -148,7 +148,7 @@ public final class BindingsCompetition {
             Cal.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
             Cal.and(operator.b()).onTrue(new SetZero());
             Cal.and(operator.a()).whileTrue(new SpinRollers(15.0));
-            operator.povDown().onTrue(new ElevatorCalibrate(-30.0));
+            Cal.and(operator.y()).onTrue(new ElevatorCalibrate(-30.0));
             
         }
 

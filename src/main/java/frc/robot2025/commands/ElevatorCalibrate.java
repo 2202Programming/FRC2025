@@ -14,8 +14,6 @@ public class ElevatorCalibrate extends Command {
   Elevator_Subsystem elevator;
   double vel;
   boolean done;
-  double count;
-  final double DELAY_COUNT = 25;
   public ElevatorCalibrate(double vel) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.vel = vel;
@@ -26,22 +24,14 @@ public class ElevatorCalibrate extends Command {
   @Override
   public void initialize() {
     done = false;
-    count = 25;
-    if(elevator.atZeroLimit()){
-      count = 0;
-    }
+    elevator.setVelocity(vel);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(elevator.atZeroLimit() && count >= DELAY_COUNT){
+    if(elevator.atZeroLimit()){
       done = true;
-    }
-    if(count < DELAY_COUNT){
-      elevator.setVelocity(30.0);
-    } else {
-      elevator.setVelocity(vel);
     }
 
   }

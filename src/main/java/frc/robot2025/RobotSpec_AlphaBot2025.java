@@ -201,7 +201,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // active. Just comment them out.
     
     //DPLPathTest.myBindings(dc); 
-    ElevTest.myBindings(dc);
+    // ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
 
