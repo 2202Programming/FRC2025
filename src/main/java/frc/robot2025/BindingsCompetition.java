@@ -3,6 +3,7 @@ package frc.robot2025;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 //add when needed - import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -12,8 +13,12 @@ import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
+import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.ScaleDriver;
+import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
+import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
+import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.commands.GroundIntake.BtmArmVel;
 import frc.robot2025.commands.GroundIntake.PickupSequence;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
@@ -21,6 +26,7 @@ import frc.robot2025.commands.GroundIntake.SetZero;
 import frc.robot2025.commands.GroundIntake.SpinRollers;
 import frc.robot2025.commands.GroundIntake.TopArmVel;
 import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.WristFLA;
@@ -96,8 +102,8 @@ public final class BindingsCompetition {
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
                 NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral"));
-                // operator.x().whileTrue(new PickupSequence("algae"));
-                // operator.y().whileTrue(new PlaceSequence("algae"));
+                operator.x().whileTrue(new PickupSequence("algae"));
+                operator.y().whileTrue(new PlaceSequence("algae"));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
                 /*
@@ -107,6 +113,24 @@ public final class BindingsCompetition {
                  * operator.povDown().onTrue(); //low
                  * NotCal.and(operator.povRight()).onTrue(); //intake height
                  */
+            NotCal.and(operator.povLeft()).onTrue(new SequentialCommandGroup (
+            new ParallelCommandGroup(
+            new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
+            new setWristPos(true)),
+            new ReleaseCoral(),
+            new ParallelCommandGroup(
+            new setWristPos(false).withTimeout(0.5)),
+            new setElevatorSetpoint(Levels.PickUp)
+        ));
+        NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
+            new ParallelCommandGroup(
+                new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
+                new setWristPos(true)),
+                new ReleaseCoral(),
+                new ParallelCommandGroup(
+                new setWristPos(false).withTimeout(0.5)),
+                new setElevatorSetpoint(Levels.PickUp)
+        ));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
@@ -124,6 +148,7 @@ public final class BindingsCompetition {
             Cal.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
             Cal.and(operator.b()).onTrue(new SetZero());
             Cal.and(operator.a()).whileTrue(new SpinRollers(15.0));
+            operator.povDown().onTrue(new ElevatorCalibrate(-30.0));
             
         }
 
