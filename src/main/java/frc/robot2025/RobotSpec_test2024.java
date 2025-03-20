@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -236,7 +237,12 @@ public class RobotSpec_test2024 implements IRobotSpec {
 
     @Override
     public SendableChooser<Command> getRegisteredCommands() {    
-        return null; // RegisteredCommands.RegisterCommands();
+        //RegisteredCommands.RegisterCommands();
+        //enable chooser - builds autochooser list
+        var autoChooser = AutoBuilder.buildAutoChooser();
+        // select our auto
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        return autoChooser; 
     }
 
     @Override
