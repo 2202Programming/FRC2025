@@ -45,7 +45,7 @@
     "rotation": 61.25999999999999
   },
   "reversed": false,
-  "folder": "Coral Source to Reef Paths",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 54.58120165416611

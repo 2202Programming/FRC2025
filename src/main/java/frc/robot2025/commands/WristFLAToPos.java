@@ -7,7 +7,6 @@ package frc.robot2025.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
-import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.WristFLA;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more

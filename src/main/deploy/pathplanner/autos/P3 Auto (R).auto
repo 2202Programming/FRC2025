@@ -44,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Comp Autos",
+  "folder": null,
   "choreoAuto": false
 }

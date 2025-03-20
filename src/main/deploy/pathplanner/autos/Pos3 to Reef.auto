@@ -20,6 +20,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Placing Autos",
+  "folder": null,
   "choreoAuto": false
 }

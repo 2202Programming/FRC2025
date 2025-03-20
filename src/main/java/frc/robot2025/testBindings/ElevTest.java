@@ -2,27 +2,21 @@ package frc.robot2025.testBindings;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.pathing.MoveToPose;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
-import frc.robot2025.commands.PickupAdjustment;
 import frc.robot2025.commands.WristFLAToPos;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
-import frc.robot2025.subsystems.Elevator_Subsystem;
-// import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
-import frc.robot2025.subsystems.WristFLA;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 
@@ -47,8 +41,8 @@ public class ElevTest {
             return cmd;
     }
     public static void myBindings(HID_Subsystem dc) {
-        Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-        WristFLA wrist = RobotContainer.getSubsystem(WristFLA.class);
+        // Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+        // WristFLA wrist = RobotContainer.getSubsystem(WristFLA.class);
         // get an xbox controller for the operator, or null
         CommandXboxController opr = (dc.Operator() instanceof CommandXboxController)
                 ? (CommandXboxController) dc.Operator()
