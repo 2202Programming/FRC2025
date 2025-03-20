@@ -73,8 +73,8 @@ public final class DPLPathTest {
         }));
         
         // l/r determined by view from driver's station
-        opr.leftStick().whileTrue(new DriveToReefTag("l"));
-        opr.rightStick().whileTrue(new DriveToReefTag("r"));
+        // opr.leftStick().whileTrue(new DriveToReefTag("l"));
+        // opr.rightStick().whileTrue(new DriveToReefTag("r"));
     }
 
    

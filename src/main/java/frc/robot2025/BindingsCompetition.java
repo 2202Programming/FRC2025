@@ -13,6 +13,7 @@ import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
+import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.ScaleDriver;
@@ -69,6 +70,9 @@ public final class BindingsCompetition {
             driver.leftBumper().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.3),
                     new RobotCentricDrive(drivetrain, dc)));
+
+            driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
+            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));
         } else {
             DriverStation.reportError("Comp Bindings: No driver bindings set, check controllers.", false);
         }

@@ -200,7 +200,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
     
-    //DPLPathTest.myBindings(dc); 
+    // DPLPathTest.myBindings(dc); 
     // ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);

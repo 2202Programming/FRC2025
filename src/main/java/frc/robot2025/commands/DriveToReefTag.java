@@ -152,8 +152,9 @@ public class DriveToReefTag extends Command {
 
         // Look for our tags and create a moveTo if we find a quality tag       
         int foundTag = 0;
-        if (LimelightHelpers.getTV(LLName) && 
-            LimelightHelpers.getTA(LLName) >= TA_MIN ) {
+        if (LimelightHelpers.getTV(LLName) ){
+             
+            // LimelightHelpers.getTA(LLName) >= TA_MIN ) {
              // read LL for tag
             foundTag = (int)LimelightHelpers.getFiducialID(LLName);
         }

@@ -38,6 +38,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.TheField;
+import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.commands.distanceWatcher;
 // 2024 robot has a pigeon, so use its sensors, add LL4
@@ -212,13 +213,15 @@ public class RobotSpec_test2024 implements IRobotSpec {
             // Driver will wants precision robot-centric throttle drive on left trigger
             driver.leftTrigger().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.25),
-                    new RobotCentricDrive(sdt, dc)));           
+                    new RobotCentricDrive(sdt, dc))); 
+            driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
+            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));          
         } else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
         }
 
          //setup test bindings
-         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
+        //  DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
          
          // Anything else that needs to run after binding/commands are created
         if (vpe != null) 
