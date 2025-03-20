@@ -11,15 +11,15 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Pos1 go to Reef"
+            "name": "DriveToReefTag"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Placing Autos",
+  "folder": null,
   "choreoAuto": false
 }
