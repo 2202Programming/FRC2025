@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.pathing.MoveToPose;
+import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.util.ModMath;
 import frc.robot2025.Constants.TheField;
 import frc.robot2025.subsystems.Limelight;
@@ -102,14 +103,21 @@ public class DriveToReefTag extends Command {
     final Map<Integer, Pose2d> bluePoses;
     final Limelight LL;
     final String LLName;
+    final OdometryInterface odo;
+    final String odoName = "vision_odo";   //todo make an arg
 
     // command vars set at init time
     boolean done;
     Command moveComand;
     Map<Integer, Pose2d> alliancePoses;
-    double TA_MIN = 0.28;  
+    double TA_MIN = 0.28;
+    int foundTag;
+    int last_usedTag;
+    Pose2d targetPose;
+    Pose2d last_targetPose;
 
     public DriveToReefTag(String reefSide) {
+        odo = RobotContainer.getSubsystemOrNull(odoName);
         LL = RobotContainer.getObjectOrNull("limelight");
         LLName = (LL != null) ? LL.getName() : "no-ll-found";  //name if we need to use LLHelpers directly
 
@@ -126,7 +134,9 @@ public class DriveToReefTag extends Command {
     @Override
     public void initialize() {
         done = true;
+        //protect from missng required ss
         if (LL == null) return;
+        if (odo == null) return;
         moveComand = null;       
 
         Alliance alliance;
@@ -142,7 +152,14 @@ public class DriveToReefTag extends Command {
         LL.setTargetTags(targetTags);
 
         //made it this far, start looking for reef tages in execute()
-        done = false;
+        done = false;        
+
+        // check to see if we are close (d < .25m) to last completed/found tag
+        // so if we can't see a tag and are close, just compute path
+        var dist = odo.getDistanceToTranslation(last_targetPose.getTranslation());
+        foundTag = (!LimelightHelpers.getTV(LLName) && dist < 0.25) ?  
+            last_usedTag :  //close, use last completed
+            0;              //wait for limelight
     }
 
     @Override
@@ -151,10 +168,7 @@ public class DriveToReefTag extends Command {
         if (moveComand != null) return;
 
         // Look for our tags and create a moveTo if we find a quality tag       
-        int foundTag = 0;
         if (LimelightHelpers.getTV(LLName) ){
-             
-            // LimelightHelpers.getTA(LLName) >= TA_MIN ) {
              // read LL for tag
             foundTag = (int)LimelightHelpers.getFiducialID(LLName);
         }
@@ -165,11 +179,11 @@ public class DriveToReefTag extends Command {
         
         // found a tag in our set, nearest I hope, build a path
         if (foundTag > 0 ) {
-            Pose2d targetPose = alliancePoses.get(foundTag);
+            targetPose = alliancePoses.get(foundTag);
             // build path to target
-            if (targetPose == null) return;   // not a reff target on our side
+            if (targetPose == null) return;   // not a reef target on our side
 
-            moveComand = new MoveToPose("vision_odo", constraints, targetPose);
+            moveComand = new MoveToPose(odoName, constraints, targetPose);
             moveComand.schedule();           
         }
     }
@@ -181,6 +195,8 @@ public class DriveToReefTag extends Command {
              moveComand.cancel();
            }
         }
+        last_usedTag = foundTag;
+        last_targetPose = targetPose;
         //restore or normal tag list.
         LL.setTargetTagsAll();
     }

@@ -112,6 +112,12 @@ public final class Constants {
     public static int[] ReefIdsRed =  { 6,  7,  8,  9, 10, 11};
     public static int[] ReefIdsBlue = {17, 18, 19, 20, 21, 22};
 
+    public static int[] PickupIdsBlue = {12, 13}; //right, left as viewed from driver stn
+    public static int[] PickupIdsRed = {2, 1};    //right, left as viewed from red driver stn
+
+    public static int DeliverAlgaeBlue = 16;
+    public static int DeliverAlgaeRed = 3;
+
     // Below tags are just examples for testing and to complete AprilTag2d to be deprecated
     // take care to use ids that exist, optional check not done here.
     public static Pose3d Tag4 = fieldLayout.getTagPose(4).get();
