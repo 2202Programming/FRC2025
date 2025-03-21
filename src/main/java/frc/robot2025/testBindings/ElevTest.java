@@ -49,9 +49,9 @@ public class ElevTest {
         opr.leftBumper().onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LFour).withTimeout(3.0),
-            new setWristPos(0.05)),
+            new setWristPos(0.05)), //position for L4 drop
             new ReleaseCoral(),
-            new setWristPos(1.0).withTimeout(1.0),
+            new setWristPos(false).withTimeout(1.0),
             new setElevatorSetpoint(Levels.PickUp)
         ));
         opr.leftBumper().onTrue(new InstantCommand(() -> {
