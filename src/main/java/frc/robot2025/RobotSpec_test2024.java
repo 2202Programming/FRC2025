@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -209,20 +208,20 @@ public class RobotSpec_test2024 implements IRobotSpec {
             // XBox
             CommandXboxController driver = (CommandXboxController) generic_driver;
             // copy basic drive cmd from compBindings
-            driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
+            driver.rightBumper().whileTrue(new RobotCentricDrive(sdt, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
             // Driver will wants precision robot-centric throttle drive on left trigger
-            driver.leftTrigger().whileTrue(new ParallelCommandGroup(
+            driver.leftBumper().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.25),
-                    new RobotCentricDrive(sdt, dc))); 
+                    new RobotCentricDrive(sdt, dc)));      
             driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
-            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));          
+            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));     
         } else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
         }
 
          //setup test bindings
-        //  DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
+         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
          
          // Anything else that needs to run after binding/commands are created
         if (vpe != null) 
@@ -237,12 +236,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
 
     @Override
     public SendableChooser<Command> getRegisteredCommands() {    
-        //RegisteredCommands.RegisterCommands();
-        //enable chooser - builds autochooser list
-        var autoChooser = AutoBuilder.buildAutoChooser();
-        // select our auto
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-        return autoChooser; 
+        return null; // RegisteredCommands.RegisterCommands();
     }
 
     @Override
