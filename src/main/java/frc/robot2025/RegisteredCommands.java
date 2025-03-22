@@ -3,7 +3,7 @@ package frc.robot2025;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.wpilibj.DriverStation;
+//import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,7 +50,8 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
-        NamedCommands.registerCommand("DriveToReefTag", new DriveToReefTag(DriverStation.getAlliance().toString()));
+        NamedCommands.registerCommand("DriveToReefTagR", new DriveToReefTag("r"));
+        NamedCommands.registerCommand("DriveToReefTagL", new DriveToReefTag("l"));
 
         //enable chooser - builds autochooser list
         autoChooser = AutoBuilder.buildAutoChooser();
