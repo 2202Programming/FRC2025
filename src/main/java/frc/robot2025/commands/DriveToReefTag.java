@@ -156,8 +156,7 @@ public class DriveToReefTag extends Command {
 
         // check to see if we are close (d < .50m) to last completed/found tag
         // so if we can't see a tag and are close, just compute path
-
-
+        // TODO - PP won't run a path closer than 0.5, so this isn't working 3/21/25
         var dist = (last_targetPose != null) ? odo.getDistanceToTranslation(last_targetPose.getTranslation()) : 99.0;
         foundTag = (!LimelightHelpers.getTV(LLName) && dist < 0.50) ?  
             last_usedTag :  //close, use last completed

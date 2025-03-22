@@ -12,10 +12,11 @@ import frc.lib2202.command.pathing.MoveToPose;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.robot2025.Constants.TheField;
 import frc.robot2025.subsystems.Limelight;
+import frc.robot2025.utils.UXTrim;
 
 public class DriveToPickupTag extends Command{
-    //static double LeftOffset =  -0.04;  //[m]
-    //static double RightOffset = -0.39;  //[m]
+    static double LeftOffset = 0.0;    //[m]
+    static double RightOffset = 0.0;   //[m]
     static double BackupOffset = 0.55; //[m]
 
     static PathConstraints constraints = new PathConstraints(2.5, 1.75, Math.PI, Math.PI / 2.0);
@@ -25,7 +26,11 @@ public class DriveToPickupTag extends Command{
     final OdometryInterface odo;
     final String odoName = "vision_odo";   //todo make an arg
     final int tagIdx;
-
+    final UXTrim backoffTrim;
+    final UXTrim xyTrim;
+    final double xyOffset;
+    final String side;
+    
     // command vars set at init time
     boolean done;
     Pose2d target;
@@ -34,9 +39,14 @@ public class DriveToPickupTag extends Command{
         odo = RobotContainer.getSubsystemOrNull(odoName);
         LL = RobotContainer.getObjectOrNull("limelight");
         LLName = (LL != null) ? LL.getName() : "no-ll-found";  //name if we need to use LLHelpers directly
+        this.side = side.toLowerCase();
 
         // pick a direction to go, left , right in TheField
-        tagIdx = side.toLowerCase().startsWith("l") ? 1 : 0;        
+        tagIdx = this.side.startsWith("l") ? 1 : 0; 
+        xyOffset = this.side.startsWith("l") ? LeftOffset : RightOffset;
+
+        backoffTrim = new UXTrim("Pickup_backoff_" + side, 0.0);
+        xyTrim = new UXTrim("Pickup_xy_" + side, 0.0);
     }
 
     @Override
@@ -59,13 +69,17 @@ public class DriveToPickupTag extends Command{
         var p3d = TheField.fieldLayout.getTagPose(tagId).get();
 
         var rot2d = p3d.getRotation().toRotation2d();//.getAngle();
-       // var rot2d = new Rotation2d(rot);
+        // left/right shift - rotate tag vector 90 outbound, use UXTrim
+        var lrRot = rot2d.plus( side.startsWith("l") ? Rotation2d.kCCW_90deg : Rotation2d.kCW_90deg);
+        double lr_dx = lrRot.getCos() * xyTrim.getValue(xyOffset);
+        double lr_dy = lrRot.getSin() * xyTrim.getValue(xyOffset);
 
-        // Backup robot along tag face
-        double dx = rot2d.getCos()*BackupOffset;
-        double dy = rot2d.getSin()*BackupOffset;
+        // Backup robot along tag face, use trims to adjust
+        double dx = rot2d.getCos() * backoffTrim.getValue(BackupOffset);
+        double dy = rot2d.getSin() * backoffTrim.getValue(BackupOffset);
 
-        target = new Pose2d(p3d.getX() + dx, p3d.getY() + dy, rot2d);
+        //rotate tag vector to calc L/R shift
+        target = new Pose2d(p3d.getX() + dx + lr_dx, p3d.getY() + dy + lr_dy, rot2d);
 
         moveComand = new MoveToPose(odoName, constraints, target);
         moveComand.schedule();           

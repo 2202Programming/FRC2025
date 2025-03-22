@@ -221,7 +221,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
         }
 
          //setup test bindings
-         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
+         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp, povDown, povL/R
          
          // Anything else that needs to run after binding/commands are created
         if (vpe != null) 

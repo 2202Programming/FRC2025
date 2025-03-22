@@ -74,10 +74,6 @@ public final class DPLPathTest {
 
         opr.povLeft().whileTrue(new DriveToPickupTag("left"));
         opr.povRight().whileTrue(new DriveToPickupTag("right"));
-        
-        // l/r determined by view from driver's station
-        // opr.leftStick().whileTrue(new DriveToReefTag("l"));
-        // opr.rightStick().whileTrue(new DriveToReefTag("r"));
     }
 
    
