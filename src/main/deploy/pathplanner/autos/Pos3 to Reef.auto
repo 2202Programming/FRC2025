@@ -13,7 +13,25 @@
         {
           "type": "named",
           "data": {
-            "name": "DriveToReefTagL"
+            "name": "DriveToReefTagLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PlaceL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Release"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToPickupTagRight"
           }
         }
       ]
