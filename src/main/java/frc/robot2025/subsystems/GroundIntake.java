@@ -17,10 +17,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib2202.Constants;
 import frc.lib2202.command.WatcherCmd;
 import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
@@ -34,13 +36,13 @@ public class GroundIntake extends SubsystemBase {
   public enum Position {
     POWERUP(0.0, 0.0), // pwr up could be different from ZERO
     ZERO(0.0, 0.0),
-    ALGAE_PICKUP(-45.0, 125.0),
-    ALGAE_PLACE(-45.0, 100.0), // algae place
-    ALGAE_REST(-45.0, 100.0),
-    CORAL_PICKUP(-12.0, 125.0),
-    CORAL_PLACE(-12.0, 45.0), // coral place
-    CORAL_REST(-12.0, 45.0),
-    FLOOR(0.0, 120.0);
+    ALGAE_PICKUP(-60.0, 135.0),
+    ALGAE_PLACE(-60.0, 100.0), // algae place
+    ALGAE_REST(-60.0, 100.0),
+    CORAL_PICKUP(-10.0, 135.0),
+    CORAL_PLACE(-10.0, 45.0), // coral place
+    CORAL_REST(-10.0, 45.0),
+    FLOOR(0.0, 135.0);
 
     public double topval;
     public double btmval;
@@ -53,11 +55,12 @@ public class GroundIntake extends SubsystemBase {
 
   // motor config constants
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
-  final int wheelStallLimit = 10;
+  final int wheelStallLimit = 20;
   final int wheelFreeLimit = 5;
   final static double Kff = 0.005;
-  final PIDFController wheelPIDF = new PIDFController(0.0, 0.0, 0.0, Kff);  // kp was 0.015                                                                         
-  final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
+  final PIDFController wheelPIDF = new PIDFController(0.00025, 0.000000, 0.0, Kff);  // kp was 0.015                                                                         
+  final static double wheelMtrGearRatio = 2.0; // 2 motor turns -> 1 wheel turn
+  final LinearFilter wheelFilter = LinearFilter.singlePoleIIR(0.2, Constants.DT);
 
   final int StallCurrent = 40;
   final int FreeCurrent = 5;
@@ -82,15 +85,15 @@ public class GroundIntake extends SubsystemBase {
 
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
-  public static final double WheelMaxVolts = 5.0;
+  //public static final double WheelMaxVolts = 5.0;
 
   PIDFController topHwAngleVelPID = new PIDFController(0.00075, 0.0, 0.0, 0.0013); // placeholder PIDs
   final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);
 
   PIDFController btmHwAngleVelPID = new PIDFController(0.0007, 0.000001, 0.0, 0.0017);
-  final PIDController btmPositionPID = new PIDController(2.5, 0.0001, 0.0);
+  final PIDController btmPositionPID = new PIDController(3.5, 0.0001, 0.0); //kp = 2.5
 
-  final double topServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
+  final double topServoGR = (1.0 / 150.0) * 360.0; // 150:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
 
   final double topIRange = 1.0; // degrees, default is infinity
@@ -225,10 +228,9 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setWheelHold(double voltage){
-    wheel_cmd = 0.0;
-    double clampVoltage = Math.abs(voltage) <= WheelMaxVolts ? voltage : WheelMaxVolts;
-    clampVoltage = Math.copySign(clampVoltage, voltage);
-    wheelMtr_ctrl.setReference(clampVoltage, ControlType.kVoltage);
+    //wheel_cmd = 0.0;
+    //wheelMtr_ctrl.setReference(voltage, ControlType.kVoltage);
+    setWheelSpeed(voltage); // HACK to test using slow speed to hold -er
   }
 
   public double getTopPosition() {
@@ -259,11 +261,11 @@ public class GroundIntake extends SubsystemBase {
     topServo.periodic();
     btmServo.periodic();
 
-    wheel_current = wheelMtr.getOutputCurrent();
+    wheel_current = wheelFilter.calculate(wheelMtr.getOutputCurrent());
     wheel_speed = wheelMtr_encoder.getVelocity();
 
     //count stalled wheel frames
-    if (wheel_cmd > 1.0 && Math.abs(wheel_cmd - wheel_speed) > 0.1){
+    if (Math.abs(wheel_cmd) > 1.0 && Math.abs(wheel_speed) < 0.5){
       // wheel is stalled 
       wheel_stall++;
     } else {
@@ -334,7 +336,6 @@ public class GroundIntake extends SubsystemBase {
       NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
       NT_cmdWheelVelocity = MonitorTable.getEntry("cmd wheel velocity");
-      NT_cmdWheelVelocity.setDouble(0.0);
       NT_has_gamepiece = MonitorTable.getEntry("hasGP");
       NT_wheel_current = MonitorTable.getEntry("wheel_current");
     }
@@ -356,6 +357,7 @@ public class GroundIntake extends SubsystemBase {
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
       NT_has_gamepiece.setBoolean(has_gamepiece);
       NT_wheel_current.setDouble(wheel_current);
+      NT_cmdWheelVelocity.setDouble(wheel_cmd);
 
       //call the pidf update so we can edit pids
       topHwAngleVelPID.NT_update();

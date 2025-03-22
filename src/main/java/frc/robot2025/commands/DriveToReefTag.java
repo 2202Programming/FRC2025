@@ -29,7 +29,7 @@ public class DriveToReefTag extends Command {
     //Robot left/right offsets for aligning with reef - TODO fix L/R values
     static double LeftOffset =  -0.04;  //[m]
     static double RightOffset = -0.39;  //[m]
-    static double BackupOffset = 0.55; //[m]
+    static double BackupOffset = 0.5; //[m]
     static Rotation2d LLRot = Rotation2d.k180deg;
                 //Rotation2d.kZero;
                 //Rotation2d.kCW_90deg; // ll on side, need to add this for final pose

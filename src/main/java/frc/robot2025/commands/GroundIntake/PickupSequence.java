@@ -22,7 +22,7 @@ public class PickupSequence extends Command {
     WaitForPickupPos // wait for system to get to setpoint
   }
   State state;
-  public static final int FrameCount = 3;
+  final int FrameCount;
   final GroundIntake groundIntake;
   final Position pickup;
   final Position rest;
@@ -30,6 +30,7 @@ public class PickupSequence extends Command {
   int pickupFrameCounter;
   final double holdVolts;
   final double holdAngle;
+  final double wheelSpeed;
 
 
   public PickupSequence(String gp) {
@@ -37,24 +38,29 @@ public class PickupSequence extends Command {
     if(gp.startsWith("a")){
       pickup = Position.ALGAE_PICKUP;
       rest = Position.ALGAE_REST;
-      hasPiece = groundIntake::senseAlgae;
-      holdVolts = 1.0;
+      hasPiece = groundIntake::getLatchedHasGamePiece;
+      holdVolts = 60.0; // HACKED TO BE SPEED -er
       holdAngle = 0.0;
+      wheelSpeed = 120.0;
+      FrameCount = 15;
     } else {
       pickup = Position.CORAL_PICKUP;
       rest = Position.CORAL_REST;
       hasPiece = groundIntake::getLatchedHasGamePiece; //was senseCoral;
       holdVolts = 0.0;
-      holdAngle = 5.0; // pos num closes -er
+      holdAngle = 2.5; // pos num closes -er
+      wheelSpeed = 50.0;
+      FrameCount = 3;
     }
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    groundIntake.clearGamePiece();
     pickupFrameCounter = 0; 
     groundIntake.setSetpoint(pickup);
-    groundIntake.setWheelSpeed(50.0); 
+    groundIntake.setWheelSpeed(wheelSpeed); 
     state = State.WaitForPickupPos;
   }
 
@@ -68,7 +74,9 @@ public class PickupSequence extends Command {
         break;
 
       case WaitForGamepiece: 
-        state = hasPiece.getAsBoolean() && pickupFrameCounter++ == FrameCount ? State.Rest : State.WaitForGamepiece;
+      state = hasPiece.getAsBoolean() && ++pickupFrameCounter == FrameCount ? 
+        State.Rest : 
+        State.WaitForGamepiece;
         break;
       
       case Rest:
@@ -76,7 +84,7 @@ public class PickupSequence extends Command {
         //groundIntake.setWheelSpeed(0.0); //Shouldn't need if holding 
         groundIntake.hold(holdAngle);
         groundIntake.setWheelHold(holdVolts);
-        state = State.WaitForMove;
+        state = State.Finished; // 3/33/35: intentional jump to finished so we dont wait for bottom arm- er
         break;
       
       case WaitForMove:
@@ -91,7 +99,7 @@ public class PickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    System.out.println("pickup sequence interrupted");
+    //System.out.println("pickup sequence interrupted");
     groundIntake.setSetpoint(hasPiece.getAsBoolean() ? rest : Position.ZERO);
     if (hasPiece.getAsBoolean())
     {

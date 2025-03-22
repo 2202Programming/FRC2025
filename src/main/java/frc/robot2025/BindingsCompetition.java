@@ -1,5 +1,6 @@
 package frc.robot2025;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -10,13 +11,17 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
+import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
+import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.ScaleDriver;
+import frc.robot2025.commands.WristFLAToPos;
+import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
@@ -49,6 +54,11 @@ public final class BindingsCompetition {
     }
 
     private static void DriverBinding(HID_Subsystem dc) {
+        OdometryInterface odo;
+        String OdometryName = "vision_odo";
+
+        odo = RobotContainer.getObjectOrNull(OdometryName);  // or "odometry"
+
         var generic_driver = dc.Driver();
         DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
 
@@ -62,17 +72,30 @@ public final class BindingsCompetition {
 
         } else if (generic_driver instanceof CommandXboxController) {
             // XBox
+
             CommandXboxController driver = (CommandXboxController) generic_driver;
             driver.rightBumper().whileTrue(new RobotCentricDrive(drivetrain, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
+
+            //this is temporary and not real; --dpl + bg
+            driver.a().onTrue(new InstantCommand( () ->{
+            //reset position to blue corner, near 0,0
+            Pose2d newPose = new Pose2d(0.45, 1.70, odo.getPose().getRotation());
+            odo.setPose(newPose);
+            }));
 
             // Driver will wants precision robot-centric throttle drive on left trigger
             driver.leftBumper().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.3),
                     new RobotCentricDrive(drivetrain, dc)));
 
+            //drive to reef
             driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
             driver.rightTrigger().whileTrue(new DriveToReefTag("r"));
+
+            //drive to pickup
+            driver.povLeft().whileTrue(new DriveToPickupTag("left"));
+            driver.povRight().whileTrue(new DriveToPickupTag("right"));
         } else {
             DriverStation.reportError("Comp Bindings: No driver bindings set, check controllers.", false);
         }
@@ -105,9 +128,9 @@ public final class BindingsCompetition {
 
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
-                NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral"));
+                NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral", -25.0));
                 NotCal.and(operator.x()).whileTrue(new PickupSequence("algae"));
-                NotCal.and(operator.y()).whileTrue(new PlaceSequence("algae"));
+                NotCal.and(operator.y()).whileTrue(new PlaceSequence("algae", -150.0));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
                 /*
@@ -146,14 +169,16 @@ public final class BindingsCompetition {
             }
 
             //Calibration
-            Cal.and(operator.rightBumper()).whileTrue(new BtmArmVel(30.0));
+            // Cal.and(operator.rightBumper()).whileTrue(new BtmArmVel(30.0));
             Cal.and(operator.leftBumper()).whileTrue(new BtmArmVel(-30.0));
             Cal.and(operator.povRight()).whileTrue(new TopArmVel(30.0));
             Cal.and(operator.povLeft()).whileTrue(new TopArmVel(-30.0));
             Cal.and(operator.b()).onTrue(new SetZero());
             Cal.and(operator.a()).whileTrue(new SpinRollers(15.0));
             Cal.and(operator.y()).onTrue(new ElevatorCalibrate(-30.0));
-            
+            Cal.and(operator.x().whileTrue(new testElevatorVelComd(30.0)));
+            Cal.and(operator.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")));
+            Cal.and(operator.leftTrigger().onTrue(new WristFLAToPos(2.0, "leftTrigger")));
         }
 
         else {

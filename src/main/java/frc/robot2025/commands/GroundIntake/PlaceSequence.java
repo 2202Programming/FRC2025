@@ -19,7 +19,7 @@ public class PlaceSequence extends Command {
     Finished // command is done
   }
 
-  final int ejectingFrameCount = 5; //tbd
+  final int ejectingFrameCount = 25; //tbd
 
   State state;
   int count;
@@ -30,9 +30,9 @@ public class PlaceSequence extends Command {
   final double WheelSpeed;
   
   
-  public PlaceSequence(String gp) {
-    this(gp, -1.0);
-  }
+  // public PlaceSequence(String gp) {
+  //   this(gp, -1.0);
+  // }
 
   public PlaceSequence(String gp, double WheelSpeed) {
     this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
@@ -40,26 +40,20 @@ public class PlaceSequence extends Command {
     if (gp.startsWith("a")){
       place = Position.ALGAE_PLACE;
       rest = Position.ALGAE_REST;
-      hasPiece = groundIntake::senseAlgae;
+      hasPiece = groundIntake::getLatchedHasGamePiece;
     } else {
       place = Position.CORAL_PLACE;
       rest = Position.CORAL_REST;
-      hasPiece = groundIntake::senseCoral;
+      hasPiece = groundIntake::getLatchedHasGamePiece;
     }
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-     count = ejectingFrameCount; // count to wait after eject
-    if (hasPiece.getAsBoolean() ) {  // goes to position without ejecting
-      groundIntake.setSetpoint(place);
-      //groundIntake.setWheelSpeed(0.0);  should alrady be 0 or a hold cmd
-      state = State.WaitForPlacePos;
-    } else {
-      groundIntake.setSetpoint(Position.ZERO);
-      state = State.DefaultPos;
-    }
+    count = ejectingFrameCount; // count to wait after eject
+    groundIntake.setSetpoint(place);
+    state = State.WaitForPlacePos;
   }
 
   @Override
@@ -67,23 +61,25 @@ public class PlaceSequence extends Command {
     switch (state) {
 
       case WaitForPlacePos:
-        if (groundIntake.isAtSetpoint()) {
+        if (groundIntake.isBottomAtSetpoint()) {
           groundIntake.setWheelSpeed(WheelSpeed);
           state = State.Eject;
+          System.out.println("leaving wait for place");
         }
         break;
 
       case Eject:
         // just rely on count down for eject timing
-        if (count <= 0 /* && !hasPiece.getAsBoolean() */) { 
+        if (--count <= 0 /* && !hasPiece.getAsBoolean() */) { 
           groundIntake.setSetpoint(Position.ZERO);
           groundIntake.setWheelSpeed(0.0);
-          groundIntake.clearGamePiece();  //this makes the hasPiece latch go false    
           state = State.DefaultPos;
+          System.out.println("leaving eject");
         }
         break;
 
       case DefaultPos:
+        groundIntake.clearGamePiece();  //this makes the hasPiece latch go false    
         if (groundIntake.isAtSetpoint() ) {
           state = State.Finished; 
         }
