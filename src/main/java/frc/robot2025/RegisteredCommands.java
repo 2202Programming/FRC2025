@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
@@ -29,13 +30,23 @@ public class RegisteredCommands {
     final static Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     private static SequentialCommandGroup place(Levels level){
         return new SequentialCommandGroup (
-            new setElevatorSetpoint(level),
-            new setWristPos(true),
+            new ParallelCommandGroup(
+                new setElevatorSetpoint(level),
+                new setWristPos(true)),
             new ReleaseCoral(),
-            new setWristPos(false),
             new InstantCommand(() -> {
-                elevator_Subsystem.setHeight(Levels.PickUp);
-            }));
+                    elevator_Subsystem.setHeight(Levels.PickUp);
+                }),
+            new setWristPos(false));
+    }
+    private static SequentialCommandGroup place4(Levels level){
+        return new SequentialCommandGroup(
+            new ParallelCommandGroup(
+            new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
+            new setWristPos(0.6), //position for L4 drop
+            new ReleaseCoral(),
+            new setWristPos(false).withTimeout(1.0),
+            new setElevatorSetpoint(Levels.PickUp));
     }
 
     public static SendableChooser<Command> RegisterCommands() {
@@ -44,7 +55,7 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("RotateTo", new RotateUntilSeeTags(Tag_Pose.ID4, Tag_Pose.ID7));
         NamedCommands.registerCommand("Pickup",   new InstantCommand(() -> {
             elevator_Subsystem.setHeight(Levels.PickUp); }));
-        NamedCommands.registerCommand("PlaceL4", place(Levels.LFour));
+        NamedCommands.registerCommand("PlaceL4", place4(Levels.LFour));
         NamedCommands.registerCommand("PlaceL3", place(Levels.LThree));
         NamedCommands.registerCommand("PlaceL2", place(Levels.LTwo));
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
