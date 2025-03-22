@@ -21,24 +21,6 @@
           "data": {
             "pathName": "Reef Tags 9 or 22 (R) to Coral Source"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "pickup station"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PlaceL3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PlaceL3"
-          }
         }
       ]
     }

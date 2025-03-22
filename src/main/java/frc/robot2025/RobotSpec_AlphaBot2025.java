@@ -74,7 +74,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight", ()-> {
         // Limelight position in robot coords - this has LL in the front of bot
-        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
+        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, -0.21, .23,
           new Rotation3d(0.0, 30.0/DEGperRAD, 0.0));
         return new Limelight("limelight", LimelightPosition );
       })

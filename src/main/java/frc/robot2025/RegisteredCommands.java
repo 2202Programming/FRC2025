@@ -14,6 +14,7 @@ import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
 import frc.robot2025.Constants.Tag_Pose;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
+import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.PickupAdjustment;
 import frc.robot2025.commands.GroundIntake.PlaceSequence;
@@ -61,8 +62,10 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
-        NamedCommands.registerCommand("DriveToReefTagR", new DriveToReefTag("r"));
-        NamedCommands.registerCommand("DriveToReefTagL", new DriveToReefTag("l"));
+        NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r"));
+        NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l"));
+        NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("l"));
+        NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("r"));
 
         //enable chooser - builds autochooser list
         autoChooser = AutoBuilder.buildAutoChooser();
