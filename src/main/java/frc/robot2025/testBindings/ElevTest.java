@@ -57,8 +57,8 @@ public class ElevTest {
                 new setWristPos(true)),
                 new ReleaseCoral(),
                 new ParallelCommandGroup(
-                new setWristPos(false).withTimeout(0.5)),
-                new setElevatorSetpoint(Levels.PickUp)
+                new setWristPos(false).withTimeout(0.5),
+                new setElevatorSetpoint(Levels.PickUp))
         ));
         opr.y().onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
@@ -66,8 +66,8 @@ public class ElevTest {
             new setWristPos(true)),
             new ReleaseCoral(),
             new ParallelCommandGroup(
-            new setWristPos(false).withTimeout(0.5)),
-            new setElevatorSetpoint(Levels.PickUp)
+            new setWristPos(false).withTimeout(0.5),
+            new setElevatorSetpoint(Levels.PickUp))
         ));
         opr.leftBumper().onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(

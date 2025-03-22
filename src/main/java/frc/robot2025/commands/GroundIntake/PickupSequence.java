@@ -43,7 +43,7 @@ public class PickupSequence extends Command {
     } else {
       pickup = Position.CORAL_PICKUP;
       rest = Position.CORAL_REST;
-      hasPiece = groundIntake::senseCoral;
+      hasPiece = groundIntake::getLatchedHasGamePiece; //was senseCoral;
       holdVolts = 0.0;
       holdAngle = 5.0; // pos num closes -er
     }

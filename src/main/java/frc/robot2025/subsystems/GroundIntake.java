@@ -67,7 +67,15 @@ public class GroundIntake extends SubsystemBase {
   final NeoServo btmServo;
   final SparkMax wheelMtr;
   final RelativeEncoder wheelMtr_encoder;
-  
+  double wheel_current; //[amps]
+  final double WheelCurrentTrip = 8.0;  //[amps] TBD
+  double wheel_cmd=0.0;   //requested speed, to compare for game piece detect
+  double wheel_speed; //measured speed
+  int wheel_stall = 0;
+  final int StallCountTrip = 5;
+  boolean has_gamepiece = false;
+
+
   // gates for piece detection
   DigitalInput coralSwitch = new DigitalInput(DigitalIO.GroundIntakeHasCoral);
   DigitalInput algeSwitch = new DigitalInput(DigitalIO.GroundIntakeHasAlgae);
@@ -142,9 +150,7 @@ public class GroundIntake extends SubsystemBase {
     this.new GroundIntakeWatcher();
 
     //testing PIDF smartdashboard stuff
-    topHwAngleVelPID.setName("topGndIn");
-   
-
+    //topHwAngleVelPID.setName("topGndIn");
   }
 
   public void setSetpoint(Position cmd) {
@@ -214,14 +220,17 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setWheelSpeed(double speed) {
+    wheel_cmd = speed;
     wheelMtr_ctrl.setReference(speed, ControlType.kVelocity);
   }
 
   public void setWheelHold(double voltage){
+    wheel_cmd = 0.0;
     double clampVoltage = Math.abs(voltage) <= WheelMaxVolts ? voltage : WheelMaxVolts;
     clampVoltage = Math.copySign(clampVoltage, voltage);
     wheelMtr_ctrl.setReference(clampVoltage, ControlType.kVoltage);
   }
+
   public double getTopPosition() {
     return topServo.getPosition();
   }
@@ -249,10 +258,38 @@ public class GroundIntake extends SubsystemBase {
     // protect against bad motion
     topServo.periodic();
     btmServo.periodic();
+
+    wheel_current = wheelMtr.getOutputCurrent();
+    wheel_speed = wheelMtr_encoder.getVelocity();
+
+    //count stalled wheel frames
+    if (wheel_cmd > 1.0 && Math.abs(wheel_cmd - wheel_speed) > 0.1){
+      // wheel is stalled 
+      wheel_stall++;
+    } else {
+      wheel_stall = 0;
+    }
+
+    // use wheel motor current/speed to detect gamepiece
+    // when we don't have switches we expected, latch value until
+    // cleard by a command.
+    has_gamepiece = has_gamepiece || 
+        (wheel_current > WheelCurrentTrip  &&
+         wheel_stall > StallCountTrip) ;
+  }
+
+  //clears has_gamepiece latch
+  public void clearGamePiece() {
+    has_gamepiece = false;
+    wheel_stall = 0;
+  }
+
+  public boolean getLatchedHasGamePiece() {
+    return has_gamepiece;
   }
 
   public class GroundIntakeWatcher extends WatcherCmd {
-    // Table Entries odometry pose
+    // Table Entries 
     NetworkTableEntry NT_topVelocity;
     NetworkTableEntry NT_btmVelocity;
     NetworkTableEntry NT_wheelVelocity;
@@ -269,6 +306,8 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_topGetIAccum;
     NetworkTableEntry NT_groundIntakeHasCoral;
     NetworkTableEntry NT_groundIntakeHasAlgae;
+    NetworkTableEntry NT_has_gamepiece;
+    NetworkTableEntry NT_wheel_current;
 
     public GroundIntakeWatcher() {
     }
@@ -296,13 +335,15 @@ public class GroundIntake extends SubsystemBase {
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
       NT_cmdWheelVelocity = MonitorTable.getEntry("cmd wheel velocity");
       NT_cmdWheelVelocity.setDouble(0.0);
+      NT_has_gamepiece = MonitorTable.getEntry("hasGP");
+      NT_wheel_current = MonitorTable.getEntry("wheel_current");
     }
 
     @Override
     public void ntupdate() {
       NT_topVelocity.setDouble(topServo.getVelocity());
       NT_btmVelocity.setDouble(btmServo.getVelocity());
-      NT_wheelVelocity.setDouble(wheelMtr_encoder.getVelocity());
+      NT_wheelVelocity.setDouble(wheel_speed);
       NT_hasCoral.setBoolean(senseCoral());
       NT_hasAlgae.setBoolean(senseAlgae());
       NT_topPos.setDouble(topServo.getPosition());
@@ -313,7 +354,9 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
-      
+      NT_has_gamepiece.setBoolean(has_gamepiece);
+      NT_wheel_current.setDouble(wheel_current);
+
       //call the pidf update so we can edit pids
       topHwAngleVelPID.NT_update();
       btmHwAngleVelPID.NT_update();  // must setup name - testing no-op 
