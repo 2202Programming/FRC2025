@@ -3,6 +3,7 @@ package frc.robot2025.commands;
 import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,8 +14,8 @@ import frc.robot2025.Constants.TheField;
 import frc.robot2025.subsystems.Limelight;
 
 public class DriveToPickupTag extends Command{
-    static double LeftOffset =  -0.04;  //[m]
-    static double RightOffset = -0.39;  //[m]
+    //static double LeftOffset =  -0.04;  //[m]
+    //static double RightOffset = -0.39;  //[m]
     static double BackupOffset = 0.55; //[m]
 
     static PathConstraints constraints = new PathConstraints(2.5, 1.75, Math.PI, Math.PI / 2.0);
@@ -35,7 +36,7 @@ public class DriveToPickupTag extends Command{
         LLName = (LL != null) ? LL.getName() : "no-ll-found";  //name if we need to use LLHelpers directly
 
         // pick a direction to go, left , right in TheField
-        tagIdx = side.toLowerCase().startsWith("l") ? 0 : 1;        
+        tagIdx = side.toLowerCase().startsWith("l") ? 1 : 0;        
     }
 
     @Override
@@ -55,9 +56,16 @@ public class DriveToPickupTag extends Command{
 
          // set LL targets to our reef only
         int tagId = (alliance == Alliance.Blue) ? TheField.PickupIdsBlue[tagIdx] : TheField.PickupIdsRed[tagIdx];
-        target = TheField.fieldLayout.getTagPose(tagId).get().toPose2d();
+        var p3d = TheField.fieldLayout.getTagPose(tagId).get();
 
-        // TODO - apply backup & L/R offset to target
+        var rot2d = p3d.getRotation().toRotation2d();//.getAngle();
+       // var rot2d = new Rotation2d(rot);
+
+        // Backup robot along tag face
+        double dx = rot2d.getCos()*BackupOffset;
+        double dy = rot2d.getSin()*BackupOffset;
+
+        target = new Pose2d(p3d.getX() + dx, p3d.getY() + dy, rot2d);
 
         moveComand = new MoveToPose(odoName, constraints, target);
         moveComand.schedule();           

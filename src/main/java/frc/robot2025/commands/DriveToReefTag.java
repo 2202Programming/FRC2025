@@ -114,7 +114,7 @@ public class DriveToReefTag extends Command {
     int foundTag;
     int last_usedTag;
     Pose2d targetPose;
-    Pose2d last_targetPose;
+    Pose2d last_targetPose = null;
 
     public DriveToReefTag(String reefSide) {
         odo = RobotContainer.getSubsystemOrNull(odoName);
@@ -154,10 +154,12 @@ public class DriveToReefTag extends Command {
         //made it this far, start looking for reef tages in execute()
         done = false;        
 
-        // check to see if we are close (d < .25m) to last completed/found tag
+        // check to see if we are close (d < .50m) to last completed/found tag
         // so if we can't see a tag and are close, just compute path
-        var dist = odo.getDistanceToTranslation(last_targetPose.getTranslation());
-        foundTag = (!LimelightHelpers.getTV(LLName) && dist < 0.25) ?  
+
+
+        var dist = (last_targetPose != null) ? odo.getDistanceToTranslation(last_targetPose.getTranslation()) : 99.0;
+        foundTag = (!LimelightHelpers.getTV(LLName) && dist < 0.50) ?  
             last_usedTag :  //close, use last completed
             0;              //wait for limelight
     }

@@ -9,7 +9,7 @@ import frc.lib2202.command.pathing.MoveToPose;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
-import frc.robot2025.commands.DriveToReefTag;
+import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.subsystems.SignalLight;
 
 public final class DPLPathTest {
@@ -71,6 +71,9 @@ public final class DPLPathTest {
             cmd.setName("moveto-backup");     
             cmd.schedule();
         }));
+
+        opr.povLeft().whileTrue(new DriveToPickupTag("left"));
+        opr.povRight().whileTrue(new DriveToPickupTag("right"));
         
         // l/r determined by view from driver's station
         // opr.leftStick().whileTrue(new DriveToReefTag("l"));

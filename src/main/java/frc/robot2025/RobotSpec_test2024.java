@@ -215,7 +215,7 @@ public class RobotSpec_test2024 implements IRobotSpec {
                     new ScaleDriver(0.25),
                     new RobotCentricDrive(sdt, dc)));      
             driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
-            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));     
+            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));
         } else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
         }
