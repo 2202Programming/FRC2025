@@ -127,9 +127,9 @@ public final class BindingsCompetition {
 
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
-                NotCal.and(operator.b()).whileTrue(new PlaceSequence("coral", -25.0));
+                NotCal.and(operator.b()).onTrue(new PlaceSequence("coral", -50.0));
                 NotCal.and(operator.x()).whileTrue(new PickupSequence("algae"));
-                NotCal.and(operator.y()).whileTrue(new PlaceSequence("algae", -150.0));
+                NotCal.and(operator.y()).onTrue(new PlaceSequence("algae", -150.0));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
                 /*
@@ -182,7 +182,7 @@ public final class BindingsCompetition {
             Cal.and(operator.b()).onTrue(new SetZero());
             Cal.and(operator.a()).whileTrue(new SpinRollers(15.0));
             Cal.and(operator.y()).onTrue(new ElevatorCalibrate(-30.0));
-            Cal.and(operator.x().whileTrue(new testElevatorVelComd(30.0)));
+            Cal.and(operator.x()).whileTrue(new testElevatorVelComd(30.0));
             Cal.and(operator.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")));
             Cal.and(operator.leftTrigger().onTrue(new setWristPos(2.0, "test")));
         }

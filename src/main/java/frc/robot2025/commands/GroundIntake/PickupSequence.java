@@ -39,7 +39,7 @@ public class PickupSequence extends Command {
       pickup = Position.ALGAE_PICKUP;
       rest = Position.ALGAE_REST;
       hasPiece = groundIntake::getLatchedHasGamePiece;
-      holdVolts = 60.0; // HACKED TO BE SPEED -er
+      holdVolts = 0.5; // HACKED TO BE % pwr -er
       holdAngle = 0.0;
       wheelSpeed = 120.0;
       FrameCount = 15;
@@ -47,7 +47,7 @@ public class PickupSequence extends Command {
       pickup = Position.CORAL_PICKUP;
       rest = Position.CORAL_REST;
       hasPiece = groundIntake::getLatchedHasGamePiece; //was senseCoral;
-      holdVolts = 0.0;
+      holdVolts = 0.2;
       holdAngle = 2.5; // pos num closes -er
       wheelSpeed = 50.0;
       FrameCount = 3;
@@ -70,13 +70,15 @@ public class PickupSequence extends Command {
     switch(state){
       
       case WaitForPickupPos:
-        state = groundIntake.isAtSetpoint() ? State.WaitForGamepiece : State.WaitForPickupPos;
+        state = groundIntake.isBottomAtSetpoint() ? State.WaitForGamepiece : State.WaitForPickupPos;
+        System.out.println("in wait for pickup");
         break;
 
       case WaitForGamepiece: 
-      state = hasPiece.getAsBoolean() && ++pickupFrameCounter == FrameCount ? 
+      state = hasPiece.getAsBoolean() && ++pickupFrameCounter >= FrameCount ? 
         State.Rest : 
         State.WaitForGamepiece;
+        System.out.println("in wait for gamepiece");
         break;
       
       case Rest:
@@ -84,14 +86,17 @@ public class PickupSequence extends Command {
         //groundIntake.setWheelSpeed(0.0); //Shouldn't need if holding 
         groundIntake.hold(holdAngle);
         groundIntake.setWheelHold(holdVolts);
-        state = State.Finished; // 3/33/35: intentional jump to finished so we dont wait for bottom arm- er
+        state = State.WaitForMove; 
+        System.out.println("in rest");
         break;
       
       case WaitForMove:
         state = groundIntake.isBottomAtSetpoint() ? State.Finished : State.WaitForMove;
+        System.out.println("in wait for move");
         break;
 
       case Finished:
+        System.out.println("Finished");
         break;
     }
   }
