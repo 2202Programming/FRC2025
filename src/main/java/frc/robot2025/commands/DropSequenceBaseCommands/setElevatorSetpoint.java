@@ -9,32 +9,33 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.utils.UXTrim;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class setElevatorSetpoint extends Command {
   Elevator_Subsystem elevator_Subsystem;
   Levels level;
   double setpoint;
-  double offset;
+  final UXTrim elevTrim;
   /** Creates a new setElevatorSetpoint. */
   public setElevatorSetpoint(Levels level) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.level = level;
     setpoint = level.height;
+    elevTrim = new UXTrim("elevatorTrim", 0.0);
     // Use addRequirements() here to declare subsystem dependencies.
   }
   public setElevatorSetpoint(double setpoint) {
-    SmartDashboard.putNumber("offset", 0.0);
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.setpoint = setpoint;
+    elevTrim = new UXTrim("elevatorTrim", 0.0);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-     offset = SmartDashboard.getNumber("offset", 0.0);
-    elevator_Subsystem.setHeight(setpoint + offset);
+    elevator_Subsystem.setHeight(setpoint + elevTrim);
   }
 
   // Returns true when the command should end.
