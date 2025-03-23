@@ -27,9 +27,9 @@ import frc.robot2025.subsystems.LimelightHelpers;
 
 public class DriveToReefTag extends Command { 
     //Robot left/right offsets for aligning with reef - TODO fix L/R values
-    static double LeftOffset =  -0.04;  //[m]
-    static double RightOffset = -0.39;  //[m]
-    static double BackupOffset = 0.5; //[m]
+    static double LeftOffset =  -0.09;  //[m]
+    static double RightOffset = -0.42;  //[m]
+    static double BackupOffset = 0.48; //[m]   was .50
     static Rotation2d LLRot = Rotation2d.k180deg;
                 //Rotation2d.kZero;
                 //Rotation2d.kCW_90deg; // ll on side, need to add this for final pose

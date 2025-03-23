@@ -15,7 +15,6 @@ import frc.robot2025.commands.WristFLAToPos;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
-import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
@@ -51,41 +50,41 @@ public class ElevTest {
         opr.x().whileTrue(new testElevatorVelComd(30.0));
         opr.a().onTrue(new ElevatorCalibrate(-30.0));
 
-        opr.b().onTrue(new SequentialCommandGroup (
-            new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
-                new setWristPos(true)),
-                new ReleaseCoral(),
-                new ParallelCommandGroup(
-                new setWristPos(false).withTimeout(0.5),
-                new setElevatorSetpoint(Levels.PickUp))
-        ));
-        opr.y().onTrue(new SequentialCommandGroup (
-            new ParallelCommandGroup(
-            new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
-            new setWristPos(true)),
-            new ReleaseCoral(),
-            new ParallelCommandGroup(
-            new setWristPos(false).withTimeout(0.5),
-            new setElevatorSetpoint(Levels.PickUp))
-        ));
-        opr.leftBumper().onTrue(new SequentialCommandGroup (
-            new ParallelCommandGroup(
-            new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
-            new setWristPos(0.2), //position for L4 drop
-            new ReleaseCoral(),
-            new setWristPos(false).withTimeout(1.0),
-            new setElevatorSetpoint(Levels.PickUp)
-        ));
-        opr.povDown().onTrue(new SequentialCommandGroup (
-            new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
-                new setWristPos(1.7)),
-                new ReleaseCoral(),
-                new ParallelCommandGroup(
-                new setWristPos(false).withTimeout(0.5)),
-                new setElevatorSetpoint(Levels.PickUp)
-        ));
+        // opr.b().onTrue(new SequentialCommandGroup (
+        //     new ParallelCommandGroup(
+        //         new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
+        //         new setWristPos(true)),
+        //         new ReleaseCoral(),
+        //         new ParallelCommandGroup(
+        //         new setWristPos(false).withTimeout(0.5),
+        //         new setElevatorSetpoint(Levels.PickUp))
+        // ));
+        // opr.y().onTrue(new SequentialCommandGroup (
+        //     new ParallelCommandGroup(
+        //     new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
+        //     new setWristPos(true)),
+        //     new ReleaseCoral(),
+        //     new ParallelCommandGroup(
+        //     new setWristPos(false).withTimeout(0.5),
+        //     new setElevatorSetpoint(Levels.PickUp))
+        // ));
+        // opr.leftBumper().onTrue(new SequentialCommandGroup (
+        //     new ParallelCommandGroup(
+        //     new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
+        //     new setWristPos(0.2), //position for L4 drop
+        //     new ReleaseCoral(),
+        //     new setWristPos(false).withTimeout(1.0),
+        //     new setElevatorSetpoint(Levels.PickUp)
+        // ));
+        // opr.povDown().onTrue(new SequentialCommandGroup (
+        //     new ParallelCommandGroup(
+        //         new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
+        //         new setWristPos(1.7)),
+        //         new ReleaseCoral(),
+        //         new ParallelCommandGroup(
+        //         new setWristPos(false).withTimeout(0.5)),
+        //         new setElevatorSetpoint(Levels.PickUp)
+        // ));
         opr.povUp().onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),

@@ -36,7 +36,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     LOne(0.0), 
     LTwo(27.0), 
     LThree(67.0), 
-    LFour(147.5),
+    LFour(146.0),
     PickUp(0.0),
     PowerUp(0.0);
     public double height;

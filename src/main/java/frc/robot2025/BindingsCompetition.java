@@ -20,7 +20,6 @@ import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.ScaleDriver;
-import frc.robot2025.commands.WristFLAToPos;
 import frc.robot2025.commands.testElevatorVelComd;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
@@ -122,9 +121,9 @@ public final class BindingsCompetition {
                 elevator.setHeight(87.25); // l3
             }));
             // TODO change value once mechanical adds more height
-            operator.povUp().onTrue(new InstantCommand(() -> {
-                elevator.setHeight(152.0);
-            }));
+            // operator.povUp().onTrue(new InstantCommand(() -> {
+            //     elevator.setHeight(152.0);
+            // }));
 
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
@@ -143,19 +142,26 @@ public final class BindingsCompetition {
             NotCal.and(operator.povLeft()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LThree).withTimeout(2.0),
-            new setWristPos(true)),
+            new setWristPos(WristFLA.MID_POSITION, "L3")),
             new ReleaseCoral(),
             new ParallelCommandGroup(
-            new setWristPos(false).withTimeout(0.5)),
+            new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
             new setElevatorSetpoint(Levels.PickUp)
         ));
         NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
-                new setWristPos(true)),
+                new setWristPos(WristFLA.MID_POSITION, "L2")),
                 new ReleaseCoral(),
                 new ParallelCommandGroup(
-                new setWristPos(false).withTimeout(0.5)),
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
+                new setElevatorSetpoint(Levels.PickUp)
+        ));
+        NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
+                new setElevatorSetpoint(Levels.LFour).withTimeout(2.0),
+                new setWristPos(WristFLA.Q3_POSITION, "L4"),
+                new ReleaseCoral(),
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp)
         ));
             }
@@ -178,7 +184,7 @@ public final class BindingsCompetition {
             Cal.and(operator.y()).onTrue(new ElevatorCalibrate(-30.0));
             Cal.and(operator.x().whileTrue(new testElevatorVelComd(30.0)));
             Cal.and(operator.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")));
-            Cal.and(operator.leftTrigger().onTrue(new WristFLAToPos(2.0, "leftTrigger")));
+            Cal.and(operator.leftTrigger().onTrue(new setWristPos(2.0, "test")));
         }
 
         else {

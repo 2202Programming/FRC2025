@@ -11,24 +11,24 @@ import frc.robot2025.utils.UXTrim;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class setWristPos extends Command {
-  WristFLA wrist;
-  double setpoint;
-  boolean drop;
+  final WristFLA wrist;
+  final double setpoint;
+  // boolean drop;
   final UXTrim wristTrim;
   /** Creates a new setWristPos. */
-  public setWristPos(boolean drop) {
-    wrist = RobotContainer.getSubsystem(WristFLA.class);
-    this.drop = drop;
-    wristTrim = new UXTrim("wristTrim", 0.0);
-    if(drop){
-      setpoint = WristFLA.MID_POSITION;
-    } else {
-      setpoint = WristFLA.PICKUP_POSITION;
-    }
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-  public setWristPos(double setpoint) {
-    wristTrim = new UXTrim("wristTrim", 0.0);
+  // public setWristPos(boolean drop) {
+  //   wrist = RobotContainer.getSubsystem(WristFLA.class);
+  //   this.drop = drop;
+  //   wristTrim = new UXTrim("wristTrim", 0.0);
+  //   if(drop){
+  //     setpoint = WristFLA.MID_POSITION;
+  //   } else {
+  //     setpoint = WristFLA.PICKUP_POSITION;
+  //   }
+  //   // Use addRequirements() here to declare subsystem dependencies.
+  // }
+  public setWristPos(double setpoint, String name) {
+    wristTrim = new UXTrim("wristTrim" + name);
     wrist = RobotContainer.getSubsystem(WristFLA.class);
     this.setpoint = setpoint;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -38,11 +38,11 @@ public class setWristPos extends Command {
   @Override
   public void initialize() {
     System.out.println(setpoint);
-    wrist.setPosition(setpoint + wristTrim.getValue());
+    wrist.setPosition(wristTrim.getValue(setpoint));
   }
   @Override
   public void execute(){
-    wrist.setPosition(setpoint  + wristTrim.getValue());
+    wrist.execute();
   }
   @Override
   public void end(boolean interrupted){

@@ -4,7 +4,6 @@
 
 package frc.robot2025.commands.DropSequenceBaseCommands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem;
@@ -22,20 +21,20 @@ public class setElevatorSetpoint extends Command {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.level = level;
     setpoint = level.height;
-    elevTrim = new UXTrim("elevatorTrim", 0.0);
+    elevTrim = new UXTrim("elevatorTrim");
     // Use addRequirements() here to declare subsystem dependencies.
   }
   public setElevatorSetpoint(double setpoint) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.setpoint = setpoint;
-    elevTrim = new UXTrim("elevatorTrim", 0.0);
+    elevTrim = new UXTrim("elevatorTrim");
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    elevator_Subsystem.setHeight(setpoint + elevTrim);
+    elevator_Subsystem.setHeight(elevTrim.getValue(setpoint));
   }
 
   // Returns true when the command should end.

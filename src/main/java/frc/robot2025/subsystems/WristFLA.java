@@ -40,7 +40,7 @@ public class WristFLA extends SubsystemBase {
   double timeToFinish;
   public static final double PICKUP_POSITION = 2; //pickup position from source
   public static final double MID_POSITION = 1.5; //drop position for L2/3
-  public static final double Q3_POSITION = .5; //drop position for L2/3
+  public static final double Q3_POSITION = 0.4; //drop position for L2/3
   public static final double DROP_POSITION = 0; //drop position for L2/3
 
   public WristFLA() {
@@ -53,10 +53,12 @@ public class WristFLA extends SubsystemBase {
   }
 
   public void setPosition(double position) {
-    //timeToFinish = EtoETime * Math.abs(pos - prevPos) + Timer.getFPGATimestamp();
-    //distance = vPositionSensor.getVoltage()*k - offset;
     distanceCmd=position;
     bandBangController.setSetpoint(position);
+}
+  public void execute() {
+    //timeToFinish = EtoETime * Math.abs(pos - prevPos) + Timer.getFPGATimestamp();
+    //distance = vPositionSensor.getVoltage()*k - offset;
 
     distance = (vPositionSensor.getVoltage()-offset)*k;
 
