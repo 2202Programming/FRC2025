@@ -15,11 +15,11 @@ public class PlaceSequence extends Command {
   public enum State {
     WaitForPlacePos, // wait for subsystem to get to commanded position
     Eject, // eject coral after arm gets to setpoint
-    DefaultPos, // go to zero 
+    DefaultPos, // go to zero
     Finished // command is done
   }
 
-  final int ejectingFrameCount = 25; //tbd
+  final int ejectingFrameCount = 25; // tbd
 
   State state;
   int count;
@@ -28,16 +28,15 @@ public class PlaceSequence extends Command {
   final Position rest;
   final BooleanSupplier hasPiece;
   final double WheelSpeed;
-  
-  
+
   // public PlaceSequence(String gp) {
-  //   this(gp, -1.0);
+  // this(gp, -1.0);
   // }
 
   public PlaceSequence(String gp, double WheelSpeed) {
     this.groundIntake = RobotContainer.getSubsystem(GroundIntake.class);
     this.WheelSpeed = WheelSpeed;
-    if (gp.startsWith("a")){
+    if (gp.startsWith("a")) {
       place = Position.ALGAE_PLACE;
       rest = Position.ALGAE_REST;
       hasPiece = groundIntake::getLatchedHasGamePiece;
@@ -70,7 +69,7 @@ public class PlaceSequence extends Command {
 
       case Eject:
         // just rely on count down for eject timing
-        if (--count <= 0 /* && !hasPiece.getAsBoolean() */) { 
+        if (--count <= 0 /* && !hasPiece.getAsBoolean() */) {
           groundIntake.setSetpoint(Position.ZERO);
           groundIntake.setWheelSpeed(0.0);
           state = State.DefaultPos;
@@ -79,9 +78,9 @@ public class PlaceSequence extends Command {
         break;
 
       case DefaultPos:
-        groundIntake.clearGamePiece();  //this makes the hasPiece latch go false    
-        if (groundIntake.isAtSetpoint() ) {
-          state = State.Finished; 
+        groundIntake.clearGamePiece(); // this makes the hasPiece latch go false
+        if (groundIntake.isAtSetpoint()) {
+          state = State.Finished;
         }
         break;
 
@@ -93,13 +92,10 @@ public class PlaceSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (hasPiece.getAsBoolean()) {
-      groundIntake.setSetpoint(rest);
-    } else {
-      groundIntake.setSetpoint(Position.ZERO);
-      groundIntake.setWheelSpeed(0.0);
-      groundIntake.hold(0.0);
-    }
+    groundIntake.setSetpoint(Position.ZERO);
+    groundIntake.setWheelSpeed(0.0);
+    groundIntake.hold(0.0);
+    groundIntake.clearGamePiece(); // this makes the hasPiece latch go false
   }
 
   // Returns true when the command should end.

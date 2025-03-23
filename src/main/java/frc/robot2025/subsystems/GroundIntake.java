@@ -55,7 +55,7 @@ public class GroundIntake extends SubsystemBase {
 
   // motor config constants
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
-  final int wheelStallLimit = 20;
+  final int wheelStallLimit = 30;
   final int wheelFreeLimit = 5;
   final static double Kff = 0.005;
   final PIDFController wheelPIDF = new PIDFController(0.00025, 0.000000, 0.0, Kff);  // kp was 0.015                                                                         
@@ -71,11 +71,11 @@ public class GroundIntake extends SubsystemBase {
   final SparkMax wheelMtr;
   final RelativeEncoder wheelMtr_encoder;
   double wheel_current; //[amps]
-  final double WheelCurrentTrip = 8.0;  //[amps] TBD
+  final double WheelCurrentTrip = 10.0;  //[amps] TBD
   double wheel_cmd=0.0;   //requested speed, to compare for game piece detect
   double wheel_speed; //measured speed
   int wheel_stall = 0;
-  final int StallCountTrip = 5;
+  final int StallCountTrip = 3;
   boolean has_gamepiece = false;
 
 
@@ -91,7 +91,7 @@ public class GroundIntake extends SubsystemBase {
   final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);
 
   PIDFController btmHwAngleVelPID = new PIDFController(0.0007, 0.000001, 0.0, 0.0017);
-  final PIDController btmPositionPID = new PIDController(3.5, 0.0001, 0.0); //kp = 2.5
+  final PIDController btmPositionPID = new PIDController(3.5, 0.0007, 0.0); //kp = 2.5
 
   final double topServoGR = (1.0 / 150.0) * 360.0; // 150:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
@@ -230,7 +230,8 @@ public class GroundIntake extends SubsystemBase {
   public void setWheelHold(double voltage){
     //wheel_cmd = 0.0;
     //wheelMtr_ctrl.setReference(voltage, ControlType.kVoltage);
-    setWheelSpeed(voltage); // HACK to test using slow speed to hold -er
+    //setWheelSpeed(voltage); // HACK to test using slow speed to hold -er
+    wheelMtr.set(voltage); // double hack for % pwr 
   }
 
   public double getTopPosition() {
