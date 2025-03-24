@@ -166,7 +166,10 @@ public class DriveToReefTag extends Command {
     @Override
     public void execute() { 
         // just waiting for our move to finish, no need to look for tag.
-        if (moveComand != null) return;
+        if (moveComand != null) {
+            moveComand.execute();  //run our moveCommand
+            return;
+        }
 
         // Look for our tags and create a moveTo if we find a quality tag       
         if (LimelightHelpers.getTV(LLName) ){
@@ -185,17 +188,20 @@ public class DriveToReefTag extends Command {
             if (targetPose == null) return;   // not a reef target on our side
 
             moveComand = new MoveToPose(odoName, constraints, targetPose);
-            moveComand.schedule();           
+
+            // now run the moveCommand in this command's context
+            if (moveComand != null) {                
+                moveComand.initialize();
+            }
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-           if (moveComand != null && moveComand.isScheduled()) {
-             moveComand.cancel();
-           }
+        if (moveComand != null) {
+            moveComand.end(interrupted);
         }
+        // keep last foundTag for shortpath WIP
         last_usedTag = foundTag;
         last_targetPose = targetPose;
         //restore or normal tag list.

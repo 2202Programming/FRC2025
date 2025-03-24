@@ -19,13 +19,31 @@
         {
           "type": "named",
           "data": {
-            "name": "PlaceL3"
+            "name": "PlaceL4"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "DriveToPickupTagLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitForPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToReefTagRight"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PlaceL4"
           }
         }
       ]

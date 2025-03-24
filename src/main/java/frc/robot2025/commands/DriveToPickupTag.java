@@ -82,17 +82,23 @@ public class DriveToPickupTag extends Command{
         target = new Pose2d(p3d.getX() + dx + lr_dx, p3d.getY() + dy + lr_dy, rot2d);
 
         moveComand = new MoveToPose(odoName, constraints, target);
-        moveComand.schedule();           
+        if (moveComand != null) {
+            moveComand.initialize();
+        }
         //made it this far, start looking for reef tages in execute()
         done = false;        
     }
 
     @Override
+    public void execute() {
+        if (moveComand == null) return;
+        moveComand.execute();
+    }
+
+    @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-           if (moveComand != null && moveComand.isScheduled()) {
-             moveComand.cancel();
-           }
+        if (moveComand != null) {
+            moveComand.end(interrupted);
         }
     }
 

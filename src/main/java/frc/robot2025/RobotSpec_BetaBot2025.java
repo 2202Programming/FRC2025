@@ -91,7 +91,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       .addAlias(VisionPoseEstimator.class, "vision_odo")
       // below are optional watchers for shuffeleboard data - disable if need too.
       .add(WristFLA.class)
-      .add(SignalLight.class, "signal")
+      .add(SignalLight.class, "light", ()-> { return new SignalLight(); })
       .add(EndEffector_Subsystem.class)
       .add(Command.class, "endEffectorWatcher", () -> {
         return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();

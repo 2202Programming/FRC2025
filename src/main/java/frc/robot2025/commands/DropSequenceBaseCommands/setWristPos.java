@@ -40,10 +40,7 @@ public class setWristPos extends Command {
     System.out.println(setpoint);
     wrist.setPosition(wristTrim.getValue(setpoint));
   }
-  @Override
-  public void execute(){
-    wrist.execute();
-  }
+  
   @Override
   public void end(boolean interrupted){
     wrist.stop();
