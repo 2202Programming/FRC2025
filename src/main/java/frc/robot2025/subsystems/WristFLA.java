@@ -53,14 +53,16 @@ public class WristFLA extends SubsystemBase {
   }
 
   // this could be the periodic, then cmds don't need to call execute()
-  public void execute() {
+  public void periodic() {
     distance = getDistance();
-    double output = bandBangController.calculate(distance, distanceCmd);
+    double output;
 
     if (!atSetpoint()) {
       if (distanceCmd >= distance) {
+        output = bandBangController.calculate(distance, distanceCmd);
         motor.set(output);
       } else {
+        output = bandBangController.calculate(distanceCmd, distance);
         motor.set(-output);
       }
     }

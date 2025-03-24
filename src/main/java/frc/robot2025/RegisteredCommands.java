@@ -37,16 +37,16 @@ public class RegisteredCommands {
             new InstantCommand(() -> {
                     elevator_Subsystem.setHeight(Levels.PickUp);
                 }),
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup")).withTimeout(1.0); //timeout for debug/sim
+            new setWristPos(WristFLA.PICKUP_POSITION, "pickup"));
     }
     private static Command place4(Levels level){
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
-            new setWristPos(0.6, "L4"), //position for L4 drop
+            new setWristPos(WristFLA.Q3_POSITION, "L4"), //position for L4 drop
             new ReleaseCoral(),
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
-            new setElevatorSetpoint(Levels.PickUp)).withTimeout(1.0);  //timeout for debug/sim
+            new setElevatorSetpoint(Levels.PickUp));
     }
 
     public static void RegisterCommands() {
