@@ -38,16 +38,17 @@ public final class Constants {
     public static final int CANDLE3 = 5;
     public static final int CANDLE4 = 6;
 
+    //CAN IDs
+    public static final int ELEVATOR_MAIN = 40;
+    public static final int ELEVATOR_FOLLOW = 41;
+    public static final int WRIST = 44;
+    public static final int END_EFFECTOR = 43;
     // Ground Intake
     public static final int IntakeTop = 51;
     public static final int IntakeBtm = 52; 
     public static final int IntakeWheel = 50; 
-    //CAN IDs
-    public static final int CLIMBER = 99; //placeholder | Changed to 43 for testing by BG
-    public static final int ELEVATOR_MAIN = 40; //placeholder
-    public static final int ELEVATOR_FOLLOW = 41; //placeholder
-    public static final int WRIST = 44; //placeholder
-    public static final int END_EFFECTOR = 43; //placeholder
+    public static final int CLIMBER = 55;
+    
 
     // DT
     // synced as of 1/25/25 
