@@ -1,28 +1,23 @@
 package frc.robot2025;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-//import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.RotateUntilSeeTags;
 import frc.robot2025.Constants.Tag_Pose;
-import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.PickupAdjustment;
-import frc.robot2025.commands.GroundIntake.PlaceSequence;
-import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.WristFLA;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
+import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
+import frc.robot2025.commands.GroundIntake.PlaceSequence;
+import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.subsystems.WristFLA;
 
 /*
  * Place commands named in PathPlaner autos here.
@@ -34,7 +29,7 @@ public class RegisteredCommands {
         String name = (level == Levels.LTwo) ? "L2" : "L3";
         return new SequentialCommandGroup (
             new ParallelCommandGroup(
-                new setElevatorSetpoint(level),
+                new setElevatorSetpoint(level, name),
                 new setWristPos(WristFLA.MID_POSITION, name)),
             new ReleaseCoral(),
             new InstantCommand(() -> {
@@ -45,16 +40,14 @@ public class RegisteredCommands {
     private static SequentialCommandGroup place4(Levels level){
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-            new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
+            new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(3.0)),
             new setWristPos(0.6, "L4"), //position for L4 drop
             new ReleaseCoral(),
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
-            new setElevatorSetpoint(Levels.PickUp));
+            new setElevatorSetpoint(Levels.PickUp, "pickup"));
     }
 
-    public static SendableChooser<Command> RegisterCommands() {
-        SendableChooser<Command> autoChooser;
-
+    public static void RegisterCommands() {
         NamedCommands.registerCommand("RotateTo", new RotateUntilSeeTags(Tag_Pose.ID4, Tag_Pose.ID7));
         NamedCommands.registerCommand("Pickup",   new InstantCommand(() -> {
             elevator_Subsystem.setHeight(Levels.PickUp); }));
@@ -68,11 +61,5 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l"));
         NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("l"));
         NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("r"));
-
-        //enable chooser - builds autochooser list
-        autoChooser = AutoBuilder.buildAutoChooser();
-        // select our auto
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-        return autoChooser;
     }
 }
