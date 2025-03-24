@@ -72,7 +72,8 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
         // FOR BOT ON BOARD you can configure bindings directly here
         // and avoid messing with BindingsOther or Comp.
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
-        if (dc.Operator() instanceof CommandXboxController operator) {
+
+        if (dc.Operator() instanceof CommandXboxController) {
             //operator.povUp().whileTrue(new ClimberVelMove(0.75));
             //operator.povDown().whileTrue(new ClimberVelMove(-0.75));
             //operator.rightBumper().onTrue(new ClimberPosition(3.0, 0.75));
