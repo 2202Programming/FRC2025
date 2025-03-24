@@ -17,17 +17,17 @@ public class setElevatorSetpoint extends Command {
   double setpoint;
   final UXTrim elevTrim;
   /** Creates a new setElevatorSetpoint. */
-  public setElevatorSetpoint(Levels level) {
+  public setElevatorSetpoint(Levels level, String name) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.level = level;
     setpoint = level.height;
-    elevTrim = new UXTrim("elevatorTrim");
+    elevTrim = new UXTrim("elevatorTrim" + name);
     // Use addRequirements() here to declare subsystem dependencies.
   }
-  public setElevatorSetpoint(double setpoint) {
+  public setElevatorSetpoint(double setpoint, String name) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.setpoint = setpoint;
-    elevTrim = new UXTrim("elevatorTrim");
+    elevTrim = new UXTrim("elevatorTrim" + name);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
