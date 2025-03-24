@@ -42,11 +42,14 @@ public class RegisteredCommands {
     private static Command place4(Levels level){
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-            new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
+            new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(3.0),
+            new setWristPos(1.0, "L4")),
             new setWristPos(WristFLA.Q3_POSITION, "L4"), //position for L4 drop
             new ReleaseCoral(),
+            new setWristPos(1.0, "L4"),
+            new ParallelCommandGroup(
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
-            new setElevatorSetpoint(Levels.PickUp, "pickup"));
+            new setElevatorSetpoint(Levels.PickUp, "pickup")));
     }
 
     public static void RegisterCommands() {
