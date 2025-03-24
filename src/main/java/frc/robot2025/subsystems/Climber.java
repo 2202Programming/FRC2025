@@ -23,8 +23,8 @@ public class Climber extends SubsystemBase {
   private boolean cageContact;
   private boolean climberPin;
   final double GearRatio = 9.0 * 5.0 * 4.0;
-  final double conversionFactor = 1.0 / GearRatio;
-  PowerDistribution pd = RobotContainer.getSubsystem("PDP");
+  final double conversionFactor = 1.0 / GearRatio; // 180.0
+  PowerDistribution pdp = RobotContainer.getSubsystem("PDP");
   ClimberWatcherCmd watcher;
 
   // Motor settings for Servo
@@ -36,8 +36,6 @@ public class Climber extends SubsystemBase {
   final double maxAccel = 360.0; // [mtr rot/min/sec]
   final double posTol = 0.01; // tol = tolerance [rot]
   final double velTol = 0.1; // [rot/s]
-
-  
 
   double cmdVel;
 
@@ -105,13 +103,13 @@ public class Climber extends SubsystemBase {
   public void climberHold(){
     climberPin = false;
     //set PDP switchable channel accordingly
-    pd.setSwitchableChannel(false);
+    pdp.setSwitchableChannel(false);
 
   }
   public void climberRelease(){
     climberPin = true;
     //set PDP switchable channel accordingly
-    pd.setSwitchableChannel(true);
+    pdp.setSwitchableChannel(true);
 
   }
 

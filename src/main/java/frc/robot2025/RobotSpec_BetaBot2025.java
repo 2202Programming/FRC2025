@@ -36,6 +36,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.subsystems.Climber;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
@@ -44,6 +45,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.WristFLA;
+import frc.robot2025.testBindings.BGClimberTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_BetaBot2025 implements IRobotSpec {
@@ -69,6 +71,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       .add(Command.class, "ElevatorWatcher", () -> {
        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       })
+      .add(Climber.class)
 
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
@@ -203,6 +206,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     // ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
+    BGClimberTest.myBindings(dc);
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // or create a binding file in ./testBindings/BotOnBoard<N>.java
