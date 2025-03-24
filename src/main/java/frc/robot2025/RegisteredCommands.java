@@ -2,6 +2,7 @@ package frc.robot2025;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -25,7 +26,7 @@ import frc.robot2025.subsystems.WristFLA;
 
 public class RegisteredCommands {
     final static Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    private static SequentialCommandGroup place(Levels level){
+    private static Command place(Levels level){
         String name = (level == Levels.LTwo) ? "L2" : "L3";
         return new SequentialCommandGroup (
             new ParallelCommandGroup(
@@ -35,16 +36,16 @@ public class RegisteredCommands {
             new InstantCommand(() -> {
                     elevator_Subsystem.setHeight(Levels.PickUp);
                 }),
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup"));
+            new setWristPos(WristFLA.PICKUP_POSITION, "pickup")).withTimeout(5.0); //timeout for debug/sim
     }
-    private static SequentialCommandGroup place4(Levels level){
+    private static Command place4(Levels level){
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LFour).withTimeout(3.0)),
             new setWristPos(0.6, "L4"), //position for L4 drop
             new ReleaseCoral(),
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
-            new setElevatorSetpoint(Levels.PickUp));
+            new setElevatorSetpoint(Levels.PickUp)).withTimeout(5.0);  //timeout for debug/sim
     }
 
     public static void RegisterCommands() {
