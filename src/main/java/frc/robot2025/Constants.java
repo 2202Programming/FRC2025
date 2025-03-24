@@ -43,7 +43,7 @@ public final class Constants {
     public static final int IntakeBtm = 52; 
     public static final int IntakeWheel = 50; 
     //CAN IDs
-    public static final int CLIMBER = 26; //placeholder | Changed to 26 for testing by BG
+    public static final int CLIMBER = 43; //placeholder | Changed to 43 for testing by BG
     public static final int ELEVATOR_MAIN = 40; //placeholder
     public static final int ELEVATOR_FOLLOW = 41; //placeholder
     public static final int WRIST = 44; //placeholder
@@ -95,7 +95,8 @@ public final class Constants {
     public static final int GroundIntakeHasAlgae = 1; // lightgate
     public static final int END_EFFECTOR_WHEEL_LOW_LIGHTGATE = 2; 
     public static final int END_EFFECTOR_LOAD_HIGH_LIGHTGATE = 3; 
-    public static final int ElevatorZeroLS = 4;    
+    public static final int ElevatorZeroLS = 4;   
+    public static final int cageContactSensor = 5; 
     
     public static final int SignalLight1 = 7;
     public static final int SignalLight2 = 8;

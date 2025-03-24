@@ -15,6 +15,9 @@ import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.Climber.ClimberPosition;
+import frc.robot2025.commands.Climber.ClimberVelMove;
+import frc.robot2025.subsystems.Climber;
 import frc.robot2025.commands.WristFLAToPos;
 import frc.robot2025.subsystems.WristFLA;
 

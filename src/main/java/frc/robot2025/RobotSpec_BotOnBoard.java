@@ -21,16 +21,14 @@ import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.ElevatorCalibrate;
-import frc.robot2025.commands.EndEffectorPercent;
-import frc.robot2025.commands.testElevatorVelComd;
-import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.commands.Climber.ClimberVelMove;
+import frc.robot2025.subsystems.Climber;
 import frc.robot2025.subsystems.Sensors_Subsystem;
 
 public class RobotSpec_BotOnBoard implements IRobotSpec {
   // Subsystems and other hardware on 2025 Robot rev Alpha
-  // $env:serialnum = "032381BF"
-  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "temp")
+  // $env:serialnum = "0312db1a"
+  final SubsystemConfig ssconfig = new SubsystemConfig("BotOnBoard", "0312db1a")
       // deferred construction via Supplier<Object> lambda
       .add(PowerDistribution.class, "PDP", () -> {
         var pdp = new PowerDistribution(CAN.PDP, ModuleType.kRev);
@@ -42,12 +40,13 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
         return new HID_Subsystem(0.3, 0.9, 0.05);
 
       })
+      .add(Climber.class);
       
       // .add(Wrist.class);
-      .add(Elevator_Subsystem.class)
-      .add(Command.class, "ElevatorWatcher", () -> {
-       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
-      });
+      //.add(Elevator_Subsystem.class)
+      //.add(Command.class, "ElevatorWatcher", () -> {
+      // return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
+      // });
       // below are optional watchers for shuffeleboard data - disable if need too.
 
   // set this true at least once after robot hw stabilizes
@@ -118,37 +117,16 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
       @SuppressWarnings("unused")
       CommandXboxController driver = (CommandXboxController)dc.Driver();
       CommandXboxController opp = (CommandXboxController)dc.Operator();
-      final Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-      opp.x().whileTrue(new testElevatorVelComd(30.0));
-      opp.rightBumper().onTrue(new ElevatorCalibrate(-30.0));
-      opp.y().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(0.0);
-      }));
-      opp.b().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(50.0);
-      }));
-      opp.a().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(90.0);
-      }));
-      opp.leftBumper().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(110.0);
-      }));
-      opp.leftTrigger().onTrue(new InstantCommand(() -> {
-        elevator_Subsystem.setHeight(148.0);
-      }));
-      // opp.rightTrigger().onTrue(new InstantCommand(() -> {
-      //   elevator_Subsystem.setHeight(75.0);
-      // }));
-      opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
-      opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger"));
-      //for end effector
-      //opp.rightBumper().whileTrue(new EndEffectorPercent(-.3, "rightBumper")); //reverse
-      //opp.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //p
-      
-      // opp.x().whileTrue(new backupEE_Move(1000.0)); 
-    }
 
-    
+      //test commands
+      opp.a().whileTrue(new ClimberVelMove(180));
+      opp.b().whileTrue(new ClimberVelMove(-180));
+      opp.y().onTrue(new InstantCommand(() -> {
+        Climber climber = RobotContainer.getSubsystem(Climber.class);
+        climber.climberRelease();
+
+      }).andThen(new ClimberVelMove(90)));
+    }
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // and avoid messing with BindingsOther or Comp.

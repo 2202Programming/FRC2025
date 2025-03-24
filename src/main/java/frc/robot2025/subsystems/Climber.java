@@ -7,8 +7,11 @@ package frc.robot2025.subsystems;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot2025.Constants;
+import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.WatcherCmd;
 import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
@@ -16,21 +19,25 @@ import frc.lib2202.util.PIDFController;
 public class Climber extends SubsystemBase {
   NeoServo servo;
   PIDFController hwClimberVel_PID = new PIDFController(0.01, 0, 0, 1 / 540);
-
+  DigitalInput cageContactSensor = new DigitalInput(Constants.DigitalIO.cageContactSensor);
+  private boolean cageContact;
+  private boolean climberPin;
   final double GearRatio = 9.0 * 5.0 * 4.0;
   final double conversionFactor = 1.0 / GearRatio;
-
-ClimberWatcherCmd watcher;
+  PowerDistribution pd = RobotContainer.getSubsystem("PDP");
+  ClimberWatcherCmd watcher;
 
   // Motor settings for Servo
   final int STALL_CURRENT = 40;
   final int FREE_CURRENT = 40;
   final boolean motor_inverted = true;
   // Servo speed/positions
-  final double maxVel = 0.75;  // [winch rot/s]
-  final double maxAccel = 0.75; // [winch rot/s/s]
+  final double maxVel = 360.0;  // [mtr rot/min]
+  final double maxAccel = 360.0; // [mtr rot/min/sec]
   final double posTol = 0.01; // tol = tolerance [rot]
   final double velTol = 0.1; // [rot/s]
+
+  
 
   double cmdVel;
 
@@ -89,12 +96,33 @@ ClimberWatcherCmd watcher;
     return servo.atSetpoint();
   }
 
+  public boolean getCageContact(){
+    return cageContact;
+  }
+  public boolean getClimberPin(){
+    return climberPin;
+  }
+  public void climberHold(){
+    climberPin = false;
+    //set PDP switchable channel accordingly
+    pd.setSwitchableChannel(false);
+
+  }
+  public void climberRelease(){
+    climberPin = true;
+    //set PDP switchable channel accordingly
+    pd.setSwitchableChannel(true);
+
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     this.servo.periodic();
 
     watcher.ntupdate();
+
+    cageContact = cageContactSensor.get();
   }
 
   class ClimberWatcherCmd extends WatcherCmd {
