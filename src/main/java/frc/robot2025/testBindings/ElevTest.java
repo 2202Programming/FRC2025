@@ -85,15 +85,15 @@ public class ElevTest {
         //         new setWristPos(false).withTimeout(0.5)),
         //         new setElevatorSetpoint(Levels.PickUp)
         // ));
-        opr.povUp().onTrue(new SequentialCommandGroup (
-            new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
-                new WristFLAToPos(1.7, "UP")),
-                new ReleaseCoral(),
-                new ParallelCommandGroup(
-                new WristFLAToPos(0.0, "DOWN").withTimeout(0.5)),
-                new setElevatorSetpoint(Levels.PickUp)
-        ));
+        // opr.povUp().onTrue(new SequentialCommandGroup (
+        //     new ParallelCommandGroup(
+        //         new setElevatorSetpoint(Levels.LTwo).withTimeout(2.0),
+        //         new WristFLAToPos(1.7, "UP")),
+        //         new ReleaseCoral(),
+        //         new ParallelCommandGroup(
+        //         new WristFLAToPos(0.0, "DOWN").withTimeout(0.5)),
+        //         new setElevatorSetpoint(Levels.PickUp)
+        // ));
 
         opr.leftTrigger().onTrue(new WristFLAToPos(2.0, "leftTrigger"));
         opr.povRight().onTrue(new WristFLAToPos(0));
