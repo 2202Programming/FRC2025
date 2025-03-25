@@ -65,6 +65,8 @@ public class WristFLA extends SubsystemBase {
         output = bandBangController.calculate(distanceCmd, distance);
         motor.set(-output);
       }
+    } else {
+      motor.set(0);
     }
   }
 
