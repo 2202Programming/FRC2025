@@ -33,7 +33,7 @@ public class WristFLA extends SubsystemBase {
   private double distance = 0.0; // measured
   private double distanceCmd = 0.0; // commanded
 
-  public static final double PICKUP_POSITION = 2.0; // pickup position from source
+  public static final double PICKUP_POSITION = 1.8; // pickup position from source
   public static final double MID_POSITION = 1.5; // drop position for L2/3
   public static final double Q3_POSITION = 0.4; // drop position for L2/3
   public static final double DROP_POSITION = 0.0; // drop position for L2/3
@@ -52,7 +52,7 @@ public class WristFLA extends SubsystemBase {
     bandBangController.setSetpoint(position);
   }
 
-  // this could be the periodic, then cmds don't need to call execute()
+  @Override
   public void periodic() {
     distance = getDistance();
     double output;

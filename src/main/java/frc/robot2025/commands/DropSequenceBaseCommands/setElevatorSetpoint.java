@@ -22,12 +22,14 @@ public class setElevatorSetpoint extends Command {
     this.level = level;
     setpoint = level.height;
     elevTrim = new UXTrim("elevatorTrim" + name);
+    addRequirements(elevator_Subsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
   public setElevatorSetpoint(double setpoint, String name) {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     this.setpoint = setpoint;
     elevTrim = new UXTrim("elevatorTrim" + name);
+    addRequirements(elevator_Subsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 

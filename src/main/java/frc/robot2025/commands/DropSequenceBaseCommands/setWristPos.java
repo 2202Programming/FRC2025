@@ -31,20 +31,16 @@ public class setWristPos extends Command {
     wristTrim = new UXTrim("wristTrim" + name);
     wrist = RobotContainer.getSubsystem(WristFLA.class);
     this.setpoint = setpoint;
+    addRequirements(wrist);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println(setpoint);
     wrist.setPosition(wristTrim.getValue(setpoint));
   }
-  
-  @Override
-  public void end(boolean interrupted){
-    wrist.stop();
-  }
+
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

@@ -2,6 +2,7 @@ package frc.robot2025;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -149,7 +150,7 @@ public final class BindingsCompetition {
             new ParallelCommandGroup(
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
             new setElevatorSetpoint(Levels.PickUp, "pickup")
-        ));
+        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
         NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LTwo, "L2").withTimeout(2.0),
@@ -158,16 +159,18 @@ public final class BindingsCompetition {
                 new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")
-        ));
+        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
         NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
                 new setWristPos(1.0, "L4")),
                 new setWristPos(WristFLA.Q3_POSITION, "L4"),
                 new ReleaseCoral(),
+                new setWristPos(1.0, "L4"),
+            new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup")
-        ));
+                new setElevatorSetpoint(Levels.PickUp, "pickup"))
+        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
                 // TODO change to rpm, i just plucked these values off so i have no clue if

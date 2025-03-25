@@ -16,6 +16,7 @@ public class ReleaseCoral extends Command {
   /** Creates a new ReleaseCoral. */
   public ReleaseCoral() {
     ee_Subsystem = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
+    addRequirements(ee_Subsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
