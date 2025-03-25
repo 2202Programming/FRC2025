@@ -150,7 +150,7 @@ public final class BindingsCompetition {
             new ParallelCommandGroup(
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
             new setElevatorSetpoint(Levels.PickUp, "pickup")
-        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
+        ));
         NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LTwo, "L2").withTimeout(2.0),
@@ -159,7 +159,7 @@ public final class BindingsCompetition {
                 new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")
-        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
+        ));
         NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
@@ -170,7 +170,7 @@ public final class BindingsCompetition {
             new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup"))
-        ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
+        ));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
