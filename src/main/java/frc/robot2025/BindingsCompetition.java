@@ -2,7 +2,6 @@ package frc.robot2025;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -134,6 +133,8 @@ public final class BindingsCompetition {
                 NotCal.and(operator.b()).onTrue(new PlaceSequence("coral", -50.0));
                 NotCal.and(operator.x()).whileTrue(new PickupSequence("algae"));
                 NotCal.and(operator.y()).onTrue(new PlaceSequence("algae", -150.0));
+
+                //NotCal.and(operator.rightTrigger().whileTrue(new EndEffectorPercent(-0.7)));
             }
             if (RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class) != null) {
                 /*
@@ -163,7 +164,7 @@ public final class BindingsCompetition {
         ));
         NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LFour, "L4"),
+                new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
                 new setWristPos(1.0, "L4")),
                 new setWristPos(WristFLA.Q3_POSITION, "L4"),
                 new ReleaseCoral(),
@@ -178,7 +179,8 @@ public final class BindingsCompetition {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
                 // they're viable -er
                 // NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
-                operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
+                operator.leftTrigger().whileTrue(new EndEffectorPercent(.5, "leftTrigger"));
+                operator.rightTrigger().whileTrue(new EndEffectorPercent(-0.5, "rightTrigger"));
             }
             if (RobotContainer.getSubsystemOrNull(WristFLA.class) != null) {
             }
