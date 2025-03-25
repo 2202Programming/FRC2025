@@ -144,25 +144,25 @@ public final class BindingsCompetition {
                  */
             NotCal.and(operator.povLeft()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
-            new setElevatorSetpoint(Levels.LThree, "L3").withTimeout(2.0),
+            new setElevatorSetpoint(Levels.LThree, "L3"),
             new setWristPos(WristFLA.MID_POSITION, "L3")),
             new ReleaseCoral(),
             new ParallelCommandGroup(
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
-            new setElevatorSetpoint(Levels.PickUp, "pickup")
+            new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+            new setElevatorSetpoint(Levels.PickUp, "pickup"))
         ));
         NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LTwo, "L2").withTimeout(2.0),
+                new setElevatorSetpoint(Levels.LTwo, "L2"),
                 new setWristPos(WristFLA.MID_POSITION, "L2")),
                 new ReleaseCoral(),
                 new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(0.5)),
-                new setElevatorSetpoint(Levels.PickUp, "pickup")
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+                new setElevatorSetpoint(Levels.PickUp, "pickup"))
         ));
         NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
+                new setElevatorSetpoint(Levels.LFour, "L4"),
                 new setWristPos(1.0, "L4")),
                 new setWristPos(WristFLA.Q3_POSITION, "L4"),
                 new ReleaseCoral(),

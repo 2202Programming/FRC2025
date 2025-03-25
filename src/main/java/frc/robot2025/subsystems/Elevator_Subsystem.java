@@ -58,7 +58,7 @@ public class Elevator_Subsystem extends SubsystemBase {
   final int FREE_CURRENT = 5;
   final double elevatorMaxVel = 50.0; // [cm/s] rpm
   final double elevatorMaxAccel = 50.0; // [cm/s^2]  servo may not enforce yet
-  final double elevatorPosTol = 0.5;  // [cm]
+  final double elevatorPosTol = 1.0;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
   final double maxPos = 149.0; // [cm]
   final double minPos = -1.0;  // [cm]
