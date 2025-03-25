@@ -16,6 +16,7 @@ import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
+import frc.robot2025.commands.AlgaeRemoval;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ElevatorCalibrate;
@@ -171,11 +172,12 @@ public final class BindingsCompetition {
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup"))
         ));
+        NotCal.and(operator.rightBumper().whileTrue(new AlgaeRemoval()));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
                 // they're viable -er
-                NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
+                // NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
                 operator.rightTrigger().whileTrue(new EndEffectorPercent(.5, "rightTrigger")); //
             }
             if (RobotContainer.getSubsystemOrNull(WristFLA.class) != null) {
