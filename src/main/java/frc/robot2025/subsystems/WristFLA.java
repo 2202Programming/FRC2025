@@ -36,6 +36,7 @@ public class WristFLA extends SubsystemBase {
   public static final double PICKUP_POSITION = 1.8; // pickup position from source
   public static final double MID_POSITION = 1.5; // drop position for L2/3
   public static final double Q3_POSITION = 0.4; // drop position for L2/3
+  public static final double ALGAE_REMOVAL_POSITION = 1.0;
   public static final double DROP_POSITION = 0.0; // drop position for L2/3
 
   public WristFLA() {

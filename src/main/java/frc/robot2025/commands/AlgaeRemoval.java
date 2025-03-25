@@ -8,15 +8,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
+import frc.robot2025.subsystems.WristFLA;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AlgaeRemoval extends Command {
   /** Creates a new AlgaeRemoval. */
   Elevator_Subsystem elevator_Subsystem;
   EndEffector_Subsystem ee_Subsystem;
+  WristFLA wrist; 
   public AlgaeRemoval() {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     ee_Subsystem = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
+    wrist = RobotContainer.getSubsystem(WristFLA.class);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -25,6 +28,7 @@ public class AlgaeRemoval extends Command {
   public void initialize() {
     elevator_Subsystem.setVelocity(60.0);
     ee_Subsystem.setPercent(-0.6);
+    wrist.setPosition(WristFLA.ALGAE_REMOVAL_POSITION);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,6 +40,7 @@ public class AlgaeRemoval extends Command {
   public void end(boolean interrupted) {
     elevator_Subsystem.setHeight(0.0);
     ee_Subsystem.setPercent(0.0);
+    wrist.setPosition(WristFLA.PICKUP_POSITION);
   }
 
   // Returns true when the command should end.
