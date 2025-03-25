@@ -66,16 +66,8 @@ public class DriveToReefTag extends Command {
             rotDirFlip = (isRed) ? !rotDirFlip : rotDirFlip;
 
             // figure out why way to shift for reef pole
-            double lr_offset;
-            if (!isRed) {
-                //blue
-                lr_offset = (isLeft) ?  l_offset : r_offset;
-            }
-            else {
-                //red
-                lr_offset = (isLeft) ? r_offset : l_offset;
-            }
-
+            double lr_offset = (isLeft) ?  l_offset : r_offset;
+           
             // adjust L/R - rotate based on which side the tags are on
             var lrRot =(rotDirFlip) ? 
                 rot2d.plus(Rotation2d.kCW_90deg) : 
