@@ -37,7 +37,7 @@ public class DriveToReefTag extends Command {
     static Map<Integer, Pose2d> redReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefRight = new HashMap<Integer, Pose2d>();
 
-    static PathConstraints constraints = new PathConstraints(2.8,1.75, Math.PI, Math.PI / 2.0);
+    static PathConstraints constraints = new PathConstraints(2.5,1.75, Math.PI, Math.PI / 2.0);
 
     static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double l_offset, double r_offset, boolean isLeft, boolean isRed) {
         // loop over given tags and build the 2d targets

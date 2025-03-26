@@ -19,7 +19,7 @@ public class DriveToPickupTag extends Command{
     static double RightOffset = 0.0;   //[m]
     static double BackupOffset = 0.48; //[m]
 
-    static PathConstraints constraints = new PathConstraints(2.7, 1.33, Math.PI, Math.PI / 2.0);
+    static PathConstraints constraints = new PathConstraints(2.8, 1.8, Math.PI, Math.PI / 2.0);
 
     final Limelight LL;
     final String LLName;
