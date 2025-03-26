@@ -5,7 +5,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib2202.builder.RobotContainer;
@@ -63,9 +62,10 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("WaitForPickup", new WaitCommand(1.0));  //TODO
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
         NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r")
-                                    // .withDistanceScheduleCmd(place4(Levels.LFour), 0.8));
-                                    .withDistanceScheduleCmd(new PrintCommand("sched place .8m away"), 0.8));
-        NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l"));
+                                    .withDistanceScheduleCmd(place4(Levels.LFour), 0.8));
+                                    // .withDistanceScheduleCmd(new PrintCommand("sched place .8m away"), 0.8));
+        NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l")
+                                    .withDistanceScheduleCmd(place4(Levels.LFour), 0.8));
         NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("left"));
         NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("right"));
     }
