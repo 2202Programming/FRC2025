@@ -66,7 +66,7 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
         NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r"));
         NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l"));
-        NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("l"));
-        NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("r"));
+        NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("left"));
+        NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("right"));
     }
 }

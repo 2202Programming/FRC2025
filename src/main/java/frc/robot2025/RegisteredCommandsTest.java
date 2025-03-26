@@ -32,8 +32,8 @@ public class RegisteredCommandsTest {
         NamedCommands.registerCommand("Release", new PrintCommand("Releasing coral"));
         NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r"));
         NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l"));
-        NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("l"));
-        NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("r"));
+        NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("left"));
+        NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("right"));
     }
 }
 

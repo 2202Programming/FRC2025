@@ -17,7 +17,7 @@ import frc.robot2025.utils.UXTrim;
 public class DriveToPickupTag extends Command{
     static double LeftOffset = 0.0;    //[m]
     static double RightOffset = 0.0;   //[m]
-    static double BackupOffset = 0.55; //[m]
+    static double BackupOffset = 0.50; //[m]
 
     static PathConstraints constraints = new PathConstraints(2.5, 1.75, Math.PI, Math.PI / 2.0);
 
@@ -26,8 +26,10 @@ public class DriveToPickupTag extends Command{
     final OdometryInterface odo;
     final String odoName = "vision_odo";   //todo make an arg
     final int tagIdx;
-    final UXTrim backoffTrim;
-    final UXTrim xyTrim;
+    final UXTrim redBackoffTrim;
+    final UXTrim blueBackoffTrim;
+    final UXTrim redXyTrim;
+    final UXTrim blueXyTrim;
     final double xyOffset;
     final String side;
     
@@ -45,12 +47,17 @@ public class DriveToPickupTag extends Command{
         tagIdx = this.side.startsWith("l") ? 1 : 0; 
         xyOffset = this.side.startsWith("l") ? LeftOffset : RightOffset;
 
-        backoffTrim = new UXTrim("Pickup_backoff_" + side, 0.0);
-        xyTrim = new UXTrim("Pickup_xy_" + side, 0.0);
+        // setup trims for both red/blue
+        redBackoffTrim = new UXTrim("Pickup_backoff_Red_" + side, 0.0);
+        blueBackoffTrim = new UXTrim("Pickup_backoff_Blue_" + side, 0.0);
+        redXyTrim = new UXTrim("Pickup_shift_Red_" + side, 0.0);
+        blueXyTrim = new UXTrim("Pickup_shift_Blue_" + side, 0.0);
     }
 
     @Override
     public void initialize() {
+        UXTrim xyTrim;
+        UXTrim backoffTrim;
         done = true;
         //protect from missng required ss
         if (LL == null) return;
@@ -64,7 +71,16 @@ public class DriveToPickupTag extends Command{
         }
         else return; // no alliance, bail
 
-         // set LL targets to our reef only
+        // set trims based on our color
+        if (alliance == Alliance.Blue) {
+            xyTrim = blueXyTrim;
+            backoffTrim = blueBackoffTrim;
+        } else {
+            xyTrim = redXyTrim;
+            backoffTrim = redBackoffTrim;
+        }
+        
+        // set LL targets to our reef only
         int tagId = (alliance == Alliance.Blue) ? TheField.PickupIdsBlue[tagIdx] : TheField.PickupIdsRed[tagIdx];
         var p3d = TheField.fieldLayout.getTagPose(tagId).get();
 
@@ -85,7 +101,6 @@ public class DriveToPickupTag extends Command{
         if (moveComand != null) {
             moveComand.initialize();
         }
-        //made it this far, start looking for reef tages in execute()
         done = false;        
     }
 
