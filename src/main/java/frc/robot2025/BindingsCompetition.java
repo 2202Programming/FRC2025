@@ -35,6 +35,7 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
+import frc.robot2025.commands.CoralVel;
 import frc.robot2025.subsystems.WristFLA;
 
 /*
@@ -178,8 +179,8 @@ public final class BindingsCompetition {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
                 // they're viable -er
                 // NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
-                operator.leftTrigger().whileTrue(new EndEffectorPercent(.5, "leftTrigger"));
-                operator.rightTrigger().whileTrue(new EndEffectorPercent(-0.5, "rightTrigger"));
+                NotCal.and(operator.leftTrigger()).whileTrue(new CoralVel(0.5));
+                NotCal.and(operator.rightTrigger()).whileTrue(new CoralVel(-0.5));
             }
             if (RobotContainer.getSubsystemOrNull(WristFLA.class) != null) {
             }
