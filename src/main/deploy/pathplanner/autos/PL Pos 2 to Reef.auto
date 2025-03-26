@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Pos2 go to Reef"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "DriveToReefTagLeft"
@@ -19,13 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PlaceL3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Release"
+            "name": "PlaceL4"
           }
         }
       ]
