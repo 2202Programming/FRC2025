@@ -35,7 +35,6 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
-import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.WristFLA;
 
 /*
@@ -106,7 +105,7 @@ public final class BindingsCompetition {
         var sideboard = dc.SwitchBoard();
         var generic_opr = dc.Operator();
         final Elevator_Subsystem elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-        final SignalLight signal = RobotContainer.getObjectOrNull("light");
+        //final SignalLight signal = RobotContainer.getObjectOrNull("light");
 
         // buttons depend on what controller is plugged in
         if (generic_opr instanceof CommandXboxController) {

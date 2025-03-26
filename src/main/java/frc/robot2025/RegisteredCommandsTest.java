@@ -30,7 +30,8 @@ public class RegisteredCommandsTest {
        
         NamedCommands.registerCommand("WaitForPickup", new PrintCommand("waiting for pickup").andThen(new WaitCommand(3.0)));  
         NamedCommands.registerCommand("Release", new PrintCommand("Releasing coral"));
-        NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r"));
+        NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r")
+                        .withDistanceScheduleCmd(new PrintCommand("sched place .8m away"), 0.8));
         NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l"));
         NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("left"));
         NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("right"));

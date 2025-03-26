@@ -2,9 +2,6 @@ package frc.robot2025;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
-
-import frc.lib2202.util.AprilTag2d;  //TODO - prefer WPILIB class, deprecate
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -19,8 +16,6 @@ import frc.lib2202.util.AprilTag2d;  //TODO - prefer WPILIB class, deprecate
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  
-  /*-------------------------Ports/CAN-------------------------------- */
   /**
    * CAN bus IDs
    * 
@@ -38,18 +33,7 @@ public final class Constants {
     public static final int CANDLE3 = 5;
     public static final int CANDLE4 = 6;
 
-    // Ground Intake
-    public static final int IntakeTop = 51;
-    public static final int IntakeBtm = 52; 
-    public static final int IntakeWheel = 50; 
-    //CAN IDs
-    public static final int CLIMBER = 26; //placeholder | Changed to 26 for testing by BG
-    public static final int ELEVATOR_MAIN = 40; //placeholder
-    public static final int ELEVATOR_FOLLOW = 41; //placeholder
-    public static final int WRIST = 44; //placeholder
-    public static final int END_EFFECTOR = 43; //placeholder
-
-    // DT
+    // SDT
     // synced as of 1/25/25 
     // https://docs.google.com/spreadsheets/d/1CyHzJscPIuvs0eFUY_qruQcuFui_w2nIXeXUyMwRKBU
     //
@@ -69,6 +53,17 @@ public final class Constants {
     public static final int FR_Drive = 27;
     public static final int FR_CANCoder = 30;
 
+    public static final int ELEVATOR_MAIN = 40; 
+    public static final int ELEVATOR_FOLLOW = 41; 
+    public static final int WRIST = 44; 
+    public static final int END_EFFECTOR = 43; 
+
+    // Ground Intake
+    public static final int IntakeTop = 51;
+    public static final int IntakeBtm = 52; 
+    public static final int IntakeWheel = 50; 
+
+    public static final int CLIMBER = 55; 
     // IMU
     public static final int PIGEON_IMU_CAN = 60;
   }
@@ -102,33 +97,19 @@ public final class Constants {
     public static final int SignalLight3 = 9;              
   }
 
-
-
   //The Field info use WPILIB data
   public class TheField {
     public static AprilTagFields fieldChoice = AprilTagFields.k2025ReefscapeAndyMark; // k2025ReefscapeWelded;
     public static AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(fieldChoice);
 
-    public static int[] ReefIdsRed =  { 6,  7,  8,  9, 10, 11};
-    public static int[] ReefIdsBlue = {17, 18, 19, 20, 21, 22};
+    // reef tags in order Drivers refer to them, aka driver order
+    public static int[] ReefIdsRed =  {11, 10,  9,  8,  7,  6};
+    public static int[] ReefIdsBlue = {20, 21, 22, 17, 18, 19};
 
     public static int[] PickupIdsBlue = {12, 13}; //right, left as viewed from driver stn
     public static int[] PickupIdsRed = {2, 1};    //right, left as viewed from red driver stn
 
     public static int DeliverAlgaeBlue = 16;
     public static int DeliverAlgaeRed = 3;
-
-    // Below tags are just examples for testing and to complete AprilTag2d to be deprecated
-    // take care to use ids that exist, optional check not done here.
-    public static Pose3d Tag4 = fieldLayout.getTagPose(4).get();
-    public static Pose3d Tag7 = fieldLayout.getTagPose(7).get();    
-  }
-  
-  // Tags called out in registered command - TODO use 3DPose
-  public static final class Tag_Pose {
-    // DON'T do this, only setup to get Registered command WIP working
-    static AprilTag2d ID4 = new AprilTag2d(4, TheField.Tag4.getX(),TheField.Tag4.getY() );
-    static AprilTag2d ID7 = new AprilTag2d(7, TheField.Tag7.getX(),TheField.Tag7.getY() );
-  }
-
+  }  
 }

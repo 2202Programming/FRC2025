@@ -26,23 +26,19 @@ import frc.robot2025.subsystems.LimelightHelpers;
 
 
 public class DriveToReefTag extends Command { 
-    //Robot left/right offsets for aligning with reef - TODO fix L/R values
+    //Robot left/right offsets for aligning with reef
     static double LeftOffset =  -0.09;  //[m]
     static double RightOffset = -0.42;  //[m]
-    static double BackupOffset = 0.48; //[m]   was .50
+    static double BackupOffset = 0.48;  //[m]   was .50
     static Rotation2d LLRot = Rotation2d.k180deg;
-                //Rotation2d.kZero;
-                //Rotation2d.kCW_90deg; // ll on side, need to add this for final pose
 
     static Map<Integer, Pose2d> blueReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> blueReefRight = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefRight = new HashMap<Integer, Pose2d>();
 
-    static PathConstraints constraints = new PathConstraints(2.5, 1.75, Math.PI, Math.PI / 2.0);
+    static PathConstraints constraints = new PathConstraints(2.8,1.75, Math.PI, Math.PI / 2.0);
 
-    //
-    @SuppressWarnings("unused")
     static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double l_offset, double r_offset, boolean isLeft, boolean isRed) {
         // loop over given tags and build the 2d targets
         double x, y, rot;
@@ -97,6 +93,7 @@ public class DriveToReefTag extends Command {
     final String LLName;
     final OdometryInterface odo;
     final String odoName = "vision_odo";   //todo make an arg
+    final int no_vision_idx;
 
     // command vars set at init time
     boolean done;
@@ -107,8 +104,20 @@ public class DriveToReefTag extends Command {
     int last_usedTag;
     Pose2d targetPose;
     Pose2d last_targetPose = null;
+    int[] targetTags;
+
+    //on Distance schedule
+    double schedDistance = 0.0;
+    Command schedCommand = null;
+    boolean scheduled = false;
 
     public DriveToReefTag(String reefSide) {
+        this(reefSide, -1);
+    }
+
+    public DriveToReefTag(String reefSide, int indexTag) {
+        // convert 1 ..6 to 0..5 or -1 if no target
+        no_vision_idx = (indexTag > 0 && indexTag <= 6) ? indexTag - 1 : -1;
         odo = RobotContainer.getSubsystemOrNull(odoName);
         LL = RobotContainer.getObjectOrNull("limelight");
         LLName = (LL != null) ? LL.getName() : "no-ll-found";  //name if we need to use LLHelpers directly
@@ -125,6 +134,7 @@ public class DriveToReefTag extends Command {
     
     @Override
     public void initialize() {
+        scheduled = false;
         done = true;
         //protect from missng required ss
         if (LL == null) return;
@@ -140,7 +150,7 @@ public class DriveToReefTag extends Command {
 
          // set LL targets to our reef only
         alliancePoses = (alliance == Alliance.Blue) ? bluePoses : redPoses;
-        int[] targetTags = keysToInt(alliancePoses);
+        targetTags = keysToInt(alliancePoses);
         LL.setTargetTags(targetTags);
 
         //made it this far, start looking for reef tages in execute()
@@ -160,6 +170,13 @@ public class DriveToReefTag extends Command {
         // just waiting for our move to finish, no need to look for tag.
         if (moveComand != null) {
             moveComand.execute();  //run our moveCommand
+            double distanceToTarget = odo.getDistanceToTranslation(targetPose.getTranslation());
+            // run our schedCommand if hasn't been done and we are close
+            if (schedCommand != null && !scheduled &&
+                distanceToTarget <= schedDistance) {
+                schedCommand.schedule();
+                scheduled = true;
+            }
             return;
         }
 
@@ -171,6 +188,11 @@ public class DriveToReefTag extends Command {
 
         if (RobotBase.isSimulation()) {
             foundTag = SimTesting.simGetTarget();
+        }
+
+        // skip vision location if we were given an index
+        if (no_vision_idx >=0 ) {
+            foundTag = targetTags[no_vision_idx];
         }
         
         // found a tag in our set, nearest I hope, build a path
@@ -208,6 +230,11 @@ public class DriveToReefTag extends Command {
         return done;
     }
 
+    public DriveToReefTag withDistanceScheduleCmd(Command cmd, double distance) {
+        schedDistance = distance;
+        schedCommand = cmd;
+        return this;
+    }
 
     int[] keysToInt(Map<Integer, Pose2d> map) {
         var keys = map.keySet();
