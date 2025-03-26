@@ -57,19 +57,22 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         pdp.clearStickyFaults();
         return pdp;
       })
+      /*
       // .add(PneumaticsControl.class)
       .add(BlinkyLights.class, "LIGHTS", () -> {
         return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE3, CAN.CANDLE4);
       })
+        */
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
+      /*/
       .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
       .add(Command.class, "ElevatorWatcher", () -> {
        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       })
-
+*/
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
@@ -90,6 +93,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
       .addAlias(VisionPoseEstimator.class, "vision_odo")
       // below are optional watchers for shuffeleboard data - disable if need too.
+      /*
       .add(WristFLA.class)
       .add(SignalLight.class, "signal")
       .add(EndEffector_Subsystem.class)
@@ -97,6 +101,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
       })
       .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
+      */
       ;
 
   // Robot Speed Limits
