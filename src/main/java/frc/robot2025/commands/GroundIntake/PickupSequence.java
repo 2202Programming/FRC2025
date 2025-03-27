@@ -52,6 +52,7 @@ public class PickupSequence extends Command {
       wheelSpeed = 50.0;
       FrameCount = 3;
     }
+    addRequirements(groundIntake);
   }
 
   // Called when the command is initially scheduled.

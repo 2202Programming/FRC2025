@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.GroundIntake.Position;
+import frc.robot2025.utils.UXTrim;
 
 public class PlaceSequence extends Command {
   public enum State {
@@ -19,7 +20,8 @@ public class PlaceSequence extends Command {
     Finished // command is done
   }
 
-  final int ejectingFrameCount = 25; // tbd
+  final int ejectingFrameCount = 10; // 200 ms
+  UXTrim ejectDuration = new UXTrim("GI eject frames");
 
   State state;
   int count;
@@ -45,12 +47,13 @@ public class PlaceSequence extends Command {
       rest = Position.CORAL_REST;
       hasPiece = groundIntake::getLatchedHasGamePiece;
     }
+    addRequirements(groundIntake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    count = ejectingFrameCount; // count to wait after eject
+    count = (int)ejectDuration.getValue(ejectingFrameCount); // wait after eject
     groundIntake.setSetpoint(place);
     state = State.WaitForPlacePos;
   }
