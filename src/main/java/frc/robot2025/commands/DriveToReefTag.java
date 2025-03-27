@@ -96,7 +96,7 @@ public class DriveToReefTag extends Command {
     final int no_vision_idx;
 
     // command vars set at init time
-    boolean done;
+    boolean failedAtInit;
     Command moveComand;
     Map<Integer, Pose2d> alliancePoses;
     double TA_MIN = 0.28;
@@ -109,7 +109,8 @@ public class DriveToReefTag extends Command {
     //on Distance schedule
     double schedDistance = 0.0;
     Command schedCommand = null;
-    boolean scheduled = false;
+    boolean schedRunning = false;
+    boolean schedOnce = false;
 
     public DriveToReefTag(String reefSide) {
         this(reefSide, -1);
@@ -134,8 +135,9 @@ public class DriveToReefTag extends Command {
     
     @Override
     public void initialize() {
-        scheduled = false;
-        done = true;
+        schedRunning = false;
+        schedOnce = false;
+        failedAtInit = true;
         //protect from missng required ss
         if (LL == null) return;
         if (odo == null) return;
@@ -148,13 +150,12 @@ public class DriveToReefTag extends Command {
         }
         else return; // no alliance, bail
 
+        failedAtInit = false; 
+
          // set LL targets to our reef only
         alliancePoses = (alliance == Alliance.Blue) ? bluePoses : redPoses;
         targetTags = keysToInt(alliancePoses);
         LL.setTargetTags(targetTags);
-
-        //made it this far, start looking for reef tages in execute()
-        done = false;        
 
         // check to see if we are close (d < .50m) to last completed/found tag
         // so if we can't see a tag and are close, just compute path
@@ -170,12 +171,17 @@ public class DriveToReefTag extends Command {
         // just waiting for our move to finish, no need to look for tag.
         if (moveComand != null) {
             moveComand.execute();  //run our moveCommand
+
+            if (schedCommand != null && schedRunning) {
+                schedCommand.execute();
+            }
             double distanceToTarget = odo.getDistanceToTranslation(targetPose.getTranslation());
             // run our schedCommand if hasn't been done and we are close
-            if (schedCommand != null && !scheduled &&
+            if (schedCommand != null && !schedRunning && !schedOnce &&
                 distanceToTarget <= schedDistance) {
-                schedCommand.schedule();
-                scheduled = true;
+                schedCommand.initialize();
+                schedRunning = true;
+                schedOnce = true;
             }
             return;
         }
@@ -215,6 +221,9 @@ public class DriveToReefTag extends Command {
         if (moveComand != null) {
             moveComand.end(interrupted);
         }
+        if (schedCommand != null && schedRunning) {
+            schedCommand.end(interrupted);
+        }
         // keep last foundTag for shortpath WIP
         last_usedTag = foundTag;
         last_targetPose = targetPose;
@@ -224,10 +233,42 @@ public class DriveToReefTag extends Command {
 
     @Override
     public boolean isFinished() {
-        if (moveComand != null) {
-            done = moveComand.isFinished();
+        if (failedAtInit) {
+            // If our preflight checks failed (or in the middle of init)
+            return true;
         }
-        return done;
+
+        // if there is no move command, we assume finished
+        boolean move_done = true;
+        if (moveComand != null) {
+            move_done = moveComand.isFinished();
+        }
+
+        boolean schedCmd_done;
+        if (schedCommand == null){
+            // no scheduled command exists, therefore nothing to do
+            schedCmd_done = true;
+        }else if (schedRunning){
+            // the command is running, let's check its status
+            schedCmd_done = schedCommand.isFinished();
+            if (schedCmd_done) {
+                // We are responsible for ending our child command if it is finished
+                schedCommand.end(false);
+                schedRunning = false;
+            }
+        }else if (schedOnce){
+            // The command exists and was run once but is not running, therefore it is done running
+            schedCmd_done = true;
+        }else {
+            // The command exists and is not currently running and not done. Therefore it is not started
+
+            // If the move has finished, but the command has not been scheduled, then the command
+            // will never start. Set command to done and finish. IE give up.
+            schedCmd_done = move_done; 
+        }
+
+        // We are responsible for both commands, we are not done until they both are
+        return move_done && schedCmd_done;
     }
 
     public DriveToReefTag withDistanceScheduleCmd(Command cmd, double distance) {
