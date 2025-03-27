@@ -21,7 +21,7 @@ public class PlaceSequence extends Command {
   }
 
   final int ejectingFrameCount = 10; // 200 ms
-  UXTrim ejectDuration = new UXTrim("GI eject frames");
+  UXTrim ejectDuration = new UXTrim("giEjectFrames");
 
   State state;
   int count;
