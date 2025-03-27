@@ -238,7 +238,7 @@ public class DriveToReefTag extends Command {
             return true;
         }
 
-        // if there is no move command, we assume finished
+        // If there is no move command, we assume finished
         boolean move_done = true;
         if (moveComand != null) {
             move_done = moveComand.isFinished();
@@ -246,7 +246,7 @@ public class DriveToReefTag extends Command {
 
         boolean schedCmd_done;
         if (schedCommand == null){
-            // no scheduled command exists, therefore nothing to do
+            // No scheduled command exists, therefore nothing to do
             schedCmd_done = true;
         }else if (schedRunning){
             // the command is running, let's check its status
@@ -260,7 +260,8 @@ public class DriveToReefTag extends Command {
             // The command exists and was run once but is not running, therefore it is done running
             schedCmd_done = true;
         }else {
-            // The command exists and is not currently running and not done. Therefore it is not started
+            // If we are here, the command exists and is not currently running and not done.
+            // Therefore it is not started
 
             // If the move has finished, but the command has not been scheduled, then the command
             // will never start. Set command to done and finish. IE give up.
