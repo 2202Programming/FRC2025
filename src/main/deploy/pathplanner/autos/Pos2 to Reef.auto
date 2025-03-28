@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos3 to Tags 9 or 22 Left"
+            "pathName": "Pos2 go to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToReefTagLeft"
           }
         },
         {
@@ -17,9 +23,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Reef Tags 9 or 22 (L) to Coral Source"
+            "name": "Release"
           }
         }
       ]
