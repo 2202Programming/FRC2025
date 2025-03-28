@@ -41,10 +41,10 @@ public class RegisteredCommands {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(3.0),
-            new setWristPos(1.0, "L4")),
-            new setWristPos(WristFLA.Q3_POSITION, "L4"), //position for L4 drop
+            new setWristPos(1.5, "L4")),
+            new setWristPos(0.3, "L4"), //position for L4 drop
             new ReleaseCoral(),
-            new setWristPos(1.0, "L4"),
+            new setWristPos(1.5, "L4"),
             new ParallelCommandGroup(
             new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
             new setElevatorSetpoint(Levels.PickUp, "pickup")));
