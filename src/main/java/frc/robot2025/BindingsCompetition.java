@@ -165,10 +165,10 @@ public final class BindingsCompetition {
         NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
-                new setWristPos(1.0, "L4")),
+                new setWristPos(1.5, "L4")),
                 new setWristPos(WristFLA.Q3_POSITION, "L4"),
                 new ReleaseCoral(),
-                new setWristPos(1.0, "L4"),
+                new setWristPos(1.5, "L4"),
             new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup"))
