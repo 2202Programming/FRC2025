@@ -59,7 +59,7 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         // TODO - need a real pickup here
-        NamedCommands.registerCommand("WaitForPickup", new WaitCommand(1.0));  //TODO
+        NamedCommands.registerCommand("WaitForPickup", new WaitCommand(2.0));  //TODO
         NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
         NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r")
                                     .withDistanceScheduleCmd(place4(Levels.LFour), 1.6));

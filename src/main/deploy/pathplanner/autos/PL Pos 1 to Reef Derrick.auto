@@ -19,12 +19,6 @@
         {
           "type": "named",
           "data": {
-            "name": "PlaceL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "DriveToPickupTagLeft"
           }
         },
@@ -38,12 +32,6 @@
           "type": "named",
           "data": {
             "name": "DriveToReefTagRight"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PlaceL4"
           }
         }
       ]
