@@ -56,8 +56,8 @@ public class Elevator_Subsystem extends SubsystemBase {
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
   final int STALL_CURRENT = 60;
   final int FREE_CURRENT = 5;
-  final double elevatorMaxVel = 100.0; // [cm/s] rpm
-  final double elevatorMaxAccel = 75.0; // [cm/s^2]  servo may not enforce yet
+  final double elevatorMaxVel = 125.0; // [cm/s] rpm
+  final double elevatorMaxAccel = 100.0; // [cm/s^2]  servo may not enforce yet
   final double elevatorPosTol = 1.0;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
   final double maxPos = 149.0; // [cm]
@@ -148,14 +148,13 @@ public class Elevator_Subsystem extends SubsystemBase {
   double getFollowCurrent() {
     return followMotor.getOutputCurrent();
   }
-
   public void setHeight (Levels level) {
     setHeight(level.height); 
   }
 
   public void setHeight (double height) {
     if (height > getPosition()) {
-      servo.setMaxVelocity(100.0);
+      servo.setMaxVelocity(125.0);
       servo.setArbFeedforward(0.02);
     }
     else {  
