@@ -20,6 +20,7 @@ public class AlgaeRemoval extends Command {
     elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     ee_Subsystem = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     wrist = RobotContainer.getSubsystem(WristFLA.class);
+    addRequirements(elevator_Subsystem, ee_Subsystem, wrist);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
