@@ -16,7 +16,8 @@ import frc.robot2025.Constants.TheField;
 
 public class Limelight extends BaseLimelight {
  
-  // protected Pose2d megaPose;
+  //access to mt2 complete object
+  LimelightHelpers.PoseEstimate mt2;
   protected Pose2d bluePose2 = new Pose2d();
   protected final IHeadingProvider gyro;
   protected final int[] allTags;
@@ -66,7 +67,7 @@ public class Limelight extends BaseLimelight {
     LimelightHelpers.SetRobotOrientation(name, gyro.getHeading().getDegrees(), 0, 0, 0, 0, 0);
     // LimelightHelpers.PoseEstimate mt1 =
     // LimelightHelpers.getBotPoseEstimate_wpiBlue(name);
-    LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
+    mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(name);
     
     //outputs 
     targetValid = false;
@@ -99,5 +100,8 @@ public class Limelight extends BaseLimelight {
 
     log(); // do logging at end
   }
-  
+
+  public LimelightHelpers.PoseEstimate getMt2() {
+    return mt2;
+  }
 }

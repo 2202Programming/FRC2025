@@ -48,11 +48,12 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     final VisionWatchdog watchdog;
     final BaseLimelight limelight;
+    final Limelight  ll2025;    //temp way to acces new funcs this year
     
     // stddev based on distance/quality of tag
-    final Matrix<N3, N1> closeStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
-    final Matrix<N3, N1> medStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
-    final Matrix<N3, N1> farStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
+    final Matrix<N3, N1> closeStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2.0));
+    final Matrix<N3, N1> medStdDevs =VecBuilder.fill(0.15, 0.15, Units.degreesToRadians(5.0));
+    final Matrix<N3, N1> farStdDevs =VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(15.0));
     
     boolean visionPoseUsingRotation = true; // read from drivetrain.useVisionRotation()
     boolean visionPoseEnabled = true;
@@ -93,6 +94,11 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         m_odometry = RobotContainer.getSubsystemOrNull("odometry");
         gyro = RobotContainer.getRobotSpecs().getHeadingProvider();
         limelight = RobotContainer.getSubsystemOrNull(limelightName);
+
+        if (limelight instanceof Limelight) {
+            ll2025 = (Limelight)limelight;
+        }
+        else ll2025 = null;
 
         altName = limelight.getName();  //debug
 
@@ -165,14 +171,27 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     /** Updates the field relative position of the robot. */
     Pose2d updateEstimator() {
+        LimelightHelpers.PoseEstimate mt2;  // access full mt2 obj for distance to tag
+        double dist2Tag = 999.0;  //way out, incase no tag.
         prev_llPose = llPose;
+
         // let limelight sub-system decide if we are good to use estimate
         // OK if it is run only intermittantly. Uses latency of vision pose.
         if (!limelight.getRejectUpdate()) { 
             var pose = limelight.getBluePose();
             var ts = limelight.getVisionTimestamp();
+            if (ll2025 != null) {
+                mt2 = ll2025.getMt2();
+                dist2Tag = mt2.avgTagDist;
+            }
+             // speeds in robot-coords
+            var bot_speeds = drivetrain.getChassisSpeeds();
+            double bot_vel = Math.hypot(bot_speeds.vxMetersPerSecond, bot_speeds.vyMetersPerSecond);
             
-            m_estimator.setVisionMeasurementStdDevs(farStdDevs);
+            //use sped/dist to weight 
+            Matrix<N3, N1> stdDev = getStdDev(bot_vel, dist2Tag);
+
+            m_estimator.setVisionMeasurementStdDevs(stdDev);
             m_estimator.addVisionMeasurement(pose, ts);
             if (watchdog != null)
                 watchdog.update(pose, prev_llPose);
@@ -346,8 +365,17 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     } // monitor cmd class
 
-    Matrix<N3, N1> getStdDev() {
+
+    Matrix<N3, N1> getStdDev(double botvel, double distance ) {
+        // not moving, rank this higher
+        if (botvel < 0.1) 
+            return closeStdDevs;
+        if ( distance < 0.5)
+            return closeStdDevs;
+        if (distance < 2.0)
+            return medStdDevs;
+        return farStdDevs;
         // use TBD to pick the stddev to log the vision estimate with
-        return medStdDevs;
+        //return medStdDevs;
     }
 }
