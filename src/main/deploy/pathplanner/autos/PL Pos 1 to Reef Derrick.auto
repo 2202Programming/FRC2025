@@ -21,18 +21,6 @@
           "data": {
             "name": "DriveToPickupTagLeft"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitForPickup"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DriveToReefTagRight"
-          }
         }
       ]
     }
