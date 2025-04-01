@@ -11,10 +11,15 @@ import frc.robot2025.subsystems.EndEffector_Subsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ReleaseCoral extends Command {
   EndEffector_Subsystem ee_Subsystem;
-  final double DELAY_COUNT = 25;
+  double DELAY_COUNT = 25;
   double count;
   /** Creates a new ReleaseCoral. */
   public ReleaseCoral() {
+   this(25);
+  }
+  
+  public ReleaseCoral(double delayCount) {
+    DELAY_COUNT = delayCount;
     ee_Subsystem = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     addRequirements(ee_Subsystem);
     // Use addRequirements() here to declare subsystem dependencies.

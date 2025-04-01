@@ -220,14 +220,21 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     return true;
   }
 
+  SendableChooser<Command> autoChooser;
+
+  //setupRegisteredCommands() is called before any call to getChooser()
   @Override
-  public SendableChooser<Command> getRegisteredCommands() {
+  public void setupRegisteredCommands() {
     // setup command registry for use in PP auto
     RegisteredCommands.RegisterCommands();
 
     //enable chooser - builds autochooser list
-    SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+  }
+
+  @Override
+  public SendableChooser<Command> getChooser() { 
     return autoChooser;
   }
 

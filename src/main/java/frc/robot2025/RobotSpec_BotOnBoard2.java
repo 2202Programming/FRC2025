@@ -6,8 +6,6 @@ import static frc.lib2202.Constants.MperFT;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
@@ -132,11 +130,6 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
     @Override
     public boolean burnFlash() {
         return false;
-    }
-
-    @Override
-    public SendableChooser<Command> getRegisteredCommands() {
-        return null;
     }
 
     @Override

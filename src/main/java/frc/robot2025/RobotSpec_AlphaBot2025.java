@@ -218,13 +218,19 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     return true;
   }
 
+  SendableChooser<Command> autoChooser;
+
   @Override
-  public SendableChooser<Command> getRegisteredCommands() {
+  public void setupRegisteredCommands() {
     RegisteredCommandsTest.RegisterCommands(); 
 
     //enable chooser - builds autochooser list
     SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);   
+  }
+  
+  @Override
+  public SendableChooser<Command> getChooser() { 
     return autoChooser;
   }
 
