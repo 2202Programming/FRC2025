@@ -28,6 +28,7 @@ import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.util.VisionWatchdog;
+import frc.robot2025.subsystems.SignalLight.Color;
 
 // Swerve Drive Train (drivetrain) must be created before Swerve-PoseEstimator
 
@@ -49,6 +50,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     final VisionWatchdog watchdog;
     final BaseLimelight limelight;
     final Limelight  ll2025;    //temp way to acces new funcs this year
+    final SignalLight signal;
     
     // stddev based on distance/quality of tag
     final Matrix<N3, N1> closeStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2.0));
@@ -63,6 +65,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     private double x_diff; // [m]
     private double y_diff; // [m]
     private double yaw_diff; // [deg]
+    private double bot_vel;
 
     //vision systems limelight and photonvision(TBD)
     private Pose2d llPose;
@@ -94,9 +97,10 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         m_odometry = RobotContainer.getSubsystemOrNull("odometry");
         gyro = RobotContainer.getRobotSpecs().getHeadingProvider();
         limelight = RobotContainer.getSubsystemOrNull(limelightName);
+        signal = RobotContainer.getObjectOrNull("light");
 
         if (limelight instanceof Limelight) {
-            ll2025 = (Limelight)limelight;
+            ll2025 = (Limelight)limelight; //horrible hack
         }
         else ll2025 = null;
 
@@ -148,8 +152,23 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         x_diff = (llPose.getX() - m_odoPose.getX());
         y_diff = (llPose.getY() - m_odoPose.getY());
         yaw_diff = (llPose.getRotation().getDegrees() - m_odoPose.getRotation().getDegrees());
+
+        SetSignal();
     }
 
+    void SetSignal() {
+        if(signal == null) return;
+
+        Color color = SignalLight.Color.RED; // nothing visible
+
+        if (!limelight.getRejectUpdate()) { // true = not valid
+            color = SignalLight.Color.GREEN;
+            if(bot_vel < 0.1) {
+                color = SignalLight.Color.BLUE;
+            }
+        }
+        signal.setLight(color);
+    }
     // helper functions
     SwerveDrivePoseEstimator initializeEstimator() {
         /*
@@ -186,7 +205,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
             }
              // speeds in robot-coords
             var bot_speeds = drivetrain.getChassisSpeeds();
-            double bot_vel = Math.hypot(bot_speeds.vxMetersPerSecond, bot_speeds.vyMetersPerSecond);
+            bot_vel = Math.hypot(bot_speeds.vxMetersPerSecond, bot_speeds.vyMetersPerSecond);
             
             //use sped/dist to weight 
             Matrix<N3, N1> stdDev = getStdDev(bot_vel, dist2Tag);
