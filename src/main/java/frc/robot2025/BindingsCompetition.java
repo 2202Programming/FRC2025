@@ -153,11 +153,9 @@ public final class BindingsCompetition {
                  * operator.povDown().onTrue(); //low
                  * NotCal.and(operator.povRight()).onTrue(); //intake height
                  */
-            
-        var povLeft_cmd = new SequentialCommandGroup (
+            NotCal.and(operator.povLeft()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LThree, "L3").withTimeout(2.0),
-<<<<<<< HEAD
             new setWristPos(WristFLA.MID_POSITION, "L3"))
         ));
         NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
@@ -172,44 +170,6 @@ public final class BindingsCompetition {
                 new setWristPos(WristFLA.Q3_POSITION, "L4")
         ));
         NotCal.and(operator.rightTrigger()).onTrue(place());
-=======
-            new setWristPos(WristFLA.MID_POSITION, "L3")),
-            new ReleaseCoral(),
-            new ParallelCommandGroup(
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-            new setElevatorSetpoint(Levels.PickUp, "pickup")));
-        povLeft_cmd.addRequirements(elevator);
-        povLeft_cmd.finallyDo(()->new setElevatorSetpoint(Levels.PickUp, "pickup"));
-        NotCal.and(operator.povLeft()).onTrue(povLeft_cmd);
-
-        var povDown_cmd = new SequentialCommandGroup (
-            new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LTwo, "L2").withTimeout(2.0),
-                new setWristPos(WristFLA.MID_POSITION, "L2")),
-                new ReleaseCoral(),
-                new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup")));
-        povDown_cmd.addRequirements(elevator);
-        povDown_cmd.finallyDo(()->new setElevatorSetpoint(Levels.PickUp, "pickup"));
-        NotCal.and(operator.povDown()).onTrue(povDown_cmd);
-
-       var povUp_cmd = new SequentialCommandGroup (
-            new ParallelCommandGroup(
-                new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
-                new setWristPos(1.5, "L4")),
-                new setWristPos(WristFLA.Q3_POSITION, "L4"),
-                new ReleaseCoral(),
-                new setWristPos(1.5, "L4"),
-            new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup"))
-        );
-        povUp_cmd.addRequirements(elevator);
-        povUp_cmd.finallyDo(()->new setElevatorSetpoint(Levels.PickUp, "pickup"));
-        NotCal.and(operator.povUp()).onTrue(povUp_cmd);
-
->>>>>>> elev_reqs
         NotCal.and(operator.rightBumper().whileTrue(new AlgaeRemoval()));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {

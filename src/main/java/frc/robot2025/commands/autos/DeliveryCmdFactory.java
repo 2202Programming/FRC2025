@@ -58,7 +58,8 @@ public class DeliveryCmdFactory {
             //move elevator
             new ParallelCommandGroup(
                 new setElevatorSetpoint(eleLevel, levelTrimName).withTimeout(2.0),
-                new setWristPos(wristPos, levelTrimName)),
+                new setWristPos(1.5, "L4")),
+            new setWristPos(wristPos, levelTrimName),
             //eject coral
             new ReleaseCoral(releaseCount),
             // return to pickup

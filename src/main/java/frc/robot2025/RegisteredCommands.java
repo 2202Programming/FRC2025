@@ -79,10 +79,12 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("WaitForPickup", new WaitCommand(2.0));  //TODO
         NamedCommands.registerCommand("Release", release());
         NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r")
-                                    .withDistanceScheduleCmd(place4(Levels.LFour), 2.0));
+                                    .withDistanceScheduleCmd(place4(Levels.LFour), 0.8));
                                     // .withDistanceScheduleCmd(new PrintCommand("sched place .8m away"), 0.8));
         NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l")
-                                    .withDistanceScheduleCmd(place4(Levels.LFour), 2.0));
+                                    .withDistanceScheduleCmd(place4(Levels.LFour), 0.8));
+        NamedCommands.registerCommand("DriveToReefTagLeftOnly", new DriveToReefTag("l"));
+                                   
         NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("left"));
         NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("right"));
     }
