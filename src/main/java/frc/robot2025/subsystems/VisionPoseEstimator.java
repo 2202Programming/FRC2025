@@ -66,6 +66,7 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     private double y_diff; // [m]
     private double yaw_diff; // [deg]
     private double bot_vel;
+    private boolean llValid = false;
 
     //vision systems limelight and photonvision(TBD)
     private Pose2d llPose;
@@ -145,6 +146,14 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         m_odoPose = m_odometry.getPose();
         meas_pos = drivetrain.getSwerveModulePositions();
         llPose = updateEstimator();
+
+        // if we aren't moving and llValid, set m_odometry to use llPose
+        if (llValid && bot_vel <= 0.05) {
+            //tracking comapare 
+            m_odometry.setPose(llPose);
+            m_odoPose = m_odometry.getPose();
+        }
+        // update field objects
         m_field.setRobotPose(llPose);
         m_field_obj.setPose(m_odoPose);
 
@@ -193,10 +202,12 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         LimelightHelpers.PoseEstimate mt2;  // access full mt2 obj for distance to tag
         double dist2Tag = 999.0;  //way out, incase no tag.
         prev_llPose = llPose;
+        llValid = false;  // true on !rejectUpdate
 
         // let limelight sub-system decide if we are good to use estimate
         // OK if it is run only intermittantly. Uses latency of vision pose.
         if (!limelight.getRejectUpdate()) { 
+            llValid = true;
             var pose = limelight.getBluePose();
             var ts = limelight.getVisionTimestamp();
             if (ll2025 != null) {

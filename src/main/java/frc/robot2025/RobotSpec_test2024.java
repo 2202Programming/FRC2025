@@ -12,9 +12,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -234,10 +232,6 @@ public class RobotSpec_test2024 implements IRobotSpec {
         SmartDashboard.putData(CommandScheduler.getInstance());
     }
 
-    @Override
-    public SendableChooser<Command> getRegisteredCommands() {    
-        return null; // RegisteredCommands.RegisterCommands();
-    }
 
     @Override
     public void setDefaultCommands() {
