@@ -2,6 +2,7 @@ package frc.robot2025;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -43,7 +44,23 @@ import frc.robot2025.subsystems.WristFLA;
  */
 
 public final class BindingsCompetition {
-
+    final static Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+    private static Command place(){
+        if(elevator_Subsystem.getPosition() > 120.0){
+            return new SequentialCommandGroup(
+                new ReleaseCoral(),
+                new setWristPos(1.5, "L4"),
+                new ParallelCommandGroup(
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+                new setElevatorSetpoint(Levels.PickUp, "pickup")));
+        } else {
+            return new SequentialCommandGroup(
+                new ReleaseCoral(),
+                new ParallelCommandGroup(
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+                new setElevatorSetpoint(Levels.PickUp, "pickup")));
+        }
+    }
     public static void ConfigureCompetition(HID_Subsystem dc) {
         ConfigureCompetition(dc, true);
     }
@@ -147,32 +164,20 @@ public final class BindingsCompetition {
             NotCal.and(operator.povLeft()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
             new setElevatorSetpoint(Levels.LThree, "L3").withTimeout(2.0),
-            new setWristPos(WristFLA.MID_POSITION, "L3")),
-            new ReleaseCoral(),
-            new ParallelCommandGroup(
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-            new setElevatorSetpoint(Levels.PickUp, "pickup"))
+            new setWristPos(WristFLA.MID_POSITION, "L3"))
         ));
         NotCal.and(operator.povDown()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LTwo, "L2").withTimeout(2.0),
-                new setWristPos(WristFLA.MID_POSITION, "L2")),
-                new ReleaseCoral(),
-                new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup"))
+                new setWristPos(WristFLA.MID_POSITION, "L2"))
         ));
         NotCal.and(operator.povUp()).onTrue(new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(2.0),
                 new setWristPos(1.5, "L4")),
-                new setWristPos(WristFLA.Q3_POSITION, "L4"),
-                new ReleaseCoral(),
-                new setWristPos(1.5, "L4"),
-            new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup"))
+                new setWristPos(WristFLA.Q3_POSITION, "L4")
         ));
+        NotCal.and(operator.rightBumper()).onTrue(place());
         NotCal.and(operator.rightBumper().whileTrue(new AlgaeRemoval()));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {

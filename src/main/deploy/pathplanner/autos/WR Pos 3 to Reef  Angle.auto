@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DPL_Pos1 face tag"
+            "pathName": "PL_Pos3 face"
           }
         },
         {
@@ -39,7 +39,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "DriveToPickupTagLeft"
+                        "name": "DriveToPickupTagRight"
                       }
                     }
                   ]

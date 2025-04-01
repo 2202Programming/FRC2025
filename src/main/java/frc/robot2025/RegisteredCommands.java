@@ -50,6 +50,23 @@ public class RegisteredCommands {
             new setElevatorSetpoint(Levels.PickUp, "pickup")));
     }
 
+    private static Command release(){
+        if(elevator_Subsystem.getPosition() > 120.0){
+            return new SequentialCommandGroup(
+                new ReleaseCoral(),
+                new setWristPos(1.5, "L4"),
+                new ParallelCommandGroup(
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+                new setElevatorSetpoint(Levels.PickUp, "pickup")));
+        } else {
+            return new SequentialCommandGroup(
+                new ReleaseCoral(),
+                new ParallelCommandGroup(
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+                new setElevatorSetpoint(Levels.PickUp, "pickup")));
+        }
+    }
+
     public static void RegisterCommands() {
         NamedCommands.registerCommand("Pickup",   new InstantCommand(() -> {
             elevator_Subsystem.setHeight(Levels.PickUp); }));
@@ -60,12 +77,12 @@ public class RegisteredCommands {
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         // TODO - need a real pickup here
         NamedCommands.registerCommand("WaitForPickup", new WaitCommand(2.0));  //TODO
-        NamedCommands.registerCommand("Release", new PlaceSequence("coral", 83.0 ));
+        NamedCommands.registerCommand("Release", release());
         NamedCommands.registerCommand("DriveToReefTagRight", new DriveToReefTag("r")
-                                    .withDistanceScheduleCmd(place4(Levels.LFour), 1.6));
+                                    .withDistanceScheduleCmd(place4(Levels.LFour), 2.0));
                                     // .withDistanceScheduleCmd(new PrintCommand("sched place .8m away"), 0.8));
         NamedCommands.registerCommand("DriveToReefTagLeft", new DriveToReefTag("l")
-                                    .withDistanceScheduleCmd(place4(Levels.LFour), 1.6));
+                                    .withDistanceScheduleCmd(place4(Levels.LFour), 2.0));
         NamedCommands.registerCommand("DriveToPickupTagLeft",new DriveToPickupTag("left"));
         NamedCommands.registerCommand("DriveToPickupTagRight",new DriveToPickupTag("right"));
     }
