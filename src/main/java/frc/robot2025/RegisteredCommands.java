@@ -30,12 +30,8 @@ public class RegisteredCommands {
         return new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(level, name),
-                new setWristPos(WristFLA.MID_POSITION, name)),
-            new ReleaseCoral(),
-            new InstantCommand(() -> {
-                    elevator_Subsystem.setHeight(Levels.PickUp);
-                }),
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup"));
+                new setWristPos(WristFLA.MID_POSITION, name))
+        );
     }
     private static Command place4(Levels level){
         return new SequentialCommandGroup(
@@ -51,21 +47,12 @@ public class RegisteredCommands {
     }
 
     private static Command release(){
-        if(elevator_Subsystem.getPosition() > 120.0){
-            return new SequentialCommandGroup(
-                new ReleaseCoral(),
-                new setWristPos(1.5, "L4"),
-                new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup")));
-        } else {
             return new SequentialCommandGroup(
                 new ReleaseCoral(),
                 new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")));
         }
-    }
 
     public static void RegisterCommands() {
         NamedCommands.registerCommand("Pickup",   new InstantCommand(() -> {

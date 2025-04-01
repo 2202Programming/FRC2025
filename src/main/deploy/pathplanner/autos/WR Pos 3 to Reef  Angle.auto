@@ -46,7 +46,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 2.0
+                        "waitTime": 1.0
                       }
                     },
                     {
@@ -76,7 +76,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Release"
+            "name": "PlaceL4"
           }
         }
       ]
