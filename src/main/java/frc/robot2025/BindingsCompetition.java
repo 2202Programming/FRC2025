@@ -46,21 +46,13 @@ import frc.robot2025.subsystems.WristFLA;
 public final class BindingsCompetition {
     final static Elevator_Subsystem elevator_Subsystem = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     private static Command place(){
-        if(elevator_Subsystem.getPosition() > 120.0){
             return new SequentialCommandGroup(
                 new ReleaseCoral(),
                 new setWristPos(1.5, "L4"),
                 new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")));
-        } else {
-            return new SequentialCommandGroup(
-                new ReleaseCoral(),
-                new ParallelCommandGroup(
-                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
-                new setElevatorSetpoint(Levels.PickUp, "pickup")));
         }
-    }
     public static void ConfigureCompetition(HID_Subsystem dc) {
         ConfigureCompetition(dc, true);
     }
@@ -177,15 +169,15 @@ public final class BindingsCompetition {
                 new setWristPos(1.5, "L4")),
                 new setWristPos(WristFLA.Q3_POSITION, "L4")
         ));
-        NotCal.and(operator.rightBumper()).onTrue(place());
+        NotCal.and(operator.rightTrigger()).onTrue(place());
         NotCal.and(operator.rightBumper().whileTrue(new AlgaeRemoval()));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
                 // TODO change to rpm, i just plucked these values off so i have no clue if
                 // they're viable -er
                 // NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
-                NotCal.and(operator.leftTrigger()).whileTrue(new CoralVel(0.5));
-                NotCal.and(operator.rightTrigger()).whileTrue(new CoralVel(-0.5));
+                NotCal.and(operator.leftBumper()).whileTrue(new CoralVel(0.5));
+                NotCal.and(operator.leftTrigger()).whileTrue(new CoralVel(-0.5));
             }
             if (RobotContainer.getSubsystemOrNull(WristFLA.class) != null) {
             }
