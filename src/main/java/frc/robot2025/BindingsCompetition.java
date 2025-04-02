@@ -125,18 +125,10 @@ public final class BindingsCompetition {
             Trigger Cal = sideboard.sw11();
             Trigger NotCal = Cal.negate(); // regular competition mode
 
-            // TODO sequence eventaully, TELL ELENA TO CHANGE once sequence is ready.
-            // operator.povDown().onTrue(new InstantCommand(() -> {
-            //     elevator.setHeight(46.25); // l2
-            // })); // seriously, tell me once its changed
             NotCal.and(operator.povLeft()).onTrue(new InstantCommand(() -> {
                 elevator.setHeight(87.25); // l3
             }));
-            // TODO change value once mechanical adds more height
-            // operator.povUp().onTrue(new InstantCommand(() -> {
-            //     elevator.setHeight(152.0);
-            // }));
-
+           
             if (RobotContainer.getSubsystemOrNull(GroundIntake.class) != null) {
                 NotCal.and(operator.a()).whileTrue(new PickupSequence("coral"));
                 NotCal.and(operator.b()).onTrue(new PlaceSequence("coral", -50.0));
@@ -173,9 +165,6 @@ public final class BindingsCompetition {
         NotCal.and(operator.rightBumper().whileTrue(new AlgaeRemoval()));
             }
             if (RobotContainer.getSubsystemOrNull(EndEffector_Subsystem.class) != null) {
-                // TODO change to rpm, i just plucked these values off so i have no clue if
-                // they're viable -er
-                // NotCal.and(operator.rightBumper()).whileTrue(new EndEffectorPercent(-.3, "rightBumper")); // reverse
                 NotCal.and(operator.leftBumper()).whileTrue(new CoralVel(0.5));
                 NotCal.and(operator.leftTrigger()).whileTrue(new CoralVel(-0.5));
             }

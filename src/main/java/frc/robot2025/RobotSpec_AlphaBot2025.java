@@ -191,7 +191,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     
     // Competition bindings -  NOTE: OPR portion of comp binding disabled 
     // until done with integration.
-    BindingsCompetition.ConfigureCompetition(dc, false);  // TESTING TODO - true for comp
+    BindingsCompetition.ConfigureCompetition(dc, false);
     
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings

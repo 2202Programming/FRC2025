@@ -31,8 +31,7 @@ import frc.robot2025.Constants.DigitalIO;
 import frc.robot2025.utils.UXTrim;
 
 public class GroundIntake extends SubsystemBase {
-  // TODO change degree values once we know actual positions. these are
-  // placeholders - er
+ 
   public enum Position {
     POWERUP(0.0, 0.0), // pwr up could be different from ZERO
     ZERO(0.0, 0.0),

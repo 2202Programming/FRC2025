@@ -7,9 +7,10 @@ package frc.robot2025.subsystems;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+//we switched to a different actuator, see WristFLA()
+@Deprecated
 public class Wrist extends SubsystemBase {
-  final static double PowerUpPosition = 1.0;  //TODO - confirm this.
+  final static double PowerUpPosition = 1.0;  
 
   /** Creates a new linearServo. */
   PWM servo;

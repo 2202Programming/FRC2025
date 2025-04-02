@@ -53,7 +53,6 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
       } else {
         System.out.println("******ERROR: Piece still found");
         end(true);
-        //TODO: HANDLE THIS BETTER!!
       }
     }
 

@@ -13,7 +13,7 @@ import frc.robot2025.Constants.DigitalIO;
 
 public class SignalLight {
 
-    public enum Color {   //TODO name these to match what we get.
+    public enum Color { 
         OFF(0),
         GREEN(1),
         BLUE(2),

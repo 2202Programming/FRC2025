@@ -82,7 +82,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     positionPid.setIZone(3.0);
     //hardware velocity pidf - holds values to send to hw, not actually run825
     velocityPid = new PIDFController(0.0008, 0.000025, 0.0000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
-    velocityPid.setIZone(10.0); //TODO: set this once value has been found, if KI is used
+    velocityPid.setIZone(10.0);
     
     //devices 
     servo = new NeoServo(CAN.ELEVATOR_MAIN, positionPid, velocityPid, motors_inverted, SparkFlex.class);
