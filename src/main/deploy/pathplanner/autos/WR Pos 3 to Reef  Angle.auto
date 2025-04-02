@@ -30,6 +30,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.1
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -46,7 +52,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.5
+                        "waitTime": 1.4
                       }
                     },
                     {
@@ -64,19 +70,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.5
+            "waitTime": 1.3
           }
         },
         {
           "type": "named",
           "data": {
             "name": "DriveToReefTagRight"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Release"
           }
         }
       ]

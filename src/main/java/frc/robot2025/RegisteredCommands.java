@@ -58,7 +58,7 @@ public class RegisteredCommands {
             elevator_Subsystem.setHeight(Levels.PickUp); }));
         NamedCommands.registerCommand("PlaceL4", place4(Levels.LFour));
         NamedCommands.registerCommand("PlaceL3", place(Levels.LThree));
-        NamedCommands.registerCommand("PlaceL2", place(Levels.LTwo));
+        NamedCommands.registerCommand("PlaceL2", place(Levels.LTwo).withTimeout(2.0));
         NamedCommands.registerCommand("PlaceL1", place(Levels.LOne));
         NamedCommands.registerCommand("PickupAdjustment", new PickupAdjustment());
         // TODO - need a real pickup here
