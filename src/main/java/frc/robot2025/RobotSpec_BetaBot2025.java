@@ -9,7 +9,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.revrobotics.spark.SparkFlex;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -36,6 +38,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.autos.DeliveryCmdFactory;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
@@ -44,6 +47,7 @@ import frc.robot2025.subsystems.Sensors_Subsystem;
 import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.WristFLA;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_BetaBot2025 implements IRobotSpec {
@@ -231,6 +235,48 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     //enable chooser - builds autochooser list
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // build other auto commands Blue side coordinates, not using PP for start
+    double x1 = 7.10;
+    double x2 = 7.20;
+    double y1 = 6.80;
+    double y2 = 4.05;
+    double y3 = 1.8;
+    double wristl4 = 0.3;
+    DeliveryCmdFactory factory = new DeliveryCmdFactory("vision_odo");
+    
+    //Position 1
+    var pos1_part2 = factory.DeliverReefFromPickup("p1_part2", 2.0,
+    6, "left",   "left",
+    Levels.LThree, "L4", wristl4);
+    var pos1 = factory.DeliverReefStart("ZZZPos1_L3", 
+      new Pose2d( x1, y1, Rotation2d.fromDegrees(-135.0)),
+       1, 
+       "left", 
+      "left",
+      Levels.LThree, "L3", WristFLA.MID_POSITION, pos1_part2);
+    autoChooser.addOption(pos1.getName(), pos1);
+    
+    //Position 2
+    var pos2 = factory.DeliverReefStart("ZZZPos2_L3", 
+      new Pose2d( x2, y2, Rotation2d.fromDegrees(-180.0)),
+       2, 
+       "left", 
+      "none",
+      Levels.LFour, "L4", wristl4, null);
+    autoChooser.addOption(pos2.getName(), pos2);
+    
+    //Position 3
+    var pos3_part2 = factory.DeliverReefFromPickup("p3_part2", 2.0,
+    4, "left",   "left",
+    Levels.LFour, "L4", wristl4);    
+    var pos3 = factory.DeliverReefStart("ZZZPos3_L3", 
+      new Pose2d( x1, y3, Rotation2d.fromDegrees(135.0)),
+       3, 
+       "left", 
+      "right",
+      Levels.LThree, "L3", WristFLA.MID_POSITION, pos3_part2);    
+    autoChooser.addOption(pos3.getName(), pos3);
   }
 
   @Override

@@ -105,6 +105,7 @@ public class DriveToReefTag extends Command {
     Pose2d targetPose;
     Pose2d last_targetPose = null;
     int[] targetTags;
+    int[] orderedTags;
 
     //on Distance schedule
     double schedDistance = 0.0;
@@ -157,6 +158,9 @@ public class DriveToReefTag extends Command {
         targetTags = keysToInt(alliancePoses);
         LL.setTargetTags(targetTags);
 
+        //these are in driver order for no_vision_idx
+        orderedTags = (alliance == Alliance.Blue) ? TheField.ReefIdsBlue : TheField.ReefIdsRed;
+
         // check to see if we are close (d < .50m) to last completed/found tag
         // so if we can't see a tag and are close, just compute path
         // TODO - PP won't run a path closer than 0.5, so this isn't working 3/21/25
@@ -198,7 +202,7 @@ public class DriveToReefTag extends Command {
 
         // skip vision location if we were given an index
         if (no_vision_idx >=0 ) {
-            foundTag = targetTags[no_vision_idx];
+            foundTag = orderedTags[no_vision_idx];
         }
         
         // found a tag in our set, nearest I hope, build a path

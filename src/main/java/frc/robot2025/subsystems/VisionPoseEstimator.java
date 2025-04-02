@@ -149,8 +149,8 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
         // if we aren't moving and llValid, set m_odometry to use llPose
         if (llValid && bot_vel <= 0.05) {
-            //tracking comapare 
-            m_odometry.setPose(llPose);
+            //tracking comapare, resync odometry xy, keeps gyro
+            m_odometry.setTranslation(llPose.getTranslation());
             m_odoPose = m_odometry.getPose();
         }
         // update field objects
@@ -299,8 +299,16 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     
     @Override
     public void setAnglePose(Rotation2d rot) {
+        //keep xy, update rotation and gyro
         setPose(new Pose2d(llPose.getTranslation(), rot));
     }
+
+    @Override
+    public void setTranslation(Translation2d newPosition) {
+        // update the xy, but keeps gyro unchanged
+        setPose(new Pose2d(newPosition, gyro.getHeading()));
+    }
+
     @Override
     public Pose2d getPose() {
         return llPose;

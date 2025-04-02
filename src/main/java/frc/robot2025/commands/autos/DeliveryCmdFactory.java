@@ -1,11 +1,11 @@
 package frc.robot2025.commands.autos;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.robot2025.commands.AlianceAwareSetPose;
@@ -23,33 +23,53 @@ public class DeliveryCmdFactory {
 
     final OdometryInterface vpe;  //vision pose estimator
     final Elevator_Subsystem elevator; 
-    final SendableChooser<Command> chooser;
-
 
     //Factory is initialized by getting correct subsystems
     public DeliveryCmdFactory(String vpeName) {
         vpe = RobotContainer.getSubsystemOrNull(vpeName);
-        elevator = RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class);
-        chooser = RobotContainer.getRobotSpecs().getChooser();
+        elevator = RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class);       
     }
 
-    public Command DeliverReef(String cmdName,
+    public Command DeliverReefStart(String cmdName,
             Pose2d startPose, int reefPosition, String reefSide,  String pickupSide,
-            Levels eleLevel, String levelTrimName, double wristPos) {
+            Levels eleLevel, String levelTrimName, double wristPos, 
+            Command part2) {
         
         SequentialCommandGroup cmd = new SequentialCommandGroup();
         cmd.setName(cmdName);
         @SuppressWarnings("unchecked")
         AlianceAwareSetPose initPose = new AlianceAwareSetPose(startPose, vpe::setPose);
         DriveToReefTag toReef = new DriveToReefTag(reefSide, reefPosition);
-        DriveToPickupTag toPickup = new DriveToPickupTag(pickupSide);
+        // might not need to pickup, example position 2
+        Command toPickup = (pickupSide.startsWith("n")) ?
+                new PrintCommand("no pickup") :
+                new DriveToPickupTag(pickupSide);
         var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
         cmd.addCommands(initPose, toReef, eleCmd, toPickup);
-        
-        // add to our chooser
-        chooser.addOption(cmdName, cmd);
+        if (part2 != null) cmd.addCommands(part2);
+       
         return cmd;
     }
+
+    // deliver but don't set initial positons
+    public Command DeliverReefFromPickup(String cmdName, double wait,
+            int reefPosition, String reefSide, String pickupSide,
+            Levels eleLevel, String levelTrimName, double wristPos) {
+        
+        SequentialCommandGroup cmd = new SequentialCommandGroup();
+        cmd.setName(cmdName);
+        var pickup = new WaitCommand(wait);
+        DriveToReefTag toReef = new DriveToReefTag(reefSide, reefPosition);
+        // might not need to pickup, example position 2
+        Command toPickup = (pickupSide.startsWith("n")) ?
+                new PrintCommand("no pickup") :
+                new DriveToPickupTag(pickupSide);
+        var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
+        cmd.addCommands(pickup, toReef, eleCmd, toPickup);
+        
+        return cmd;
+    }
+
 
     public Command ElevatorDelivery(Levels eleLevel, String levelTrimName, double wristPos, double releaseCount ) {
         if (elevator == null) return new PrintCommand("No elevator found.");
