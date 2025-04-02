@@ -397,14 +397,15 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
 
     Matrix<N3, N1> getStdDev(double botvel, double distance ) {
+        return closeStdDevs;
         // not moving, rank this higher
-        if (botvel < 0.1) 
-            return closeStdDevs;
-        if ( distance < 0.5)
-            return closeStdDevs;
-        if (distance < 2.0)
-            return medStdDevs;
-        return farStdDevs;
+        // if (botvel < 0.1) 
+        //     return closeStdDevs;
+        // if ( distance < 0.5)
+        //     return closeStdDevs;
+        // if (distance < 2.0)
+        //     return medStdDevs;
+        // return farStdDevs;
         // use TBD to pick the stddev to log the vision estimate with
         //return medStdDevs;
     }
