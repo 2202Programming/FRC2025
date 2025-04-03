@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.lib2202.builder.Robot;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
@@ -25,6 +26,9 @@ public class DeliveryCmdFactory {
     final OdometryInterface vpe;  //vision pose estimator
     final Elevator_Subsystem elevator; 
     final DriveTrainInterface sdt;
+
+    // for coral eject 
+    final int releaseCount = 10;
 
     //Factory is initialized by getting correct subsystems
     public DeliveryCmdFactory(String vpeName) {
@@ -47,8 +51,15 @@ public class DeliveryCmdFactory {
         Command toPickup = (pickupSide.startsWith("n")) ?
                 new PrintCommand("no pickup") :
                 new DriveToPickupTag(pickupSide);
-        var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
-        cmd.addCommands(initPose, toReef, /*  eleCmd,*/ toPickup);
+        var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, releaseCount);
+        if (eleLevel == Levels.LFour) {
+            toReef.withDistanceScheduleCmd(eleCmd, 0.8);  //.8m worked 
+            cmd.addCommands(initPose, toReef, toPickup);
+        }
+        else {
+            // not doing l4, run eleCmd after we get there
+            cmd.addCommands(initPose, toReef, eleCmd, toPickup);
+        }        
         if (part2 != null) cmd.addCommands(part2);
         cmd.addRequirements(sdt);
         return cmd;
@@ -67,8 +78,15 @@ public class DeliveryCmdFactory {
         Command toPickup = (pickupSide.startsWith("n")) ?
                 new PrintCommand("no pickup") :
                 new DriveToPickupTag(pickupSide);
-        var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
-        cmd.addCommands(pickup, toReef, /* eleCmd,*/ toPickup);
+        var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, releaseCount);
+        if (eleLevel == Levels.LFour) {
+            toReef.withDistanceScheduleCmd(eleCmd, 0.8);  //.8m worked 
+            cmd.addCommands(pickup, toReef, toPickup);
+        }
+        else {
+            // not doing l4, run eleCmd after we get there
+            cmd.addCommands(pickup, toReef, eleCmd, toPickup);
+        }           
         cmd.addRequirements(sdt);
         return cmd;
     }
@@ -90,6 +108,8 @@ public class DeliveryCmdFactory {
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")));
         
+        var cmd2 = new PrintCommand("doing elevator delivery:" + eleLevel.toString());
+        if (Robot.isSimulation()) return cmd2;
         return cmd;
     }
 

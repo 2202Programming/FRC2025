@@ -237,6 +237,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // build other auto commands Blue side coordinates, not using PP for start
+    double pickupWait = 1.5;
     double bot_center_len = 0.875 / 2.0; //includes bumpers
     double x_cl = 7.118; //[m] alignment tape line
     double x1_3 = x_cl;
@@ -249,20 +250,33 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     double wristl4 = 0.3;
     DeliveryCmdFactory factory = new DeliveryCmdFactory("vision_odo");
     
-    //Position 1
-    var pos1_part2 = factory.DeliverReefFromPickup("p1_part2", 2.0,
+    //Position 1 L2/L4
+    var pos1_part2 = factory.DeliverReefFromPickup("p1_part2", pickupWait,
     6, "left",   "left",
-    Levels.LThree, "L4", wristl4);
-    var pos1 = factory.DeliverReefStart("ZZZPos1_L3", 
+    Levels.LFour, "L4", wristl4);
+    var pos1 = factory.DeliverReefStart("ZZZPos1_L2_L4", 
       new Pose2d( x1_3, y1, Rotation2d.fromDegrees(-135.0)),
-       1, 
-       "left", 
+      1, 
+      "left", 
       "left",
-      Levels.LThree, "L3", WristFLA.MID_POSITION, pos1_part2);
+      Levels.LTwo, "L2", WristFLA.MID_POSITION, pos1_part2);
     autoChooser.addOption(pos1.getName(), pos1);
+
+    //Position 1a L4/L2
+    var pos1a_part2 = factory.DeliverReefFromPickup("p1a_part2", pickupWait,
+      6, "left",   "left",
+      Levels.LTwo, "L2", WristFLA.MID_POSITION);
+  
+    var pos1a = factory.DeliverReefStart("ZZZPos1_L4_L2", 
+      new Pose2d( x1_3, y1, Rotation2d.fromDegrees(-135.0)),
+      1, 
+      "left", 
+      "left",
+      Levels.LFour, "L4", wristl4, pos1a_part2);
+    autoChooser.addOption(pos1a.getName(), pos1a);
     
-    //Position 2
-    var pos2 = factory.DeliverReefStart("ZZZPos2_L3", 
+    //Position 2 L4 only
+    var pos2 = factory.DeliverReefStart("ZZZPos2_L4_only", 
       new Pose2d( x2, y2, Rotation2d.fromDegrees(-180.0)),
        2, 
        "left", 
@@ -270,17 +284,31 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       Levels.LFour, "L4", wristl4, null);
     autoChooser.addOption(pos2.getName(), pos2);
     
-    //Position 3
-    var pos3_part2 = factory.DeliverReefFromPickup("p3_part2", 2.0,
+    //Position 3 L2/L4
+    var pos3_part2 = factory.DeliverReefFromPickup("p3_part2", pickupWait,
     4, "left",   "right",
     Levels.LFour, "L4", wristl4);    
-    var pos3 = factory.DeliverReefStart("ZZZPos3_L3", 
+    var pos3 = factory.DeliverReefStart("ZZZPos3_L2_l4", 
       new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
        3, 
        "left", 
       "right",
-      Levels.LThree, "L3", WristFLA.MID_POSITION, pos3_part2);    
+      Levels.LTwo, "L2", WristFLA.MID_POSITION, pos3_part2);    
     autoChooser.addOption(pos3.getName(), pos3);
+
+    // setup pos3a - L4/L2
+    var pos3a_part2 = factory.DeliverReefFromPickup("p3_part2", pickupWait,
+      4, "left",   "right",
+      Levels.LTwo, "L2", WristFLA.MID_POSITION);    
+    var pos3a = factory.DeliverReefStart("ZZZPos3_L4_L2", 
+      new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
+      3, 
+      "left", 
+      "right",
+      Levels.LFour, "L4", wristl4, pos3a_part2);    
+    autoChooser.addOption(pos3a.getName(), pos3a);
+
+
   }
 
   @Override
