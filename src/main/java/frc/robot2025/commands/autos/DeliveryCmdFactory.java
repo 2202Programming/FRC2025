@@ -48,7 +48,7 @@ public class DeliveryCmdFactory {
                 new PrintCommand("no pickup") :
                 new DriveToPickupTag(pickupSide);
         var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
-        cmd.addCommands(initPose, toReef, eleCmd, toPickup);
+        cmd.addCommands(initPose, toReef, /*  eleCmd,*/ toPickup);
         if (part2 != null) cmd.addCommands(part2);
         cmd.addRequirements(sdt);
         return cmd;
@@ -68,7 +68,7 @@ public class DeliveryCmdFactory {
                 new PrintCommand("no pickup") :
                 new DriveToPickupTag(pickupSide);
         var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
-        cmd.addCommands(pickup, toReef, eleCmd, toPickup);
+        cmd.addCommands(pickup, toReef, /* eleCmd,*/ toPickup);
         cmd.addRequirements(sdt);
         return cmd;
     }
