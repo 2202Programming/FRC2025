@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.subsystem.OdometryInterface;
+import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.AlianceAwareSetPose;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
@@ -23,11 +24,13 @@ public class DeliveryCmdFactory {
 
     final OdometryInterface vpe;  //vision pose estimator
     final Elevator_Subsystem elevator; 
+    final DriveTrainInterface sdt;
 
     //Factory is initialized by getting correct subsystems
     public DeliveryCmdFactory(String vpeName) {
         vpe = RobotContainer.getSubsystemOrNull(vpeName);
-        elevator = RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class);       
+        elevator = RobotContainer.getSubsystemOrNull(Elevator_Subsystem.class);
+        sdt = RobotContainer.getSubsystem("drivetrain");   
     }
 
     public Command DeliverReefStart(String cmdName,
@@ -47,7 +50,7 @@ public class DeliveryCmdFactory {
         var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
         cmd.addCommands(initPose, toReef, eleCmd, toPickup);
         if (part2 != null) cmd.addCommands(part2);
-       
+        cmd.addRequirements(sdt);
         return cmd;
     }
 
@@ -66,7 +69,7 @@ public class DeliveryCmdFactory {
                 new DriveToPickupTag(pickupSide);
         var eleCmd = ElevatorDelivery(eleLevel, levelTrimName, wristPos, 5);
         cmd.addCommands(pickup, toReef, eleCmd, toPickup);
-        
+        cmd.addRequirements(sdt);
         return cmd;
     }
 
