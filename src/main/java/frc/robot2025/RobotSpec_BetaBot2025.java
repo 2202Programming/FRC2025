@@ -262,12 +262,12 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       Levels.LTwo, "L2", WristFLA.MID_POSITION, pos1_part2);
     autoChooser.addOption(pos1.getName(), pos1);
 
-    //Position 1a L4/L2
+    //Position 1a L4/L4
     var pos1a_part2 = factory.DeliverReefFromPickup("p1a_part2", pickupWait,
       6, "left",   "left",
-      Levels.LTwo, "L2", WristFLA.MID_POSITION);
+      Levels.LFour, "L4",wristl4);
   
-    var pos1a = factory.DeliverReefStart("ZZZPos1_L4_L2", 
+    var pos1a = factory.DeliverReefStart("ZZZPos1_L4_L4", 
       new Pose2d( x1_3, y1, Rotation2d.fromDegrees(-135.0)),
       1, 
       "left", 
@@ -288,7 +288,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     var pos3_part2 = factory.DeliverReefFromPickup("p3_part2", pickupWait,
     4, "left",   "right",
     Levels.LFour, "L4", wristl4);    
-    var pos3 = factory.DeliverReefStart("ZZZPos3_L2_l4", 
+    var pos3 = factory.DeliverReefStart("ZZZPos3_L2_L4", 
       new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
        3, 
        "left", 
@@ -296,11 +296,11 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       Levels.LTwo, "L2", WristFLA.MID_POSITION, pos3_part2);    
     autoChooser.addOption(pos3.getName(), pos3);
 
-    // setup pos3a - L4/L2
+    // setup pos3a - L4/L4
     var pos3a_part2 = factory.DeliverReefFromPickup("p3_part2", pickupWait,
       4, "left",   "right",
-      Levels.LTwo, "L2", WristFLA.MID_POSITION);    
-    var pos3a = factory.DeliverReefStart("ZZZPos3_L4_L2", 
+      Levels.LFour, "L4", wristl4);    
+    var pos3a = factory.DeliverReefStart("ZZZPos3_L4_L4", 
       new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
       3, 
       "left", 
