@@ -237,11 +237,15 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // build other auto commands Blue side coordinates, not using PP for start
-    double x1 = 7.10;
-    double x2 = 7.20;
-    double y1 = 6.80;
-    double y2 = 4.05;
-    double y3 = 1.8;
+    double bot_center_len = 0.875 / 2.0; //includes bumpers
+    double x_cl = 7.118; //[m] alignment tape line
+    double x1_3 = x_cl;
+    double x2 = x_cl - bot_center_len;   // was 7.20
+    double y2 = 4.025; // center of field [m]
+    // dist from center for other positions, our offset stick + bot legth when rotated 45 deg
+    double dy = 2.00 + bot_center_len*Math.sqrt(2.0);   
+    double y1 = y2 + dy;  // Pos1 above pos 2
+    double y3 = y2 - dy;  // Pos3 below pos 2
     double wristl4 = 0.3;
     DeliveryCmdFactory factory = new DeliveryCmdFactory("vision_odo");
     
@@ -250,7 +254,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     6, "left",   "left",
     Levels.LThree, "L4", wristl4);
     var pos1 = factory.DeliverReefStart("ZZZPos1_L3", 
-      new Pose2d( x1, y1, Rotation2d.fromDegrees(-135.0)),
+      new Pose2d( x1_3, y1, Rotation2d.fromDegrees(-135.0)),
        1, 
        "left", 
       "left",
@@ -268,10 +272,10 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     
     //Position 3
     var pos3_part2 = factory.DeliverReefFromPickup("p3_part2", 2.0,
-    4, "left",   "left",
+    4, "left",   "right",
     Levels.LFour, "L4", wristl4);    
     var pos3 = factory.DeliverReefStart("ZZZPos3_L3", 
-      new Pose2d( x1, y3, Rotation2d.fromDegrees(135.0)),
+      new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
        3, 
        "left", 
       "right",

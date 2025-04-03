@@ -59,5 +59,7 @@ public class AlianceAwareSetPose extends InstantCommand {
         for (Consumer<Rotation2d> consumer : rotCallBacks) {
             consumer.accept(alliancePose.getRotation());
         }
+        // print what we were set too
+        DriverStation.reportWarning("*** AWSetPose() " + pose.toString(), false);
     }
 }
