@@ -79,7 +79,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight", ()-> {
         // Limelight position in robot coords - this has LL in the front of bot
-        Pose3d LimelightPosition = new Pose3d((0.7112 / 2.0) - .07, -0.275, .225,
+        Pose3d LimelightPosition = new Pose3d((0.7112 / 2.0) - .07, -0.28, .225,
           new Rotation3d(0.0, 10.0/DEGperRAD, 0.0));
         return new Limelight("limelight", LimelightPosition );
       })
@@ -239,7 +239,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     // build other auto commands Blue side coordinates, not using PP for start
     double pickupWait = 1.5;
     double bot_center_len = 0.875 / 2.0; //includes bumpers
-    double x_cl = 7.118; //[m] alignment tape line
+    double x_cl = 7.556; //[m] alignment tape line
     double x1_3 = x_cl;
     double x2 = x_cl - bot_center_len;   // was 7.20
     double y2 = 4.025; // center of field [m]

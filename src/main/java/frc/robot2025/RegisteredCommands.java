@@ -32,17 +32,18 @@ public class RegisteredCommands {
                 new setWristPos(WristFLA.MID_POSITION, name))
         );
     }
-    private static Command place4(Levels level){
+    
+    private static Command place4(Levels level) {
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-            new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(3.0),
-            new setWristPos(1.5, "L4")),
-            new setWristPos(0.3, "L4"), //position for L4 drop
-            new ReleaseCoral(),
-            new setWristPos(1.5, "L4"),
-            new ParallelCommandGroup(
-            new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
-            new setElevatorSetpoint(Levels.PickUp, "pickup")));
+                new ParallelCommandGroup(
+                        new setElevatorSetpoint(Levels.LFour, "L4").withTimeout(3.0),
+                        new setWristPos(1.5, "L4")),
+                new setWristPos(0.3, "L4"), // position for L4 drop
+                new ReleaseCoral(),
+                new setWristPos(1.5, "L4"),
+                new ParallelCommandGroup(
+                        new setWristPos(WristFLA.PICKUP_POSITION, "pickup").withTimeout(1.0),
+                        new setElevatorSetpoint(Levels.PickUp, "pickup")));
     }
 
     private static Command release(){

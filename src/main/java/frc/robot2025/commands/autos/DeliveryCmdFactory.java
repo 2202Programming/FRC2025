@@ -1,5 +1,7 @@
 package frc.robot2025.commands.autos;
 
+import java.lang.System.Logger.Level;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -94,8 +96,10 @@ public class DeliveryCmdFactory {
 
     public Command ElevatorDelivery(Levels eleLevel, String levelTrimName, double wristPos, double releaseCount ) {
         if (elevator == null) return new PrintCommand("No elevator found.");
+        Command cmd;
+        if (eleLevel == Levels.LFour) {
         // we have an elevator make a real command
-        var cmd = new SequentialCommandGroup (
+           cmd = new SequentialCommandGroup (
             //move elevator
             new ParallelCommandGroup(
                 new setElevatorSetpoint(eleLevel, levelTrimName).withTimeout(2.0),
@@ -103,11 +107,23 @@ public class DeliveryCmdFactory {
             new setWristPos(wristPos, levelTrimName),
             //eject coral
             new ReleaseCoral(releaseCount),
+            new setWristPos(1.5, "L4"),
             // return to pickup
             new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")));
-        
+        }else {
+            // L2, L3 
+            cmd = new SequentialCommandGroup (
+            new ParallelCommandGroup(
+                new setElevatorSetpoint(eleLevel, levelTrimName),
+                new setWristPos(WristFLA.MID_POSITION, levelTrimName)),
+            new ReleaseCoral(releaseCount),
+            new ParallelCommandGroup(
+                new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
+                new setElevatorSetpoint(Levels.PickUp, "pickup")));
+
+        }
         var cmd2 = new PrintCommand("doing elevator delivery:" + eleLevel.toString());
         if (Robot.isSimulation()) return cmd2;
         return cmd;
