@@ -48,6 +48,7 @@ import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.WristFLA;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.testBindings.DPLWristTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_BetaBot2025 implements IRobotSpec {
@@ -197,8 +198,10 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     
     // Competition bindings -  NOTE: OPR portion of comp binding disabled 
     // until done with integration.
-    BindingsCompetition.ConfigureCompetition(dc, true);
-    
+    BindingsCompetition.ConfigureCompetition(dc, false );  //TODO FIX ME ASAP true for comp
+    DPLWristTest.myBindings(dc);
+
+
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.

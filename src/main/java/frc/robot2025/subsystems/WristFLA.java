@@ -13,9 +13,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib2202.command.WatcherCmd;
 import frc.robot2025.Constants.AnalogIn;
 import frc.robot2025.Constants.CAN;
 
@@ -32,6 +35,9 @@ public class WristFLA extends SubsystemBase {
 
   private double distance = 0.0; // measured
   private double distanceCmd = 0.0; // commanded
+  private double output; // [-1,1] motor outs
+  private double voltage;
+
 
   public static final double PICKUP_POSITION = 1.8; // pickup position from source
   public static final double MID_POSITION = 1.5; // drop position for L2/3
@@ -45,7 +51,9 @@ public class WristFLA extends SubsystemBase {
     SparkBaseConfig driveCfg = new SparkMaxConfig().inverted(false).idleMode(IdleMode.kCoast);
     motor.configure(driveCfg, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // this setPosition() won't happen until robot is enabled
-    setPosition(2.5);    
+    setPosition(2.5); 
+
+    this.new WristWatcher();  //comment out when not needed
   }
 
   public void setPosition(double position) {
@@ -56,7 +64,6 @@ public class WristFLA extends SubsystemBase {
   @Override
   public void periodic() {
     distance = getDistance();
-    double output;
 
     if (!atSetpoint()) {
       if (distanceCmd >= distance) {
@@ -72,7 +79,8 @@ public class WristFLA extends SubsystemBase {
   }
 
   public double getDistance(){
-    return (vPositionSensor.getVoltage() - KV_offset) * KV;
+    voltage = vPositionSensor.getVoltage();
+    return (voltage - KV_offset) * KV;
   }
 
   //stop shouldn't be needed, should always drive to distanceCmd
@@ -82,6 +90,40 @@ public class WristFLA extends SubsystemBase {
 
   public boolean atSetpoint() {
     return bandBangController.atSetpoint();
+  }
+
+  
+  public class WristWatcher extends WatcherCmd {
+    // Table Entries
+    NetworkTableEntry NT_Voltage;
+    NetworkTableEntry NT_cmdPos;
+    NetworkTableEntry NT_pos;
+    NetworkTableEntry NT_output;
+
+    public WristWatcher() {
+    }
+
+    @Override
+    public String getTableName() {
+      return "WristFLA";
+    }
+
+    @Override
+    public void ntcreate() {
+      NetworkTable MonitorTable = getTable();
+      NT_Voltage = MonitorTable.getEntry("feedback V");
+      NT_cmdPos = MonitorTable.getEntry("cmd");
+      NT_pos = MonitorTable.getEntry("position");
+      NT_output = MonitorTable.getEntry("output");
+    }
+
+    @Override
+    public void ntupdate() {
+      NT_Voltage.setDouble(voltage);
+      NT_cmdPos.setDouble(distanceCmd);
+      NT_output.setDouble(output);
+      NT_pos.setDouble(distance);
+    }
   }
 
 }
