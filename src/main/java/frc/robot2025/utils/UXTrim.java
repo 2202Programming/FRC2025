@@ -1,7 +1,6 @@
 package frc.robot2025.utils;
 
 import java.util.ArrayList;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -19,63 +18,46 @@ public class UXTrim {
 
     //instance vars
     final DoubleSubscriber trimSub;
-    final DoubleTopic d_topic;
-
-    //data, and optional accessor, optional change callback
     double trim;
-    DoubleSupplier dataSupplier;
     Supplier<Boolean> changeCallback;
 
     public UXTrim(String name){
         this(name, 0.0);
     }
 
-    public UXTrim(String name, DoubleSupplier dataSupplier){
-        this(name, 0.0, dataSupplier);
-    }
-
-    public UXTrim(String name, double trim) {     
+    public UXTrim(String name, double default_trim) {     
+        DoubleTopic d_topic;
         changeCallback = null;
-        dataSupplier = null;
                 
         //create the topic, and subscribe
         d_topic = TrimTable.getDoubleTopic(name);
-        trimSub = d_topic.subscribe(trim);
+        trimSub = d_topic.subscribe(default_trim);
         // get the persisted value, if there is one
         this.trim = trimSub.get();
         // publish & persist
         d_topic.publish().set(this.trim);        
         d_topic.setPersistent(true);
-      
-        trims.add(this);
-    }
-
-    public UXTrim(String name, double trim, DoubleSupplier dataSupplier) {
-        this(name, trim);
-        this.dataSupplier = dataSupplier;
     }
 
     public double getValue() {
-        return dataSupplier.getAsDouble() + trim;
+        trim = trimSub.get();
+        return trim;
     }
 
     public double getValue(double value){
+        trim = trimSub.get();
         return value + trim;
-    }
-
-    public UXTrim addDoubleSupplier(DoubleSupplier dataSupplier) {
-        this.dataSupplier = dataSupplier;
-        return this;
     }
 
     public UXTrim addChangeCallback(Supplier<Boolean> callback) {
         changeCallback = callback;
+        trims.add(this);
         return this;
     }
 
     //Hook this into the robot loop somewhere 
     static public void periodic() {
-        //monitor subs for new trim values
+        //monitor subs for new trim values if they have a callback
         for (UXTrim uxTrim : trims) {
             double newval = uxTrim.trimSub.get();
             if (newval != uxTrim.trim) {
