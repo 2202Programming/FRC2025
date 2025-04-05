@@ -28,7 +28,7 @@ public class DeliveryCmdFactory {
     final DriveTrainInterface sdt;
 
     // for coral eject 
-    final int releaseCount = 10;
+    final int releaseCount = 25;
 
     //Factory is initialized by getting correct subsystems
     public DeliveryCmdFactory(String vpeName) {
@@ -104,7 +104,7 @@ public class DeliveryCmdFactory {
                 new setWristPos(1.5, "L4")),
             new setWristPos(wristPos, levelTrimName),
             //eject coral
-            new ReleaseCoral(releaseCount),
+            new ReleaseCoral(),
             new setWristPos(1.5, "L4"),
             // return to pickup
             new ParallelCommandGroup(
@@ -116,7 +116,7 @@ public class DeliveryCmdFactory {
             new ParallelCommandGroup(
                 new setElevatorSetpoint(eleLevel, levelTrimName),
                 new setWristPos(WristFLA.MID_POSITION, levelTrimName)),
-            new ReleaseCoral(releaseCount),
+            new ReleaseCoral(),
             new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                 new setElevatorSetpoint(Levels.PickUp, "pickup")));
