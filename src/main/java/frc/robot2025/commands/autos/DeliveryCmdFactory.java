@@ -115,7 +115,7 @@ public class DeliveryCmdFactory {
             cmd = new SequentialCommandGroup (
             new ParallelCommandGroup(
                 new setElevatorSetpoint(eleLevel, levelTrimName),
-                new setWristPos(WristFLA.MID_POSITION, levelTrimName)),
+                new setWristPos(WristFLA.MID_POSITION, levelTrimName)).withTimeout(2.0),
             new ReleaseCoral(),
             new ParallelCommandGroup(
                 new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
