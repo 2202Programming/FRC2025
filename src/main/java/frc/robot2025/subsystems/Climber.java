@@ -17,8 +17,9 @@ public class Climber extends SubsystemBase {
   NeoServo servo;
   PIDFController hwClimberVel_PID = new PIDFController(0.01, 0, 0, 1 / 540);
 
-  final double GearRatio = 9.0 * 5.0 * 4.0;
-  final double conversionFactor = 1.0 / GearRatio;
+  //TODO convert to deg/s units at the geared output
+  final double GearRatio = 9.0 * 5.0 * 4.0 * 6.1;  // 5/30/25 6.1 is approx for new gears/chain ratio
+  final double conversionFactor = 360.0 / GearRatio;  // [deg/rot ]
 
 ClimberWatcherCmd watcher;
 
@@ -31,13 +32,15 @@ ClimberWatcherCmd watcher;
   final double maxAccel = 0.75; // [winch rot/s/s]
   final double posTol = 0.01; // tol = tolerance [rot]
   final double velTol = 0.1; // [rot/s]
+  final double PowerUpPosition = 0.0; //[deg]
 
+  double cmdPos;
   double cmdVel;
 
   /** Creates a new Climber. */
   public Climber() {
     servo = new NeoServo(Constants.CAN.CLIMBER, new PIDController(0 ,0, 0), hwClimberVel_PID, motor_inverted);
-    servo.setConversionFactor(conversionFactor)
+    servo.setConversionFactor(conversionFactor)  // units should be [deg] and [deg/s]
         .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
         .setVelocityHW_PID(maxVel, maxAccel)
         .setTolerance(posTol, velTol)
@@ -45,6 +48,14 @@ ClimberWatcherCmd watcher;
         this.watcher = new ClimberWatcherCmd();
 
         watcher.ntcreate();
+    // We are going to use position command, so need to set power on POS
+    // this also means some PIT trim needs to be done when shutting off for a match
+    zero();
+  }
+
+  public void zero() {
+    servo.setVelocityCmd(0.0);
+    servo.setPosition(PowerUpPosition);   
   }
 
   // velocity control only used for testing, normal cmds will use position
@@ -94,11 +105,12 @@ ClimberWatcherCmd watcher;
     // This method will be called once per scheduler run
     this.servo.periodic();
 
-    watcher.ntupdate();
+    //watcher.ntupdate(); // no need to call ntupdate, watcher commands get scheduled like any other cmd
+    // @ Ben G.  Delete these comments when you understand why this isn't needed.
   }
 
   class ClimberWatcherCmd extends WatcherCmd {
-    NetworkTableEntry nt_cmdVelocity;
+    NetworkTableEntry nt_cmdVelocity;  
     NetworkTableEntry nt_measVelocity;
     NetworkTableEntry nt_measPosition;
     NetworkTableEntry nt_cmdPosition; // setpoint
@@ -116,6 +128,7 @@ ClimberWatcherCmd watcher;
       nt_measVelocity = table.getEntry("measVelocity");
       nt_measPosition = table.getEntry("measPosition");
       nt_cmdPosition = table.getEntry("cmdPosition");
+      nt_atSetpoint = table.getEntry("atSetpoint");
     }
 
     public void ntupdate() {
@@ -123,6 +136,7 @@ ClimberWatcherCmd watcher;
       nt_measVelocity.setDouble(getVelocity());
       nt_measPosition.setDouble(getPosition());
       nt_cmdPosition.setDouble(getSetpoint());
+      nt_atSetpoint.setBoolean(atSetpoint());
     }
   }
 }

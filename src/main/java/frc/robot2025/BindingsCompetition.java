@@ -17,6 +17,7 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.AlgaeRemoval;
+import frc.robot2025.commands.ClimberVelMove;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ElevatorCalibrate;
@@ -32,6 +33,7 @@ import frc.robot2025.commands.GroundIntake.PlaceSequence;
 import frc.robot2025.commands.GroundIntake.SetZero;
 import frc.robot2025.commands.GroundIntake.SpinRollers;
 import frc.robot2025.commands.GroundIntake.TopArmVel;
+import frc.robot2025.subsystems.Climber;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
@@ -115,6 +117,8 @@ public final class BindingsCompetition {
         var sideboard = dc.SwitchBoard();
         var generic_opr = dc.Operator();
         final Elevator_Subsystem elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
+        final Climber climber =  RobotContainer.getSubsystem(Climber.class);
+
         //final SignalLight signal = RobotContainer.getObjectOrNull("light");
 
         // buttons depend on what controller is plugged in
@@ -183,6 +187,10 @@ public final class BindingsCompetition {
             Cal.and(operator.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")));
             Cal.and(operator.leftTrigger().onTrue(new setWristPos(2.0, "test")));
             // Cal.and(operator.b().whileTrue(signal.getColorCommand(SignalLight.Color.BLUE)));
+            // New climber pitt calibration, no buttons need to use sideboard
+            Cal.and(sideboard.sw21()).whileTrue(new ClimberVelMove(5.0)); //[deg/s]
+            Cal.and(sideboard.sw22()).whileTrue(new ClimberVelMove(-5.0)); //[deg/s]
+            Cal.and(sideboard.sw23()).onTrue( new InstantCommand(() -> { climber.zero();} ));
         }
 
         else {

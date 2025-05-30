@@ -16,7 +16,7 @@ public class ClimberVelMove extends Command {
   public ClimberVelMove(double speed) {
     climber = RobotContainer.getSubsystem(Climber.class);
     this.speed = speed;
-    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.

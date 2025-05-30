@@ -8,31 +8,29 @@ import frc.robot2025.subsystems.Climber;
 public class ClimberPosition extends Command {
   final Climber climber;
   final double maxVel;
-  double desired;
 
-  public ClimberPosition(double maxVel) {
-    // 3.0 tested on test stand, good default value; re-tune when needed
-    this(3.0, maxVel);
+  public ClimberPosition(double position) {
+    this(position, 5.0); // pick a slow speed for testing if this api used
   }
 
-  public ClimberPosition(double pos, double maxVel) {
-    SmartDashboard.putNumber("Desired Pos", pos);
+  public ClimberPosition(double position, double maxVel) {
+    SmartDashboard.putNumber("Desired Pos", position);
     climber = RobotContainer.getSubsystem(Climber.class);
-    this.maxVel = maxVel;
+    this.maxVel = maxVel;  
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    desired = SmartDashboard.getNumber("Desired Pos", 0.0);
+    double cmdPos = SmartDashboard.getNumber("Desired Pos", 0.0);
     climber.setMaxVelocity(maxVel);
-    climber.setSetpoint(desired);
+    climber.setSetpoint(cmdPos);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climber.setVelocity(0.0);
+    //climber.setVelocity(0.0);  Don't need to do this, servo stays in positon mode
   }
 
   // Returns true when the command should end.
