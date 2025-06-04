@@ -15,11 +15,11 @@ import frc.lib2202.util.PIDFController;
 
 public class Climber extends SubsystemBase {
   NeoServo servo;
-  PIDFController hwClimberVel_PID = new PIDFController(0.01, 0, 0, 1 / 540);
+  PIDFController hwClimberVel_PID = new PIDFController(0.0, 0.0, 0.0, 5.0 / 180.0 / 1.2);
 
   //TODO convert to deg/s units at the geared output
-  final double GearRatio = 9.0 * 5.0 * 4.0 * 6.1;  // 5/30/25 6.1 is approx for new gears/chain ratio
-  final double conversionFactor = 360.0 / GearRatio;  // [deg/rot ]
+  final double GearRatio = 9.0 * 5.0 * 4.0 * 4.0; // sprocket gear is 64/16
+  final double conversionFactor = 360.0 / GearRatio;  // [deg/rot]
 
 ClimberWatcherCmd watcher;
 

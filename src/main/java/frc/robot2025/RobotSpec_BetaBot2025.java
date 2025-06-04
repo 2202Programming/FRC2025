@@ -39,6 +39,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
 import frc.robot2025.commands.autos.DeliveryCmdFactory;
+import frc.robot2025.subsystems.Climber;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.GroundIntake;
@@ -70,6 +71,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       })
       .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
+      .add(Climber.class)
       .add(Command.class, "ElevatorWatcher", () -> {
        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       })

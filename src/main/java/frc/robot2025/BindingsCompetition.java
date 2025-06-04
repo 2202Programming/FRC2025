@@ -188,8 +188,9 @@ public final class BindingsCompetition {
             Cal.and(operator.leftTrigger().onTrue(new setWristPos(2.0, "test")));
             // Cal.and(operator.b().whileTrue(signal.getColorCommand(SignalLight.Color.BLUE)));
             // New climber pitt calibration, no buttons need to use sideboard
-            Cal.and(sideboard.sw21()).whileTrue(new ClimberVelMove(5.0)); //[deg/s]
-            Cal.and(sideboard.sw22()).whileTrue(new ClimberVelMove(-5.0)); //[deg/s]
+            Cal.and(sideboard.sw21()).whileTrue(new ClimberVelMove(10.0)); //[deg/s]
+            Cal.and(sideboard.sw22()).whileTrue(new ClimberVelMove(-10.0)); //[deg/s]
+
             Cal.and(sideboard.sw23()).onTrue( new InstantCommand(() -> { climber.zero();} ));
         }
 
