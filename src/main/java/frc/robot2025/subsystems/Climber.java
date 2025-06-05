@@ -4,6 +4,8 @@
 
 package frc.robot2025.subsystems;
 
+import com.revrobotics.spark.SparkBase;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -15,8 +17,7 @@ import frc.lib2202.util.PIDFController;
 
 public class Climber extends SubsystemBase {
   NeoServo servo;
-  PIDFController hwClimberVel_PID = new PIDFController(0.0, 0.0, 0.0, 5.0 / 180.0 / 1.2);
-
+  PIDFController hwClimberVel_PID = new PIDFController(0.05, 0.0000100, 0.0, 5.0 / 180.0 / 1.2);
   //TODO convert to deg/s units at the geared output
   final double GearRatio = 9.0 * 5.0 * 4.0 * 4.0; // sprocket gear is 64/16
   final double conversionFactor = 360.0 / GearRatio;  // [deg/rot]
@@ -24,21 +25,24 @@ public class Climber extends SubsystemBase {
 ClimberWatcherCmd watcher;
 
   // Motor settings for Servo
-  final int STALL_CURRENT = 40;
-  final int FREE_CURRENT = 40;
+  final int STALL_CURRENT = 80;
+  final int FREE_CURRENT = 80;
   final boolean motor_inverted = true;
   // Servo speed/positions
-  final double maxVel = 0.75;  // [winch rot/s]
-  final double maxAccel = 0.75; // [winch rot/s/s]
-  final double posTol = 0.01; // tol = tolerance [rot]
-  final double velTol = 0.1; // [rot/s]
+  final double maxVel = 15.0;  // [winch deg/s]
+  final double maxAccel = 5.0; // [winch deg/s/s]
+  final double posTol = 0.1; // tol = tolerance [deg]
+  final double velTol = 1.0; // [deg/s]
   final double PowerUpPosition = 0.0; //[deg]
 
   double cmdPos;
   double cmdVel;
 
+  SparkBase controller;
+
   /** Creates a new Climber. */
   public Climber() {
+    hwClimberVel_PID.setIZone(200.0); //[deg/s]  outside this region ignore integral
     servo = new NeoServo(Constants.CAN.CLIMBER, new PIDController(0 ,0, 0), hwClimberVel_PID, motor_inverted);
     servo.setConversionFactor(conversionFactor)  // units should be [deg] and [deg/s]
         .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
@@ -46,11 +50,13 @@ ClimberWatcherCmd watcher;
         .setTolerance(posTol, velTol)
         .setMaxVelocity(maxVel);
         this.watcher = new ClimberWatcherCmd();
+        controller = servo.getController();
 
-        watcher.ntcreate();
-    // We are going to use position command, so need to set power on POS
-    // this also means some PIT trim needs to be done when shutting off for a match
-    zero();
+        servo.setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT);
+
+        // We are going to use position command, so need to set power on POS
+        // this also means some PIT trim needs to be done when shutting off for a match
+        zero();
   }
 
   public void zero() {
@@ -115,6 +121,8 @@ ClimberWatcherCmd watcher;
     NetworkTableEntry nt_measPosition;
     NetworkTableEntry nt_cmdPosition; // setpoint
     NetworkTableEntry nt_atSetpoint;
+    NetworkTableEntry nt_current;
+    NetworkTableEntry nt_appliedOutput;
     // add nt for pos when we add it
 
     @Override
@@ -129,6 +137,8 @@ ClimberWatcherCmd watcher;
       nt_measPosition = table.getEntry("measPosition");
       nt_cmdPosition = table.getEntry("cmdPosition");
       nt_atSetpoint = table.getEntry("atSetpoint");
+      nt_current = table.getEntry("mtrCurrent");
+      nt_appliedOutput = table.getEntry("appliedOutput");
     }
 
     public void ntupdate() {
@@ -137,6 +147,8 @@ ClimberWatcherCmd watcher;
       nt_measPosition.setDouble(getPosition());
       nt_cmdPosition.setDouble(getSetpoint());
       nt_atSetpoint.setBoolean(atSetpoint());
+      nt_current.setDouble(controller.getOutputCurrent());
+      nt_appliedOutput.setDouble(controller.getAppliedOutput());
     }
   }
 }
