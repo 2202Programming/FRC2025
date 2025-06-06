@@ -14,7 +14,7 @@ public class ClimberPosition extends Command {
   }
 
   public ClimberPosition(double position, double maxVel) {
-    SmartDashboard.putNumber("Desired Pos", position);
+    SmartDashboard.putNumber("Climber/Desired Pos", position);
     climber = RobotContainer.getSubsystem(Climber.class);
     this.maxVel = maxVel;  
   }
@@ -22,16 +22,16 @@ public class ClimberPosition extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double cmdPos = SmartDashboard.getNumber("Desired Pos", 0.0);
+    double cmdPos = SmartDashboard.getNumber("Climber/Desired Pos", 0.0);
     climber.setMaxVelocity(maxVel);
     climber.setSetpoint(cmdPos);
   }
 
   // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
+  //@Override
+  //public void end(boolean interrupted) {
     //climber.setVelocity(0.0);  Don't need to do this, servo stays in positon mode
-  }
+  //}
 
   // Returns true when the command should end.
   @Override
