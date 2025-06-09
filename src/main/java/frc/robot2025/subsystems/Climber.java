@@ -18,14 +18,14 @@ import frc.lib2202.util.PIDFController;
 
 public class Climber extends SubsystemBase {
   NeoServo servo;
+  boolean disable_servo = false;
+
   PIDFController hwVelocity_PID = new PIDFController(0.05, 0.0000100, 0.0, 5.0 / 180.0 / 1.2); // [deg/s]
   PIDController  swPosition_PID =  new PIDController(0 ,0, 0);  //[deg]
 
-  //TODO convert to deg/s units at the geared output
+  //convert to deg/s units at the geared output
   final double GearRatio = 9.0 * 5.0 * 4.0 * 4.0; // sprocket gear is 64/16
   final double conversionFactor = 360.0 / GearRatio;  // [deg/rot]
-
-ClimberWatcherCmd watcher;
 
   // Motor settings for Servo
   final int STALL_CURRENT = 80;
@@ -43,9 +43,11 @@ ClimberWatcherCmd watcher;
 
   final SparkBase controller;
   final SparkClosedLoopController cl_controller;
+  ClimberWatcherCmd watcher;
 
   /** Creates a new Climber. */
   public Climber() {
+    // setup any other hardware Pid values, like Izone 
     hwVelocity_PID.setIZone(200.0); //[deg/s]  outside this region ignore integral
 
     servo = new NeoServo(Constants.CAN.CLIMBER, swPosition_PID, hwVelocity_PID, motor_inverted);
@@ -118,13 +120,21 @@ ClimberWatcherCmd watcher;
     cl_controller.setIAccum(iaccum);
   }
 
+  public void setDutyCycleMode(double duty) {
+    // this is a hack to force the servo motor into power mode
+    // Return to normal servo mode with duty==0.0
+    disable_servo = !(duty == 0.0);
+    controller.set(duty);
+  }
+
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    this.servo.periodic();
-
-    //watcher.ntupdate(); // no need to call ntupdate, watcher commands get scheduled like any other cmd
-    // @ Ben G.  Delete these comments when you understand why this isn't needed.
+    // power mode testing, disable servo if testing with duty-cycle
+    if (!disable_servo) {
+      servo.periodic();
+    }
   }
 
   class ClimberWatcherCmd extends WatcherCmd {

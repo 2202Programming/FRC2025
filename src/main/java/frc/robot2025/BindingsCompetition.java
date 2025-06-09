@@ -17,6 +17,7 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.AlgaeRemoval;
+import frc.robot2025.commands.ClimberDutyCycleTest;
 import frc.robot2025.commands.ClimberVelMove;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
@@ -187,11 +188,12 @@ public final class BindingsCompetition {
             Cal.and(operator.rightBumper().whileTrue(new EndEffectorPercent(-0.7, "rightBumper")));
             Cal.and(operator.leftTrigger().onTrue(new setWristPos(2.0, "test")));
             // Cal.and(operator.b().whileTrue(signal.getColorCommand(SignalLight.Color.BLUE)));
+
             // New climber pitt calibration, no buttons need to use sideboard
             Cal.and(sideboard.sw21()).whileTrue(new ClimberVelMove(5.0)); //[deg/s]
             Cal.and(sideboard.sw22()).whileTrue(new ClimberVelMove(-5.0)); //[deg/s]
-
-            Cal.and(sideboard.sw23()).onTrue( new InstantCommand(() -> { climber.zero();} ));
+            Cal.and(sideboard.sw23()).onTrue(   new InstantCommand(() -> { climber.zero();} )); 
+            Cal.and(sideboard.sw24()).whileTrue(new ClimberDutyCycleTest(.5));  // use after stalled as test only
         }
 
         else {
