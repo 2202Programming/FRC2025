@@ -190,10 +190,10 @@ public final class BindingsCompetition {
             // Cal.and(operator.b().whileTrue(signal.getColorCommand(SignalLight.Color.BLUE)));
 
             // New climber pitt calibration, no buttons need to use sideboard
-            Cal.and(sideboard.sw21()).whileTrue(new ClimberVelMove(5.0)); //[deg/s]
+            Cal.and(sideboard.sw21()).whileTrue(new ClimberVelMove(15.0)); //[deg/s]
             Cal.and(sideboard.sw22()).whileTrue(new ClimberVelMove(-5.0)); //[deg/s]
             Cal.and(sideboard.sw23()).onTrue(   new InstantCommand(() -> { climber.zero();} )); 
-            Cal.and(sideboard.sw24()).whileTrue(new ClimberDutyCycleTest(.5));  // use after stalled as test only
+            Cal.and(sideboard.sw24()).whileTrue(new ClimberDutyCycleTest(.95));  // use after stalled as test only
         }
 
         else {

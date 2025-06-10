@@ -20,11 +20,11 @@ public class Climber extends SubsystemBase {
   NeoServo servo;
   boolean disable_servo = false;
 
-  PIDFController hwVelocity_PID = new PIDFController(0.05, 0.0000100, 0.0, 5.0 / 180.0 / 1.2); // [deg/s]
+  PIDFController hwVelocity_PID = new PIDFController(0.04, 0.0000100, 0.0, 5.0 / 180.0 / 1.2); // [deg/s]
   PIDController  swPosition_PID =  new PIDController(0 ,0, 0);  //[deg]
 
   //convert to deg/s units at the geared output
-  final double GearRatio = 9.0 * 5.0 * 4.0 * 4.0; // sprocket gear is 64/16
+  final double GearRatio = 9.0 * 5.0 * 5.0 * 4.0; // sprocket gear is 64/16
   final double conversionFactor = 360.0 / GearRatio;  // [deg/rot]
 
   // Motor settings for Servo
