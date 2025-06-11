@@ -18,6 +18,7 @@ import frc.lib2202.subsystem.hid.TMJoystickController;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.AlgaeRemoval;
 import frc.robot2025.commands.ClimberDutyCycleTest;
+import frc.robot2025.commands.ClimberPosition;
 import frc.robot2025.commands.ClimberVelMove;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
@@ -194,6 +195,9 @@ public final class BindingsCompetition {
             Cal.and(sideboard.sw22()).whileTrue(new ClimberVelMove(-5.0)); //[deg/s]
             Cal.and(sideboard.sw23()).onTrue(   new InstantCommand(() -> { climber.zero();} )); 
             Cal.and(sideboard.sw24()).whileTrue(new ClimberDutyCycleTest(.95));  // use after stalled as test only
+            // 60 deg capture,  19 deg lock onto cage
+            Cal.and(sideboard.sw25()).onTrue(new ClimberPosition(60.0, 15.0));
+            Cal.and(sideboard.sw26()).onTrue(new ClimberPosition(19.0, 15.0));
         }
 
         else {

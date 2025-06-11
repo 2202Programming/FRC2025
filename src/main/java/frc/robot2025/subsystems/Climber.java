@@ -20,15 +20,15 @@ public class Climber extends SubsystemBase {
   NeoServo servo;
   boolean disable_servo = false;
 
-  PIDFController hwVelocity_PID = new PIDFController(0.04, 0.0000100, 0.0, 5.0 / 180.0 / 1.2); // [deg/s]
-  PIDController  swPosition_PID =  new PIDController(0 ,0, 0);  //[deg]
+  PIDFController hwVelocity_PID = new PIDFController(0.04, 0.00000500, 0.0, 5.0 / 180.0 / 1.2); // [deg/s]
+  PIDController  swPosition_PID = new PIDController(3.0 ,0, 0);  //[deg]
 
   //convert to deg/s units at the geared output
   final double GearRatio = 9.0 * 5.0 * 5.0 * 4.0; // sprocket gear is 64/16
   final double conversionFactor = 360.0 / GearRatio;  // [deg/rot]
 
   // Motor settings for Servo
-  final int STALL_CURRENT = 80;
+  final int STALL_CURRENT = 100;
   final int FREE_CURRENT = 20;
   final boolean motor_inverted = true;
   // Servo speed/positions
@@ -173,7 +173,7 @@ public class Climber extends SubsystemBase {
       nt_cmdPosition.setDouble(getSetpoint());
       nt_atSetpoint.setBoolean(atSetpoint());
       nt_current.setDouble(controller.getOutputCurrent());
-      nt_appliedOutput.setDouble(controller.getAppliedOutput());
+      nt_appliedOutput.setDouble(controller.getAppliedOutput()*100.0);
       nt_Iacc.setDouble(cl_controller.getIAccum());
       nt_mtrTemp.setDouble(controller.getMotorTemperature());
 
