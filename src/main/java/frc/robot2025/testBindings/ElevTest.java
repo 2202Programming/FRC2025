@@ -16,7 +16,7 @@ import frc.robot2025.subsystems.VisionPoseEstimator;
 
 public class ElevTest {
     static OdometryInterface odo;
-     static String OdometryName = VisionPoseEstimator.class.getSimpleName();
+    static String OdometryName = VisionPoseEstimator.class.getSimpleName();
     static DriveTrainInterface sdt;
     static SignalLight signal;
 
