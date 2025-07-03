@@ -49,6 +49,7 @@ import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
 import frc.robot2025.subsystems.WristFLA;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.testBindings.Parade2025;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_BetaBot2025 implements IRobotSpec {
@@ -106,7 +107,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
       ;
 
   // Robot Speed Limits
-  RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(15.0), DegreesPerSecond.of(180.0));
+  RobotLimits robotLimits = new RobotLimits(FeetPerSecond.of(5.0), DegreesPerSecond.of(180.0));
 
   // Chassis
   double kWheelCorrectionFactor = 1.02;
@@ -209,6 +210,7 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     // ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
+    Parade2025.myBindings(dc);
 
     // FOR BOT ON BOARD you can configure bindings directly here
     // or create a binding file in ./testBindings/BotOnBoard<N>.java
