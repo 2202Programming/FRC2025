@@ -10,14 +10,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.swerve.AllianceAwareGyroReset;
 import frc.lib2202.command.swerve.RobotCentricDrive;
-import frc.lib2202.subsystem.hid.CommandSwitchboardController;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.ElevatorCalibrate;
 import frc.robot2025.commands.DropSequenceBaseCommands.ReleaseCoral;
 import frc.robot2025.commands.DropSequenceBaseCommands.setElevatorSetpoint;
 import frc.robot2025.commands.DropSequenceBaseCommands.setWristPos;
-import frc.robot2025.commands.GroundIntake.SetZero;
 import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.WristFLA;
@@ -42,17 +40,20 @@ public class Parade2025 {
                         new setWristPos(WristFLA.PICKUP_POSITION, "pickup"),
                         new setElevatorSetpoint(Levels.PickUp, "pickup"))));
 
-        driver.povUp().onTrue(new SequentialCommandGroup (
+        driver.povLeft().onTrue(new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        new setElevatorSetpoint(80, "L2").withTimeout(2.0))));
+
+        driver.povDown().onTrue(new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        new setElevatorSetpoint(35, "L2").withTimeout(2.0))));
+        
+        driver.povUp().onTrue(new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new setElevatorSetpoint(35, "L2").withTimeout(2.0),
-new setWristPos(WristFLA.MID_POSITION, "L2"))
-        ));
-        driver.povDown().onTrue(new SequentialCommandGroup (
-            new ParallelCommandGroup(
-            new setElevatorSetpoint(14, "L2").withTimeout(2.0),
-            new setWristPos(WristFLA.MID_POSITION, "L2"))));
-            driver.b().onTrue(new ElevatorCalibrate(-30.0));
-           // driver.a().onTrue(new SetZero());
-            driver.y().onTrue(new AllianceAwareGyroReset());
-    }   
+                new setElevatorSetpoint(110, "PL2").withTimeout(2.0))));
+                        
+        driver.b().onTrue(new ElevatorCalibrate(-30.0));
+        // driver.a().onTrue(new SetZero());
+        driver.y().onTrue(new AllianceAwareGyroReset());
+    }
 }
