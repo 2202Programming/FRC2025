@@ -196,8 +196,8 @@ public final class BindingsCompetition {
             Cal.and(sideboard.sw23()).onTrue(   new InstantCommand(() -> { climber.zero();} )); 
             Cal.and(sideboard.sw24()).whileTrue(new ClimberDutyCycleTest(.95));  // use after stalled as test only
             // 60 deg capture,  19 deg lock onto cage
-            Cal.and(sideboard.sw25()).onTrue(new ClimberPosition(60.0, 15.0));
-            Cal.and(sideboard.sw26()).onTrue(new ClimberPosition(19.0, 15.0));
+            Cal.and(sideboard.sw25()).onTrue(new ClimberPosition(-45.0, 90.0));
+            Cal.and(sideboard.sw26()).onTrue(new ClimberPosition(20.0, 90.0));
         }
 
         else {

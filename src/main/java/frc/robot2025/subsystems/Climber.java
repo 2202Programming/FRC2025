@@ -32,8 +32,8 @@ public class Climber extends SubsystemBase {
   final int FREE_CURRENT = 20;
   final boolean motor_inverted = true;
   // Servo speed/positions
-  final double maxVel = 15.0;  // [winch deg/s]
-  final double maxAccel = 10.0; // [winch deg/s/s]
+  final double maxVel = 100.0;  // [winch deg/s]
+  final double maxAccel = 75.0; // [winch deg/s/s]
   final double posTol =  1.0; // tol = tolerance [deg]
   final double velTol =  0.5; // [deg/s]
   final double PowerUpPosition = 0.0; //[deg]
