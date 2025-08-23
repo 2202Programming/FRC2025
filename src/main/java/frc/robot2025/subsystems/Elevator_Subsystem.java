@@ -34,9 +34,9 @@ public class Elevator_Subsystem extends SubsystemBase {
    */
   public enum Levels {
     LOne(0.0), 
-    LTwo(27.0), 
-    LThree(67.0), 
-    LFour(146.0),
+    LTwo(27.5), 
+    LThree(67.5), 
+    LFour(146.5),
     PickUp(0.0),
     PowerUp(0.0);
     public double height;

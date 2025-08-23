@@ -165,19 +165,19 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
         //BR -> FR
 
         modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,  -66.97) // 7/9/25 dpl/ds post parade recal, why???  //-95.8007)
+        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,  159.6999) // 7/9/25 dpl/ds post parade recal, why???  //-95.8007)
         .setInversions(false, true, false);
 
         modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle, -105.3806)
+        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle, -105.4684)
         .setInversions(true, true, false);
 
         modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle, 87.0553)
+        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle, 86.3521)
         .setInversions(false, true, false);
 
         modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle, -141.0646)
+        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle, -139.922)
         .setInversions(true, true, false);
 
     return modules;
