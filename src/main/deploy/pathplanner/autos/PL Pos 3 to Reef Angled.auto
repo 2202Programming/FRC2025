@@ -7,19 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos2 to Tags 10 or 21 Right"
+            "pathName": "PL_Pos3 face"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "PlaceL3"
+            "name": "DriveToReefTagLeft"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToPickupTagRight"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Comp Autos",
+  "folder": null,
   "choreoAuto": false
 }

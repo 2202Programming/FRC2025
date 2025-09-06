@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.pathing.MoveToPose;
+import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.util.ModMath;
 import frc.robot2025.Constants.TheField;
 import frc.robot2025.subsystems.Limelight;
@@ -25,23 +26,19 @@ import frc.robot2025.subsystems.LimelightHelpers;
 
 
 public class DriveToReefTag extends Command { 
-    //Robot left/right offsets for aligning with reef - TODO fix L/R values
-    static double LeftOffset =  -0.04;  //[m]
-    static double RightOffset = -0.39;  //[m]
-    static double BackupOffset = 0.55; //[m]
+    //Robot left/right offsets for aligning with reef
+    static double LeftOffset =  -0.11;  //[m]   was -0.09 4/3/25
+    static double RightOffset = -0.42;  //[m]
+    static double BackupOffset = 0.48;  //[m]   was .50
     static Rotation2d LLRot = Rotation2d.k180deg;
-                //Rotation2d.kZero;
-                //Rotation2d.kCW_90deg; // ll on side, need to add this for final pose
 
     static Map<Integer, Pose2d> blueReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> blueReefRight = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefLeft = new HashMap<Integer, Pose2d>();
     static Map<Integer, Pose2d> redReefRight = new HashMap<Integer, Pose2d>();
 
-    static PathConstraints constraints = new PathConstraints(2.5, 1.75, Math.PI, Math.PI / 2.0);
+    static PathConstraints constraints = new PathConstraints(2.5,1.75, Math.PI, Math.PI / 2.0);
 
-    //
-    @SuppressWarnings("unused")
     static void buildPositions(Map<Integer, Pose2d> map, int[] tags, double l_offset, double r_offset, boolean isLeft, boolean isRed) {
         // loop over given tags and build the 2d targets
         double x, y, rot;
@@ -65,16 +62,8 @@ public class DriveToReefTag extends Command {
             rotDirFlip = (isRed) ? !rotDirFlip : rotDirFlip;
 
             // figure out why way to shift for reef pole
-            double lr_offset;
-            if (!isRed) {
-                //blue
-                lr_offset = (isLeft) ?  l_offset : r_offset;
-            }
-            else {
-                //red
-                lr_offset = (isLeft) ? r_offset : l_offset;
-            }
-
+            double lr_offset = (isLeft) ?  l_offset : r_offset;
+           
             // adjust L/R - rotate based on which side the tags are on
             var lrRot =(rotDirFlip) ? 
                 rot2d.plus(Rotation2d.kCW_90deg) : 
@@ -102,14 +91,36 @@ public class DriveToReefTag extends Command {
     final Map<Integer, Pose2d> bluePoses;
     final Limelight LL;
     final String LLName;
+    final OdometryInterface odo;
+    final String odoName = "vision_odo";   //todo make an arg
+    final int no_vision_idx;
 
     // command vars set at init time
-    boolean done;
+    boolean failedAtInit;
     Command moveComand;
     Map<Integer, Pose2d> alliancePoses;
-    double TA_MIN = 0.28;  
+    double TA_MIN = 0.28;
+    int foundTag;
+    int last_usedTag;
+    Pose2d targetPose;
+    Pose2d last_targetPose = null;
+    int[] targetTags;
+    int[] orderedTags;
+
+    //on Distance schedule
+    double schedDistance = 0.0;
+    Command schedCommand = null;
+    boolean schedRunning = false;
+    boolean schedOnce = false;
 
     public DriveToReefTag(String reefSide) {
+        this(reefSide, -1);
+    }
+
+    public DriveToReefTag(String reefSide, int indexTag) {
+        // convert 1 ..6 to 0..5 or -1 if no target
+        no_vision_idx = (indexTag > 0 && indexTag <= 6) ? indexTag - 1 : -1;
+        odo = RobotContainer.getSubsystemOrNull(odoName);
         LL = RobotContainer.getObjectOrNull("limelight");
         LLName = (LL != null) ? LL.getName() : "no-ll-found";  //name if we need to use LLHelpers directly
 
@@ -125,8 +136,12 @@ public class DriveToReefTag extends Command {
     
     @Override
     public void initialize() {
-        done = true;
+        schedRunning = false;
+        schedOnce = false;
+        failedAtInit = true;
+        //protect from missng required ss
         if (LL == null) return;
+        if (odo == null) return;
         moveComand = null;       
 
         Alliance alliance;
@@ -136,24 +151,47 @@ public class DriveToReefTag extends Command {
         }
         else return; // no alliance, bail
 
+        failedAtInit = false; 
+
          // set LL targets to our reef only
         alliancePoses = (alliance == Alliance.Blue) ? bluePoses : redPoses;
-        int[] targetTags = keysToInt(alliancePoses);
+        targetTags = keysToInt(alliancePoses);
         LL.setTargetTags(targetTags);
 
-        //made it this far, start looking for reef tages in execute()
-        done = false;
+        //these are in driver order for no_vision_idx
+        orderedTags = (alliance == Alliance.Blue) ? TheField.ReefIdsBlue : TheField.ReefIdsRed;
+
+        // check to see if we are close (d < .50m) to last completed/found tag
+        // so if we can't see a tag and are close, just compute path
+        // TODO - PP won't run a path closer than 0.5, so this isn't working 3/21/25
+        var dist = (last_targetPose != null) ? odo.getDistanceToTranslation(last_targetPose.getTranslation()) : 99.0;
+        foundTag = (!LimelightHelpers.getTV(LLName) && dist < 0.50) ?  
+            last_usedTag :  //close, use last completed
+            0;              //wait for limelight
     }
 
     @Override
     public void execute() { 
         // just waiting for our move to finish, no need to look for tag.
-        if (moveComand != null) return;
+        if (moveComand != null) {
+            moveComand.execute();  //run our moveCommand
+
+            if (schedCommand != null && schedRunning) {
+                schedCommand.execute();
+            }
+            double distanceToTarget = odo.getDistanceToTranslation(targetPose.getTranslation());
+            // run our schedCommand if hasn't been done and we are close
+            if (schedCommand != null && !schedRunning && !schedOnce &&
+                distanceToTarget <= schedDistance) {
+                schedCommand.initialize();
+                schedRunning = true;
+                schedOnce = true;
+            }
+            return;
+        }
 
         // Look for our tags and create a moveTo if we find a quality tag       
-        int foundTag = 0;
-        if (LimelightHelpers.getTV(LLName) && 
-            LimelightHelpers.getTA(LLName) >= TA_MIN ) {
+        if (LimelightHelpers.getTV(LLName) ){
              // read LL for tag
             foundTag = (int)LimelightHelpers.getFiducialID(LLName);
         }
@@ -161,37 +199,88 @@ public class DriveToReefTag extends Command {
         if (RobotBase.isSimulation()) {
             foundTag = SimTesting.simGetTarget();
         }
+
+        // skip vision location if we were given an index
+        if (no_vision_idx >=0 ) {
+            foundTag = orderedTags[no_vision_idx];
+        }
         
         // found a tag in our set, nearest I hope, build a path
         if (foundTag > 0 ) {
-            Pose2d targetPose = alliancePoses.get(foundTag);
+            targetPose = alliancePoses.get(foundTag);
             // build path to target
-            if (targetPose == null) return;   // not a reff target on our side
+            if (targetPose == null) return;   // not a reef target on our side
 
-            moveComand = new MoveToPose("vision_odo", constraints, targetPose);
-            moveComand.schedule();           
+            moveComand = new MoveToPose(odoName, constraints, targetPose);
+
+            // now run the moveCommand in this command's context
+            if (moveComand != null) {                
+                moveComand.initialize();
+            }
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) {
-           if (moveComand != null && moveComand.isScheduled()) {
-             moveComand.cancel();
-           }
+        if (moveComand != null) {
+            moveComand.end(interrupted);
         }
+        if (schedCommand != null && schedRunning) {
+            schedCommand.end(interrupted);
+        }
+        // keep last foundTag for shortpath WIP
+        last_usedTag = foundTag;
+        last_targetPose = targetPose;
         //restore or normal tag list.
         LL.setTargetTagsAll();
     }
 
     @Override
     public boolean isFinished() {
-        if (moveComand != null) {
-            done = moveComand.isFinished();
+        if (failedAtInit) {
+            // If our preflight checks failed (or in the middle of init)
+            return true;
         }
-        return done;
+
+        // If there is no move command, we assume finished
+        boolean move_done = true;
+        if (moveComand != null) {
+            move_done = moveComand.isFinished();
+        }
+
+        boolean schedCmd_done;
+        if (schedCommand == null){
+            // No scheduled command exists, therefore nothing to do
+            schedCmd_done = true;
+        }else if (schedRunning){
+            // the command is running, let's check its status
+            schedCmd_done = schedCommand.isFinished();
+            if (schedCmd_done) {
+                // We are responsible for ending our child command if it is finished
+                schedCommand.end(false);
+                schedRunning = false;
+            }
+        }else if (schedOnce){
+            // The command exists and was run once but is not running, therefore it is done running
+            schedCmd_done = true;
+        }else {
+            // If we are here, the command exists and is not currently running and not done.
+            // Therefore it is not started
+
+            // If the move has finished, but the command has not been scheduled, then the command
+            // will never start. Set command to done and finish. IE give up.
+            schedCmd_done = move_done; 
+        }
+
+        // We are responsible for both commands, we are not done until they both are
+        return move_done && schedCmd_done;
     }
 
+    public DriveToReefTag withDistanceScheduleCmd(Command cmd, double distance) {
+        schedDistance = distance;
+        schedCommand = cmd;
+        return this;
+    }
 
     int[] keysToInt(Map<Integer, Pose2d> map) {
         var keys = map.keySet();

@@ -17,10 +17,12 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib2202.Constants;
 import frc.lib2202.command.WatcherCmd;
 import frc.lib2202.util.NeoServo;
 import frc.lib2202.util.PIDFController;
@@ -29,18 +31,17 @@ import frc.robot2025.Constants.DigitalIO;
 import frc.robot2025.utils.UXTrim;
 
 public class GroundIntake extends SubsystemBase {
-  // TODO change degree values once we know actual positions. these are
-  // placeholders - er
+ 
   public enum Position {
     POWERUP(0.0, 0.0), // pwr up could be different from ZERO
     ZERO(0.0, 0.0),
-    ALGAE_PICKUP(-45.0, 125.0),
-    ALGAE_PLACE(-45.0, 100.0), // algae place
-    ALGAE_REST(-45.0, 100.0),
-    CORAL_PICKUP(-12.0, 125.0),
-    CORAL_PLACE(-12.0, 45.0), // coral place
-    CORAL_REST(-12.0, 45.0),
-    FLOOR(0.0, 120.0);
+    ALGAE_PICKUP(-60.0, 135.0),
+    ALGAE_PLACE(-60.0, 100.0), // algae place
+    ALGAE_REST(-60.0, 100.0),
+    CORAL_PICKUP(-10.0, 135.0),
+    CORAL_PLACE(-10.0, 45.0), // coral place
+    CORAL_REST(-10.0, 45.0),
+    FLOOR(0.0, 135.0);
 
     public double topval;
     public double btmval;
@@ -53,11 +54,12 @@ public class GroundIntake extends SubsystemBase {
 
   // motor config constants
   final ClosedLoopSlot wheelSlot = ClosedLoopSlot.kSlot0;
-  final int wheelStallLimit = 10;
+  final int wheelStallLimit = 30;
   final int wheelFreeLimit = 5;
   final static double Kff = 0.005;
-  final PIDFController wheelPIDF = new PIDFController(0.0, 0.0, 0.0, Kff);  // kp was 0.015                                                                         
-  final static double wheelMtrGearRatio = 1.0 / 2.0; // 2 motor turns -> 1 wheel turn
+  final PIDFController wheelPIDF = new PIDFController(0.00025, 0.000000, 0.0, Kff);  // kp was 0.015                                                                         
+  final static double wheelMtrGearRatio = 2.0; // 2 motor turns -> 1 wheel turn
+  final LinearFilter wheelFilter = LinearFilter.singlePoleIIR(0.2, Constants.DT);
 
   final int StallCurrent = 40;
   final int FreeCurrent = 5;
@@ -67,22 +69,30 @@ public class GroundIntake extends SubsystemBase {
   final NeoServo btmServo;
   final SparkMax wheelMtr;
   final RelativeEncoder wheelMtr_encoder;
-  
+  double wheel_current; //[amps]
+  final double WheelCurrentTrip = 10.0;  //[amps] TBD
+  double wheel_cmd=0.0;   //requested speed, to compare for game piece detect
+  double wheel_speed; //measured speed
+  int wheel_stall = 0;
+  final int StallCountTrip = 3;
+  boolean has_gamepiece = false;
+
+
   // gates for piece detection
   DigitalInput coralSwitch = new DigitalInput(DigitalIO.GroundIntakeHasCoral);
   DigitalInput algeSwitch = new DigitalInput(DigitalIO.GroundIntakeHasAlgae);
 
   final SparkMaxConfig wheelMtr_cfg;
   final SparkClosedLoopController wheelMtr_ctrl;
-  public static final double WheelMaxVolts = 5.0;
+  //public static final double WheelMaxVolts = 5.0;
 
   PIDFController topHwAngleVelPID = new PIDFController(0.00075, 0.0, 0.0, 0.0013); // placeholder PIDs
   final PIDController topPositionPID = new PIDController(3.5, 0.0, 0.0);
 
   PIDFController btmHwAngleVelPID = new PIDFController(0.0007, 0.000001, 0.0, 0.0017);
-  final PIDController btmPositionPID = new PIDController(2.5, 0.0001, 0.0);
+  final PIDController btmPositionPID = new PIDController(3.5, 0.0007, 0.0); //kp = 2.5
 
-  final double topServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
+  final double topServoGR = (1.0 / 150.0) * 360.0; // 150:1 gearbox reduction * 360 degrees / turn
   final double btmServoGR = (1.0 / 45.0) * 360.0; // 45:1 gearbox reduction * 360 degrees / turn
 
   final double topIRange = 1.0; // degrees, default is infinity
@@ -142,9 +152,7 @@ public class GroundIntake extends SubsystemBase {
     this.new GroundIntakeWatcher();
 
     //testing PIDF smartdashboard stuff
-    topHwAngleVelPID.setName("topGndIn");
-   
-
+    //topHwAngleVelPID.setName("topGndIn");
   }
 
   public void setSetpoint(Position cmd) {
@@ -214,14 +222,17 @@ public class GroundIntake extends SubsystemBase {
   }
 
   public void setWheelSpeed(double speed) {
+    wheel_cmd = speed;
     wheelMtr_ctrl.setReference(speed, ControlType.kVelocity);
   }
 
   public void setWheelHold(double voltage){
-    double clampVoltage = Math.abs(voltage) <= WheelMaxVolts ? voltage : WheelMaxVolts;
-    clampVoltage = Math.copySign(clampVoltage, voltage);
-    wheelMtr_ctrl.setReference(clampVoltage, ControlType.kVoltage);
+    //wheel_cmd = 0.0;
+    //wheelMtr_ctrl.setReference(voltage, ControlType.kVoltage);
+    //setWheelSpeed(voltage); // HACK to test using slow speed to hold -er
+    wheelMtr.set(voltage); // double hack for % pwr 
   }
+
   public double getTopPosition() {
     return topServo.getPosition();
   }
@@ -249,10 +260,38 @@ public class GroundIntake extends SubsystemBase {
     // protect against bad motion
     topServo.periodic();
     btmServo.periodic();
+
+    wheel_current = wheelFilter.calculate(wheelMtr.getOutputCurrent());
+    wheel_speed = wheelMtr_encoder.getVelocity();
+
+    //count stalled wheel frames
+    if (Math.abs(wheel_cmd) > 1.0 && Math.abs(wheel_speed) < 0.5){
+      // wheel is stalled 
+      wheel_stall++;
+    } else {
+      wheel_stall = 0;
+    }
+
+    // use wheel motor current/speed to detect gamepiece
+    // when we don't have switches we expected, latch value until
+    // cleard by a command.
+    has_gamepiece = has_gamepiece || 
+        (wheel_current > WheelCurrentTrip  &&
+         wheel_stall > StallCountTrip) ;
+  }
+
+  //clears has_gamepiece latch
+  public void clearGamePiece() {
+    has_gamepiece = false;
+    wheel_stall = 0;
+  }
+
+  public boolean getLatchedHasGamePiece() {
+    return has_gamepiece;
   }
 
   public class GroundIntakeWatcher extends WatcherCmd {
-    // Table Entries odometry pose
+    // Table Entries 
     NetworkTableEntry NT_topVelocity;
     NetworkTableEntry NT_btmVelocity;
     NetworkTableEntry NT_wheelVelocity;
@@ -269,6 +308,8 @@ public class GroundIntake extends SubsystemBase {
     NetworkTableEntry NT_topGetIAccum;
     NetworkTableEntry NT_groundIntakeHasCoral;
     NetworkTableEntry NT_groundIntakeHasAlgae;
+    NetworkTableEntry NT_has_gamepiece;
+    NetworkTableEntry NT_wheel_current;
 
     public GroundIntakeWatcher() {
     }
@@ -295,14 +336,15 @@ public class GroundIntake extends SubsystemBase {
       NT_topAtSetpoint = MonitorTable.getEntry("is top at setpoint");
       NT_topGetIAccum = MonitorTable.getEntry("top IAccum");
       NT_cmdWheelVelocity = MonitorTable.getEntry("cmd wheel velocity");
-      NT_cmdWheelVelocity.setDouble(0.0);
+      NT_has_gamepiece = MonitorTable.getEntry("hasGP");
+      NT_wheel_current = MonitorTable.getEntry("wheel_current");
     }
 
     @Override
     public void ntupdate() {
       NT_topVelocity.setDouble(topServo.getVelocity());
       NT_btmVelocity.setDouble(btmServo.getVelocity());
-      NT_wheelVelocity.setDouble(wheelMtr_encoder.getVelocity());
+      NT_wheelVelocity.setDouble(wheel_speed);
       NT_hasCoral.setBoolean(senseCoral());
       NT_hasAlgae.setBoolean(senseAlgae());
       NT_topPos.setDouble(topServo.getPosition());
@@ -313,7 +355,10 @@ public class GroundIntake extends SubsystemBase {
       NT_btmCmdPos.setDouble(btmServo.getSetpoint());
       NT_topAtSetpoint.setBoolean(isTopAtSetpoint());
       NT_topGetIAccum.setDouble(topServo.getController().getClosedLoopController().getIAccum());
-      
+      NT_has_gamepiece.setBoolean(has_gamepiece);
+      NT_wheel_current.setDouble(wheel_current);
+      NT_cmdWheelVelocity.setDouble(wheel_cmd);
+
       //call the pidf update so we can edit pids
       topHwAngleVelPID.NT_update();
       btmHwAngleVelPID.NT_update();  // must setup name - testing no-op 

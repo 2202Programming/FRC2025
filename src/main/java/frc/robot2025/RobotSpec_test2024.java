@@ -12,9 +12,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -38,6 +36,7 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.TheField;
+import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.commands.distanceWatcher;
 // 2024 robot has a pigeon, so use its sensors, add LL4
@@ -207,18 +206,20 @@ public class RobotSpec_test2024 implements IRobotSpec {
             // XBox
             CommandXboxController driver = (CommandXboxController) generic_driver;
             // copy basic drive cmd from compBindings
-            driver.rightTrigger().whileTrue(new RobotCentricDrive(sdt, dc));
+            driver.rightBumper().whileTrue(new RobotCentricDrive(sdt, dc));
             driver.y().onTrue(new AllianceAwareGyroReset(true));
             // Driver will wants precision robot-centric throttle drive on left trigger
-            driver.leftTrigger().whileTrue(new ParallelCommandGroup(
+            driver.leftBumper().whileTrue(new ParallelCommandGroup(
                     new ScaleDriver(0.25),
-                    new RobotCentricDrive(sdt, dc)));           
+                    new RobotCentricDrive(sdt, dc)));      
+            driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
+            driver.rightTrigger().whileTrue(new DriveToReefTag("r"));
         } else {
             DriverStation.reportWarning("Bindings: No driver bindings set, check controllers.", false);
         }
 
          //setup test bindings
-         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp
+         DPLPathTest.myBindings(dc); //opr l/r-stickbutton, povUp, povDown, povL/R
          
          // Anything else that needs to run after binding/commands are created
         if (vpe != null) 
@@ -231,10 +232,6 @@ public class RobotSpec_test2024 implements IRobotSpec {
         SmartDashboard.putData(CommandScheduler.getInstance());
     }
 
-    @Override
-    public SendableChooser<Command> getRegisteredCommands() {    
-        return null; // RegisteredCommands.RegisterCommands();
-    }
 
     @Override
     public void setDefaultCommands() {

@@ -12,6 +12,8 @@ import frc.robot2025.subsystems.Wrist;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
+//this version not used, see WristFLA
+@Deprecated  
 public class WristToPos extends InstantCommand {
   Wrist servo = RobotContainer.getSubsystem(Wrist.class);
   double pos;

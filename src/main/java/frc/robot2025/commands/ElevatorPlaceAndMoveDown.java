@@ -11,7 +11,7 @@ import frc.robot2025.subsystems.Elevator_Subsystem;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-import frc.robot2025.subsystems.Wrist;
+import frc.robot2025.subsystems.WristFLA;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -21,7 +21,7 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
   Elevator_Subsystem elevator;
   EndEffector_Subsystem endEffector;
   Sensors_Subsystem sensors;
-  Wrist wrist;
+  WristFLA wrist;
   Levels setPoint;
 
   /** Creates a new ElevatorPlaceAndMoveDown2. */
@@ -29,7 +29,7 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
     endEffector = RobotContainer.getSubsystem("endEffectorSubsystem");
     sensors = RobotContainer.getSubsystem("sensors");
-    wrist = RobotContainer.getSubsystem(Wrist.class);
+    wrist = RobotContainer.getSubsystem(WristFLA.class);
 
     this.setPoint = setPoint;
 
@@ -38,7 +38,7 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
       end(true);
     } else {
       addCommands(new 
-        WristToPos(1.0)
+        WristFLAToPos(WristFLA.PICKUP_POSITION)
         .andThen(new ElevatorMove(setPoint))
         .andThen(new EndEffectorRPM(1000))
         .andThen(new WaitCommand(0.5))
@@ -48,12 +48,11 @@ public class ElevatorPlaceAndMoveDown extends SequentialCommandGroup {
         addCommands(new
         EndEffectorRPM(0)
         .andThen(new ElevatorMove(Levels.PickUp))
-        .andThen(new WristToPos(0.0))
+        .andThen(new WristFLAToPos(WristFLA.DROP_POSITION))
         );
       } else {
         System.out.println("******ERROR: Piece still found");
         end(true);
-        //TODO: HANDLE THIS BETTER!!
       }
     }
 

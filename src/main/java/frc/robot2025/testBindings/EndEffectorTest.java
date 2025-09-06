@@ -6,6 +6,7 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.robot2025.commands.EndEffectorPercent;
 import frc.robot2025.commands.WristToPos;
 
+@Deprecated  // switched to WristFLA
 public class EndEffectorTest {
     public static void myBindings(HID_Subsystem dc) {
 

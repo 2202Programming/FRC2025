@@ -28,6 +28,7 @@ import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.util.VisionWatchdog;
+import frc.robot2025.subsystems.SignalLight.Color;
 
 // Swerve Drive Train (drivetrain) must be created before Swerve-PoseEstimator
 
@@ -48,11 +49,13 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     final VisionWatchdog watchdog;
     final BaseLimelight limelight;
+    final Limelight  ll2025;    //temp way to acces new funcs this year
+    final SignalLight signal;
     
     // stddev based on distance/quality of tag
-    final Matrix<N3, N1> closeStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
-    final Matrix<N3, N1> medStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
-    final Matrix<N3, N1> farStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2));
+    final Matrix<N3, N1> closeStdDevs =VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(2.0));
+    final Matrix<N3, N1> medStdDevs =VecBuilder.fill(0.15, 0.15, Units.degreesToRadians(5.0));
+    final Matrix<N3, N1> farStdDevs =VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(15.0));
     
     boolean visionPoseUsingRotation = true; // read from drivetrain.useVisionRotation()
     boolean visionPoseEnabled = true;
@@ -62,6 +65,8 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     private double x_diff; // [m]
     private double y_diff; // [m]
     private double yaw_diff; // [deg]
+    private double bot_vel;
+    private boolean llValid = false;
 
     //vision systems limelight and photonvision(TBD)
     private Pose2d llPose;
@@ -93,6 +98,12 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         m_odometry = RobotContainer.getSubsystemOrNull("odometry");
         gyro = RobotContainer.getRobotSpecs().getHeadingProvider();
         limelight = RobotContainer.getSubsystemOrNull(limelightName);
+        signal = RobotContainer.getObjectOrNull("light");
+
+        if (limelight instanceof Limelight) {
+            ll2025 = (Limelight)limelight; //horrible hack
+        }
+        else ll2025 = null;
 
         altName = limelight.getName();  //debug
 
@@ -135,6 +146,14 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         m_odoPose = m_odometry.getPose();
         meas_pos = drivetrain.getSwerveModulePositions();
         llPose = updateEstimator();
+
+        // if we aren't moving and llValid, set m_odometry to use llPose
+        if (llValid && bot_vel <= 0.05) {
+            //tracking comapare, resync odometry xy, keeps gyro
+            m_odometry.setTranslation(llPose.getTranslation());
+            m_odoPose = m_odometry.getPose();
+        }
+        // update field objects
         m_field.setRobotPose(llPose);
         m_field_obj.setPose(m_odoPose);
 
@@ -142,8 +161,23 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         x_diff = (llPose.getX() - m_odoPose.getX());
         y_diff = (llPose.getY() - m_odoPose.getY());
         yaw_diff = (llPose.getRotation().getDegrees() - m_odoPose.getRotation().getDegrees());
+
+        SetSignal();
     }
 
+    void SetSignal() {
+        if(signal == null) return;
+
+        Color color = SignalLight.Color.RED; // nothing visible
+
+        if (!limelight.getRejectUpdate()) { // true = not valid
+            color = SignalLight.Color.GREEN;
+            if(bot_vel < 0.1) {
+                color = SignalLight.Color.BLUE;
+            }
+        }
+        signal.setLight(color);
+    }
     // helper functions
     SwerveDrivePoseEstimator initializeEstimator() {
         /*
@@ -165,14 +199,29 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     /** Updates the field relative position of the robot. */
     Pose2d updateEstimator() {
+        LimelightHelpers.PoseEstimate mt2;  // access full mt2 obj for distance to tag
+        double dist2Tag = 999.0;  //way out, incase no tag.
         prev_llPose = llPose;
+        llValid = false;  // true on !rejectUpdate
+
         // let limelight sub-system decide if we are good to use estimate
         // OK if it is run only intermittantly. Uses latency of vision pose.
         if (!limelight.getRejectUpdate()) { 
+            llValid = true;
             var pose = limelight.getBluePose();
             var ts = limelight.getVisionTimestamp();
+            if (ll2025 != null) {
+                mt2 = ll2025.getMt2();
+                dist2Tag = mt2.avgTagDist;
+            }
+             // speeds in robot-coords
+            var bot_speeds = drivetrain.getChassisSpeeds();
+            bot_vel = Math.hypot(bot_speeds.vxMetersPerSecond, bot_speeds.vyMetersPerSecond);
             
-            m_estimator.setVisionMeasurementStdDevs(farStdDevs);
+            //use sped/dist to weight 
+            Matrix<N3, N1> stdDev = getStdDev(bot_vel, dist2Tag);
+
+            m_estimator.setVisionMeasurementStdDevs(stdDev);
             m_estimator.addVisionMeasurement(pose, ts);
             if (watchdog != null)
                 watchdog.update(pose, prev_llPose);
@@ -250,8 +299,16 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
     
     @Override
     public void setAnglePose(Rotation2d rot) {
+        //keep xy, update rotation and gyro
         setPose(new Pose2d(llPose.getTranslation(), rot));
     }
+
+    @Override
+    public void setTranslation(Translation2d newPosition) {
+        // update the xy, but keeps gyro unchanged
+        setPose(new Pose2d(newPosition, gyro.getHeading()));
+    }
+
     @Override
     public Pose2d getPose() {
         return llPose;
@@ -346,8 +403,18 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
 
     } // monitor cmd class
 
-    Matrix<N3, N1> getStdDev() {
+
+    Matrix<N3, N1> getStdDev(double botvel, double distance ) {
+        return closeStdDevs;
+        // not moving, rank this higher
+        // if (botvel < 0.1) 
+        //     return closeStdDevs;
+        // if ( distance < 0.5)
+        //     return closeStdDevs;
+        // if (distance < 2.0)
+        //     return medStdDevs;
+        // return farStdDevs;
         // use TBD to pick the stddev to log the vision estimate with
-        return medStdDevs;
+        //return medStdDevs;
     }
 }

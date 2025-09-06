@@ -34,10 +34,10 @@ public class Elevator_Subsystem extends SubsystemBase {
    */
   public enum Levels {
     LOne(0.0), 
-    LTwo(40.0), 
-    LThree(80.0), 
-    LFour(147.5),
-    PickUp(3.0),
+    LTwo(27.5), 
+    LThree(67.5), 
+    LFour(146.5),
+    PickUp(0.0),
     PowerUp(0.0);
     public double height;
 
@@ -56,9 +56,9 @@ public class Elevator_Subsystem extends SubsystemBase {
   final DigitalInput zeroLimitSwitch = new DigitalInput(DigitalIO.ElevatorZeroLS);
   final int STALL_CURRENT = 60;
   final int FREE_CURRENT = 5;
-  final double elevatorMaxVel = 50.0; // [cm/s] rpm
-  final double elevatorMaxAccel = 50.0; // [cm/s^2]  servo may not enforce yet
-  final double elevatorPosTol = 0.5;  // [cm]
+  final double elevatorMaxVel = 175.0; // [cm/s] rpm
+  final double elevatorMaxAccel = 100.0; // [cm/s^2]  servo may not enforce yet
+  final double elevatorPosTol = 1.0;  // [cm]
   final double elevatorVelTol = 0.5;  // [cm]
   final double maxPos = 149.0; // [cm]
   final double minPos = -1.0;  // [cm]
@@ -82,7 +82,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     positionPid.setIZone(3.0);
     //hardware velocity pidf - holds values to send to hw, not actually run825
     velocityPid = new PIDFController(0.0008, 0.000025, 0.0000, 1.0/565.0); //1.0/800 before, 565 is vortex Kv
-    velocityPid.setIZone(20.0); //TODO: set this once value has been found, if KI is used
+    velocityPid.setIZone(10.0);
     
     //devices 
     servo = new NeoServo(CAN.ELEVATOR_MAIN, positionPid, velocityPid, motors_inverted, SparkFlex.class);
@@ -102,7 +102,7 @@ public class Elevator_Subsystem extends SubsystemBase {
       .setTolerance(elevatorPosTol, elevatorPosTol)
       .setVelocityHW_PID(elevatorMaxVel, elevatorMaxAccel)
       .setSmartCurrentLimit(STALL_CURRENT, FREE_CURRENT)
-      .setMaxVelocity(125.0)
+      .setMaxVelocity(175.0)
       .setClamp(minPos, maxPos);
     
     //setup follower motor
@@ -119,7 +119,7 @@ public class Elevator_Subsystem extends SubsystemBase {
     
     // power up starting position of servo
     servo.setPosition(Levels.PowerUp.height);
-    servo.getWatcher();
+   // servo.getWatcher();
   }
 
   @Override
@@ -148,18 +148,17 @@ public class Elevator_Subsystem extends SubsystemBase {
   double getFollowCurrent() {
     return followMotor.getOutputCurrent();
   }
-
   public void setHeight (Levels level) {
     setHeight(level.height); 
   }
 
   public void setHeight (double height) {
     if (height > getPosition()) {
-      servo.setMaxVelocity(100.0);
+      servo.setMaxVelocity(175.0);
       servo.setArbFeedforward(0.02);
     }
     else {  
-      servo.setMaxVelocity(80.0);
+      servo.setMaxVelocity(100.0);
     }
     servo.setSetpoint(height); 
   }

@@ -6,15 +6,15 @@ package frc.robot2025.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.Wrist;
 import frc.robot2025.subsystems.EndEffector_Subsystem;
 import frc.lib2202.builder.RobotContainer;
 import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
+import frc.robot2025.subsystems.WristFLA;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class PickupSequence extends Command {
   Elevator_Subsystem elevator;
-  Wrist wrist;
+  WristFLA wrist;
   EndEffector_Subsystem endEffector;
   Levels level;
   boolean station;
@@ -35,7 +35,7 @@ public class PickupSequence extends Command {
 
   public PickupSequence(Levels level, boolean station) {
     elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
-    wrist = RobotContainer.getSubsystem(Wrist.class);
+    wrist = RobotContainer.getSubsystem(WristFLA.class);
     endEffector = RobotContainer.getSubsystem(EndEffector_Subsystem.class);
     this.station = station;
     this.level = level;
@@ -60,7 +60,7 @@ public class PickupSequence extends Command {
       } else{
         elevator.setHeight(Levels.LOne);
       }
-        wrist.setPos(wrist.drop);
+        wrist.setPosition(WristFLA.DROP_POSITION);
         if(elevator.atSetpoint() && wrist.atSetpoint()){
           elevator.setVelocity(0);
           phase = Phase.WaitingForCoral;
@@ -90,7 +90,7 @@ public class PickupSequence extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    wrist.setPos(wrist.drop);
+    wrist.setPosition(WristFLA.DROP_POSITION);
     elevator.setHeight(Levels.LFour);
 
   }

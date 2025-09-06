@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.FeetPerSecond;
 import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.revrobotics.spark.SparkFlex;
 
@@ -20,9 +21,7 @@ import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
-import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.FieldCentricDrive;
-import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
@@ -35,15 +34,9 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.subsystems.Elevator_Subsystem;
-import frc.robot2025.subsystems.EndEffector_Subsystem;
-import frc.robot2025.subsystems.GroundIntake;
 import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
-import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
-import frc.robot2025.subsystems.Wrist;
-import frc.robot2025.testBindings.DPLPathTest;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_AlphaBot2025 implements IRobotSpec {
@@ -57,26 +50,29 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
         pdp.clearStickyFaults();
         return pdp;
       })
+      /*
       // .add(PneumaticsControl.class)
       .add(BlinkyLights.class, "LIGHTS", () -> {
         return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE3, CAN.CANDLE4);
       })
+        */
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
       })
+      /*/
       .add(GroundIntake.class)
       .add(Elevator_Subsystem.class)
       .add(Command.class, "ElevatorWatcher", () -> {
        return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       })
-
+*/
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
       .add(Limelight.class, "limelight", ()-> {
         // Limelight position in robot coords - this has LL in the front of bot
-        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, .21, .23,
-          new Rotation3d(0.0, 30.0/DEGperRAD, 0.0));
+        Pose3d LimelightPosition = new Pose3d(0.7112 / 2.0, -0.21, .23,
+          new Rotation3d(0.0, 12.0/DEGperRAD, 0.0));
         return new Limelight("limelight", LimelightPosition );
       })
       .add(SwerveDrivetrain.class, "drivetrain", () ->{
@@ -90,13 +86,15 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
       // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
       .addAlias(VisionPoseEstimator.class, "vision_odo")
       // below are optional watchers for shuffeleboard data - disable if need too.
-      .add(Wrist.class)
+      /*
+      .add(WristFLA.class)
       .add(SignalLight.class, "signal")
       .add(EndEffector_Subsystem.class)
       .add(Command.class, "endEffectorWatcher", () -> {
         return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
       })
       .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
+      */
       ;
 
   // Robot Speed Limits
@@ -193,13 +191,13 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     
     // Competition bindings -  NOTE: OPR portion of comp binding disabled 
     // until done with integration.
-    BindingsCompetition.ConfigureCompetition(dc, false);  // TESTING TODO - true for comp
+    BindingsCompetition.ConfigureCompetition(dc, false);
     
     // Place your test binding in ./testBinding/<yourFile>.java and call it here
     // comment out any conflicting bindings. Try not to push with your bindings
     // active. Just comment them out.
     
-    DPLPathTest.myBindings(dc); 
+    // DPLPathTest.myBindings(dc); 
     // ElevTest.myBindings(dc);
     // EndEffectorTest.myBindings(dc);
     // GITest.myBindings(dc);
@@ -220,10 +218,20 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     return true;
   }
 
+  SendableChooser<Command> autoChooser;
+
   @Override
-  public SendableChooser<Command> getRegisteredCommands() {
-    // no robot parts to support thse now
-    return RegisteredCommands.RegisterCommands();
+  public void setupRegisteredCommands() {
+    RegisteredCommandsTest.RegisterCommands(); 
+
+    //enable chooser - builds autochooser list
+    SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);   
+  }
+  
+  @Override
+  public SendableChooser<Command> getChooser() { 
+    return autoChooser;
   }
 
   @Override

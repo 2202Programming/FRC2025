@@ -7,43 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "P1 to Tags 11 or 20 Left"
+            "pathName": "Pos3 face tag"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "PlaceL3"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Reef Tags 11 or 20 (L) to Coral Source"
+            "name": "DriveToReefTagLeft"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "pickup station"
+            "name": "DriveToPickupTagRight"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "PlaceL3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PlaceL3"
+            "name": "DriveToReefTagLeft"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Comp Autos",
+  "folder": null,
   "choreoAuto": false
 }

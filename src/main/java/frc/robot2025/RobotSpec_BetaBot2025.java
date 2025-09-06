@@ -2,11 +2,17 @@ package frc.robot2025;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.FeetPerSecond;
+import static frc.lib2202.Constants.DEGperRAD;
 import static frc.lib2202.Constants.MperFT;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.revrobotics.spark.SparkFlex;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,6 +25,7 @@ import frc.lib2202.builder.RobotLimits;
 import frc.lib2202.builder.SubsystemConfig;
 import frc.lib2202.command.PDPMonitorCmd;
 import frc.lib2202.command.swerve.FieldCentricDrive;
+import frc.lib2202.subsystem.BlinkyLights;
 import frc.lib2202.subsystem.Odometry;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
@@ -31,8 +38,17 @@ import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig.CornerID;
 import frc.lib2202.util.PIDFController;
 import frc.robot2025.Constants.CAN;
+import frc.robot2025.commands.autos.DeliveryCmdFactory;
+import frc.robot2025.subsystems.Climber;
+import frc.robot2025.subsystems.Elevator_Subsystem;
+import frc.robot2025.subsystems.EndEffector_Subsystem;
+import frc.robot2025.subsystems.GroundIntake;
+import frc.robot2025.subsystems.Limelight;
 import frc.robot2025.subsystems.Sensors_Subsystem;
+import frc.robot2025.subsystems.SignalLight;
 import frc.robot2025.subsystems.VisionPoseEstimator;
+import frc.robot2025.subsystems.WristFLA;
+import frc.robot2025.subsystems.Elevator_Subsystem.Levels;
 import frc.robot2025.utils.UXTrim;
 
 public class RobotSpec_BetaBot2025 implements IRobotSpec {
@@ -47,13 +63,28 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
         return pdp;
       })
       // .add(PneumaticsControl.class)
+      .add(BlinkyLights.class, "LIGHTS", () -> {
+        return new BlinkyLights(CAN.CANDLE1, CAN.CANDLE2, CAN.CANDLE3, CAN.CANDLE4);
+      })
       .add(HID_Subsystem.class, "DC", () -> {
         return new HID_Subsystem(0.3, 0.9, 0.05);
+      })
+      .add(GroundIntake.class)
+      .add(Elevator_Subsystem.class)
+      .add(Climber.class)
+      .add(Command.class, "ElevatorWatcher", () -> {
+       return RobotContainer.getSubsystem(Elevator_Subsystem.class).getWatcher();
       })
 
       // Sensors, limelight and drivetrain all use interfaces, so make sure their alias names
       // match what is given here.
       .add(Sensors_Subsystem.class, "sensors")
+      .add(Limelight.class, "limelight", ()-> {
+        // Limelight position in robot coords - this has LL in the front of bot
+        Pose3d LimelightPosition = new Pose3d((0.7112 / 2.0) - .07, -0.28, .225,
+          new Rotation3d(0.0, 10.0/DEGperRAD, 0.0));
+        return new Limelight("limelight", LimelightPosition );
+      })
       .add(SwerveDrivetrain.class, "drivetrain", () ->{
           return new SwerveDrivetrain(SparkFlex.class);
       })
@@ -62,11 +93,15 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
         obj.new OdometryWatcher();
         return obj;
       })
-
       // VisonPoseEstimator needs LL and Odometry, adds simplename and alias to lookup
       .addAlias(VisionPoseEstimator.class, "vision_odo")
-
       // below are optional watchers for shuffeleboard data - disable if need too.
+      .add(WristFLA.class)
+      .add(SignalLight.class, "light", ()-> { return new SignalLight(); })
+      .add(EndEffector_Subsystem.class)
+      .add(Command.class, "endEffectorWatcher", () -> {
+        return RobotContainer.getSubsystem(EndEffector_Subsystem.class).getWatcher();
+      })
       .add(PDPMonitorCmd.class, ()->{ return new PDPMonitorCmd(); })
       ;
 
@@ -130,19 +165,19 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
         //BR -> FR
 
         modules[CornerID.FrontLeft.getIdx()] = new ModuleConfig(CornerID.FrontLeft,
-        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle, -95.624905875)
+        CAN.FR_CANCoder, CAN.FR_Drive, CAN.FR_Angle,  159.6999) // 7/9/25 dpl/ds post parade recal, why???  //-95.8007)
         .setInversions(false, true, false);
 
         modules[CornerID.FrontRight.getIdx()] = new ModuleConfig(CornerID.FrontRight,
-        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle, -105.82006325)
+        CAN.BR_CANCoder, CAN.BR_Drive, CAN.BR_Angle, -105.4684)
         .setInversions(true, true, false);
 
         modules[CornerID.BackLeft.getIdx()] = new ModuleConfig(CornerID.BackLeft,
-        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle, 89.2525541875)
+        CAN.FL_CANCoder, CAN.FL_Drive, CAN.FL_Angle, 86.3521)
         .setInversions(false, true, false);
 
         modules[CornerID.BackRight.getIdx()] = new ModuleConfig(CornerID.BackRight,
-        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle,  -140.625156625)
+        CAN.BL_CANCoder, CAN.BL_Drive, CAN.BL_Angle, -139.922)
         .setInversions(true, true, false);
 
     return modules;
@@ -191,11 +226,96 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     return true;
   }
 
+  SendableChooser<Command> autoChooser;
+
+  //setupRegisteredCommands() is called before any call to getChooser()
   @Override
-  public SendableChooser<Command> getRegisteredCommands() {
-    // no robot parts to support thse now
-    // return RegisteredCommands.RegisterCommands();
-    return null;
+  public void setupRegisteredCommands() {
+    // setup command registry for use in PP auto
+    RegisteredCommands.RegisterCommands();
+
+    //enable chooser - builds autochooser list
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // build other auto commands Blue side coordinates, not using PP for start
+    double pickupWait = 1.5;
+    double bot_center_len = 0.875 / 2.0; //includes bumpers
+    double x_cl = 7.556; //[m] alignment tape line
+    double x1_3 = x_cl;
+    double x2 = x_cl - bot_center_len;   // was 7.20
+    double y2 = 4.025; // center of field [m]
+    // dist from center for other positions, our offset stick + bot legth when rotated 45 deg
+    double dy = 2.00 + bot_center_len*Math.sqrt(2.0);   
+    double y1 = y2 + dy;  // Pos1 above pos 2
+    double y3 = y2 - dy;  // Pos3 below pos 2
+    double wristl4 = 0.3;
+    DeliveryCmdFactory factory = new DeliveryCmdFactory("vision_odo");
+    
+    //Position 1 L2/L4
+    var pos1_part2 = factory.DeliverReefFromPickup("p1_part2", pickupWait,
+    6, "left",   "left",
+    Levels.LFour, "L4", wristl4);
+    var pos1 = factory.DeliverReefStart("WI_Reg_Pos1_L2_L4", 
+      new Pose2d( x1_3, y1, Rotation2d.fromDegrees(-135.0)),
+      1, 
+      "left", 
+      "left",
+      Levels.LTwo, "L2", WristFLA.MID_POSITION, pos1_part2);
+    autoChooser.addOption(pos1.getName(), pos1);
+
+    //Position 1a L4/L4
+    var pos1a_part2 = factory.DeliverReefFromPickup("p1a_part2", pickupWait,
+      6, "left",   "left",
+      Levels.LFour, "L4",wristl4);
+  
+    var pos1a = factory.DeliverReefStart("WI_Reg_Pos1_L4_L4", 
+      new Pose2d( x1_3, y1, Rotation2d.fromDegrees(-135.0)),
+      1, 
+      "left", 
+      "left",
+      Levels.LFour, "L4", wristl4, pos1a_part2);
+    autoChooser.addOption(pos1a.getName(), pos1a);
+    
+    //Position 2 L4 only
+    var pos2 = factory.DeliverReefStart("WI_Reg_Pos2_L4_only", 
+      new Pose2d( x2, y2, Rotation2d.fromDegrees(-180.0)),
+       2, 
+       "left", 
+      "none",
+      Levels.LFour, "L4", wristl4, null);
+    autoChooser.addOption(pos2.getName(), pos2);
+    
+    //Position 3 L2/L4
+    var pos3_part2 = factory.DeliverReefFromPickup("p3_part2", pickupWait,
+    4, "left",   "right",
+    Levels.LFour, "L4", wristl4);    
+    var pos3 = factory.DeliverReefStart("WI_Reg_Pos3_L2_L4", 
+      new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
+       3, 
+       "left", 
+      "right",
+      Levels.LTwo, "L2", WristFLA.MID_POSITION, pos3_part2);    
+    autoChooser.addOption(pos3.getName(), pos3);
+
+    // setup pos3a - L4/L4
+    var pos3a_part2 = factory.DeliverReefFromPickup("p3_part2", pickupWait,
+      4, "left",   "right",
+      Levels.LFour, "L4", wristl4);    
+    var pos3a = factory.DeliverReefStart("WI_Reg_Pos3_L4_L4", 
+      new Pose2d( x1_3, y3, Rotation2d.fromDegrees(135.0)),
+      3, 
+      "left", 
+      "right",
+      Levels.LFour, "L4", wristl4, pos3a_part2);    
+    autoChooser.addOption(pos3a.getName(), pos3a);
+
+
+  }
+
+  @Override
+  public SendableChooser<Command> getChooser() { 
+    return autoChooser;
   }
 
   @Override

@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Pos3 get out of the way"
+            "pathName": "Pos2 go to Reef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DriveToReefTagLeft"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "No Potato Auto",
+  "folder": null,
   "choreoAuto": false
 }

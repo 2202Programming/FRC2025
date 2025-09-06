@@ -2,8 +2,7 @@ package frc.robot2025;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.IRobotSpec;
 import frc.lib2202.builder.RobotContainer;
@@ -14,9 +13,8 @@ import frc.lib2202.subsystem.swerve.IHeadingProvider;
 import frc.lib2202.subsystem.swerve.config.ChassisConfig;
 import frc.lib2202.subsystem.swerve.config.ModuleConfig;
 import frc.robot2025.Constants.CAN;
-import frc.robot2025.commands.ClimberPosition;
-import frc.robot2025.commands.ClimberVelMove;
-import frc.robot2025.subsystems.Climber;
+import frc.robot2025.commands.WristFLAToPos;
+import frc.robot2025.subsystems.WristFLA;
 
 public class RobotSpec_BotOnBoard3 implements IRobotSpec {
 
@@ -38,7 +36,8 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
             .add(HID_Subsystem.class, "DC", () -> {
                 return new HID_Subsystem(0.3, 0.9, 0.05);
             })
-            .add(Climber.class);
+            //.add(Climber.class);
+            .add(WristFLA.class);
 
     public RobotSpec_BotOnBoard3() {
         // add the specs to the ssconfig
@@ -71,21 +70,22 @@ public class RobotSpec_BotOnBoard3 implements IRobotSpec {
         // FOR BOT ON BOARD you can configure bindings directly here
         // and avoid messing with BindingsOther or Comp.
         HID_Subsystem dc = RobotContainer.getSubsystem("DC");
-        if (dc.Operator() instanceof CommandXboxController operator) {
-            operator.povUp().whileTrue(new ClimberVelMove(0.75));
-            operator.povDown().whileTrue(new ClimberVelMove(-0.75));
-            operator.rightBumper().onTrue(new ClimberPosition(3.0, 0.75));
+
+        if (dc.Operator() instanceof CommandXboxController) {
+            //operator.povUp().whileTrue(new ClimberVelMove(0.75));
+            //operator.povDown().whileTrue(new ClimberVelMove(-0.75));
+            //operator.rightBumper().onTrue(new ClimberPosition(3.0, 0.75));
+        } else if (dc.Operator() instanceof CommandPS4Controller operator) {
+            operator.triangle().onTrue(new WristFLAToPos(WristFLA.PICKUP_POSITION,"triangle"));
+            operator.square().onTrue(new WristFLAToPos(WristFLA.Q3_POSITION,"square"));
+            operator.circle().onTrue(new WristFLAToPos(WristFLA.MID_POSITION,"circle"));
+            operator.cross().onTrue(new WristFLAToPos(WristFLA.DROP_POSITION, "cross"));
         }
     }
 
     @Override
     public boolean burnFlash() {
         return false;
-    }
-
-    @Override
-    public SendableChooser<Command> getRegisteredCommands() {
-        return null;
     }
 
     @Override
