@@ -6,10 +6,13 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.pathing.MoveToPose;
+import frc.lib2202.command.swerve.AllianceAwareGyroReset;
+import frc.lib2202.command.swerve.RobotCentricDrive;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.DriveToPickupTag;
+import frc.robot2025.commands.DriveToReefTag;
 import frc.robot2025.subsystems.SignalLight;
 
 public final class DPLPathTest {
@@ -28,11 +31,24 @@ public final class DPLPathTest {
                 ? (CommandXboxController) dc.Operator()
                 : null;
 
+        CommandXboxController driver = (dc.Driver() instanceof CommandXboxController)
+                ? (CommandXboxController) dc.Driver()
+                : null;
+
         // if we have what we need, create our commands
         // signal is protected in the bound command
         if (odo != null && sdt != null && opr != null) {
             xboxOperator(opr);
         }
+
+        if (odo != null && sdt != null && driver != null) {
+            xboxDriver(driver, dc);
+        }
+    }
+
+    static void xboxDriver(CommandXboxController driver, HID_Subsystem dc) { //hack passing the full driver controls in when we don't need to
+        driver.y().onTrue(new AllianceAwareGyroReset(true));
+        driver.rightBumper().whileTrue(new RobotCentricDrive(sdt, dc));
     }
 
     static void xboxOperator(CommandXboxController opr) {
@@ -74,6 +90,9 @@ public final class DPLPathTest {
 
         opr.povLeft().whileTrue(new DriveToPickupTag("left"));
         opr.povRight().whileTrue(new DriveToPickupTag("right"));
+
+        opr.leftStick().whileTrue(new DriveToReefTag("l"));
+        opr.rightStick().whileTrue(new DriveToReefTag("r"));
     }
 
    
