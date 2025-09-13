@@ -21,11 +21,14 @@ public final class DPLPathTest {
     static String OdometryName = "vision_odo"; //VisionPoseEstimator.class.getSimpleName();
     static DriveTrainInterface sdt;
     static SignalLight signal;
+    static HID_Subsystem dc;
 
-    public static void myBindings(HID_Subsystem dc) {
+    public static void myBindings(HID_Subsystem _dc) {
+        dc = _dc;
         odo = RobotContainer.getObjectOrNull(OdometryName);  // or "odometry"
         sdt = RobotContainer.getObjectOrNull("drivetrain");
         signal = RobotContainer.getObjectOrNull("signal");
+        
         // get an xbox controller for the operator, or null
         CommandXboxController opr = (dc.Operator() instanceof CommandXboxController)
                 ? (CommandXboxController) dc.Operator()
@@ -42,24 +45,32 @@ public final class DPLPathTest {
         }
 
         if (odo != null && sdt != null && driver != null) {
-            xboxDriver(driver, dc);
+            xboxDriver(driver);
         }
     }
 
-    static void xboxDriver(CommandXboxController driver, HID_Subsystem dc) { //hack passing the full driver controls in when we don't need to
+    static void xboxDriver(CommandXboxController driver) { 
+        // minimal standard driver controls - gyro reset and robot centric
         driver.y().onTrue(new AllianceAwareGyroReset(true));
         driver.rightBumper().whileTrue(new RobotCentricDrive(sdt, dc));
     }
 
     static void xboxOperator(CommandXboxController opr) {
+        // my testing commands
+
         opr.a().onTrue(new InstantCommand( () ->{
-            //reset position to blue corner, near 0,0
-            Pose2d newPose = new Pose2d(0.45, 1.70, odo.getPose().getRotation());
-            odo.setPose(newPose);
+            ///WIP - clear odo history and sdt - keep last estimate as set point
+            //use when robot not moving, clearing odo,sdt history
+            Pose2d vision_current = odo.getPose();
+            //var vel = sdt.getChassisSpeeds();
+            odo.printPose();            
+            sdt.setPositions(0); //clear wheel positions,
+            ///Pose2d newPose = new Pose2d(0.45, 1.70, odo.getPose().getRotation());
+            odo.setPose(vision_current);
         }));
 
 
-        // test moveToPose
+        // test moveToPose - 1m forward in field coords
         opr.povUp().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
             // add 1m forward, field not robot.
