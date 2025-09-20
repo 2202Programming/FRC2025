@@ -226,7 +226,7 @@ public class RobotSpec_AlphaBot2025 implements IRobotSpec {
     RegisteredCommandsTest.RegisterCommands(); 
 
     //enable chooser - builds autochooser list
-    SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);   
   }
   
