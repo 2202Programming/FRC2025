@@ -3,6 +3,7 @@ package frc.robot2025.testBindings;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.pathing.MoveToPose;
@@ -13,6 +14,7 @@ import frc.lib2202.subsystem.hid.HID_Subsystem;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
 import frc.robot2025.commands.DriveToPickupTag;
 import frc.robot2025.commands.DriveToReefTag;
+import frc.robot2025.commands.ScaleDriver;
 import frc.robot2025.subsystems.SignalLight;
 
 public final class DPLPathTest {
@@ -39,14 +41,12 @@ public final class DPLPathTest {
                 : null;
 
         // if we have what we need, create our commands
-        // signal is protected in the bound command
-        if (odo != null && sdt != null && opr != null && driver != null) {
-            xboxOperator(opr);
-            xboxDriver(driver);
-        }
-
+        // signal light object is protected in the bound command       
         if (odo != null && sdt != null && driver != null) {
             xboxDriver(driver);
+        }
+        if (odo != null && sdt != null && opr != null) {
+            xboxOperator(opr);        
         }
     }
 
@@ -54,6 +54,19 @@ public final class DPLPathTest {
         // minimal standard driver controls - gyro reset and robot centric
         driver.y().onTrue(new AllianceAwareGyroReset(true));
         driver.rightBumper().whileTrue(new RobotCentricDrive(sdt, dc));
+
+        //other binding used by driver from comp bindings
+        // Driver will wants precision robot-centric throttle drive on left trigger
+        driver.leftBumper().whileTrue(new ParallelCommandGroup(
+                    new ScaleDriver(0.3),
+                    new RobotCentricDrive(sdt, dc)));
+        //drive to reef
+        driver.leftTrigger().whileTrue(new DriveToReefTag("left"));
+        driver.rightTrigger().whileTrue(new DriveToReefTag("right"));
+
+        //drive to pickup
+        driver.povLeft().whileTrue(new DriveToPickupTag("left"));
+        driver.povRight().whileTrue(new DriveToPickupTag("right"));
     }
 
     static void xboxOperator(CommandXboxController opr) {
@@ -89,6 +102,7 @@ public final class DPLPathTest {
             cmd.schedule();
         }));
 
+        // calc and execute a path - 1m forward in X field coords
         opr.povDown().onTrue(new InstantCommand(() -> {
             Pose2d currentPose = odo.getPose(); // field coords
             // add 1m forward, field not robot.
@@ -99,18 +113,7 @@ public final class DPLPathTest {
             cmd.setName("moveto-backup");     
             cmd.schedule();
         }));
+        
     }
-
-    static void xboxDriver(CommandXboxController driver) {
-        // l/r determined by view from driver's station
-        driver.leftTrigger().whileTrue(new DriveToReefTag("l"));
-        driver.rightTrigger().whileTrue(new DriveToReefTag("r"));
-        opr.povLeft().whileTrue(new DriveToPickupTag("left"));
-        opr.povRight().whileTrue(new DriveToPickupTag("right"));
-
-        opr.leftStick().whileTrue(new DriveToReefTag("l"));
-        opr.rightStick().whileTrue(new DriveToReefTag("r"));
-    }
-
    
 }
