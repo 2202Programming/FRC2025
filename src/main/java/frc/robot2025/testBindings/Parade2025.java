@@ -27,6 +27,7 @@ public class Parade2025 {
                 ? (CommandXboxController) dc.Driver()
                 : null;
 
+        @SuppressWarnings("unused")
         Elevator_Subsystem elevator = RobotContainer.getSubsystem(Elevator_Subsystem.class);
 
         DriveTrainInterface drivetrain = RobotContainer.getSubsystem("drivetrain");
