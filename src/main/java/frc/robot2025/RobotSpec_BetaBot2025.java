@@ -334,5 +334,22 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     UXTrim.periodic();
   }
 
+  @Override
+  public void disableInit(){
+    Limelight ll = RobotContainer.getSubsystem("limelight");
+
+    //200 is low frame rate for thermal management
+    ll.setThrottle(200);
+
+  }
+
+  @Override
+  public void disabledExit(){
+    Limelight ll = RobotContainer.getSubsystem("limelight");
+
+    //0? is max frame rate for game mode
+    ll.setThrottle(0);
+
+  }
 
 }

@@ -8,6 +8,7 @@ import static frc.lib2202.Constants.DEGperRAD;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.subsystem.BaseLimelight;
@@ -48,6 +49,17 @@ public class Limelight extends BaseLimelight {
     for (int i = 0; i < tgs.size(); i++)
       allTags[i] = tgs.get(i).ID;
   }
+
+  public void setThrottle(int throttle_value){
+   //We recommend setting this to 100-200 while disabled. Sets number of frames to skip between processed frames to reduce temperature rise. 
+   //Outputs are not zeroed during skipped frames.
+
+    System.out.println("***Pre-throttle change value: "+NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set"));
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(throttle_value);
+    System.out.println("***Post-throttle change value: "+NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set"));
+
+  }
+
 
   // Some helper methods not in the base, candidates for moving to baseclass, but
   // may be LL4
