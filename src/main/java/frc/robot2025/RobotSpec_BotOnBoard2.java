@@ -127,11 +127,7 @@ public class RobotSpec_BotOnBoard2 implements IRobotSpec {
 
     }
 
-    @Override
-    public boolean burnFlash() {
-        return false;
-    }
-
+   
     @Override
     public void setDefaultCommands() {
 

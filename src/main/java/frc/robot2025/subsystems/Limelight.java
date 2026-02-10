@@ -62,7 +62,7 @@ public class Limelight extends BaseLimelight {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    pipeline = nt_pipelineNTE.getInteger(0);
+    pipeline = (int)nt_pipelineNTE.getInteger(0);
 
     LimelightHelpers.SetRobotOrientation(name, gyro.getHeading().getDegrees(), 0, 0, 0, 0, 0);
     // LimelightHelpers.PoseEstimate mt1 =

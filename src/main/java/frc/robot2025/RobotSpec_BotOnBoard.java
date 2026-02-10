@@ -155,11 +155,6 @@ public class RobotSpec_BotOnBoard implements IRobotSpec {
     //BindingsOther.ConfigureOther(dc);
   }
 
-  @Override
-  public boolean burnFlash() {
-    return burnFlash;
-  }
-
 
   @Override
   public void setDefaultCommands() {

@@ -221,11 +221,6 @@ public class RobotSpec_BetaBot2025 implements IRobotSpec {
     SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
-  @Override
-  public boolean burnFlash() {
-    return true;
-  }
-
   SendableChooser<Command> autoChooser;
 
   //setupRegisteredCommands() is called before any call to getChooser()

@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib2202.builder.RobotContainer;
 import frc.lib2202.command.WatcherCmd;
-import frc.lib2202.command.swerve.AllianceAwareGyroReset;
+import frc.lib2202.command.pathing.AllianceAwareGyroReset;
 import frc.lib2202.subsystem.BaseLimelight;
 import frc.lib2202.subsystem.OdometryInterface;
 import frc.lib2202.subsystem.swerve.DriveTrainInterface;
@@ -231,30 +231,8 @@ public class VisionPoseEstimator extends SubsystemBase implements OdometryInterf
         return m_estimator.update(gyro.getRotation2d(), meas_pos);       
     }
 
-    //set drivetrain's pose if it's enabled
-    // This couples odometry by forcing it to take the LL pose.
-    // really we are incorporating the odometry measurements into the LLPoseEstimator.
-    // Should be able to have pathing users take this estimator's pose
-    @Deprecated
-    void useEstimate() {
-        visionPoseUsingRotation = m_odometry.useVisionRotation();
-        visionPoseEnabled = m_odometry.useVisionPose();
-        
-        Rotation2d current_rotation = m_odoPose.getRotation();
-        if (visionPoseEnabled) {           
-            if(watchdog != null) watchdog.update(llPose, prev_llPose);
-            if (visionPoseUsingRotation) {
-                // update robot pose, include vision-based rotation
-                m_odometry.setPose(llPose);
-            } else {
-                // update robot translation, do not update rotation
-                m_odometry.setPose(new Pose2d(llPose.getTranslation(), current_rotation));
-            }         
-        }
-    }
-
     public void configureGyroCallback(){
-        AllianceAwareGyroReset.AddCallback(this::setAnglePose);
+        AllianceAwareGyroReset.AddRotationCallback(this::setAnglePose);
     }
     
     
